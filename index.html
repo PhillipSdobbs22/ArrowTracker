@@ -22,7 +22,7 @@
     font-family:-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
     -webkit-font-smoothing:antialiased;}
   .mono{font-family:"SF Mono", ui-monospace, Menlo, Consolas, monospace;}
- 
+
   header{
     padding: max(18px, env(safe-area-inset-top)) 20px 16px;
     border-bottom:1px solid var(--line);
@@ -34,9 +34,9 @@
   }
   header h1{margin:0; font-size:22px; font-weight:650; letter-spacing:-.01em;}
   header p{margin:4px 0 0; font-size:13px; color:var(--dim);}
- 
+
   main{padding:16px 16px 100px; max-width:640px; margin:0 auto;}
- 
+
   .panel{
     background:var(--panel); border:1px solid var(--line); border-radius:14px;
     padding:16px; margin-bottom:16px;
@@ -45,7 +45,7 @@
     margin:0 0 14px; font-size:13px; text-transform:uppercase; letter-spacing:.1em;
     color:var(--dim); font-weight:600;
   }
- 
+
   .field{margin-bottom:12px;}
   .field:last-child{margin-bottom:0;}
   .field label{
@@ -62,7 +62,7 @@
   }
   .row2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
   .row3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;}
- 
+
   .btn{
     display:block; width:100%; text-align:center; padding:13px 16px;
     border-radius:10px; border:none; font-size:15px; font-weight:600;
@@ -72,7 +72,7 @@
   .btn-primary:active{background:var(--accent-dim);}
   .btn-ghost{background:transparent; color:var(--dim); border:1px solid var(--line);}
   .btn-sm{padding:9px 12px; font-size:13px; width:auto;}
- 
+
   .arrow-card{
     background:var(--panel); border:1px solid var(--line); border-radius:12px;
     padding:14px 16px; margin-bottom:10px;
@@ -91,13 +91,13 @@
   .arrow-card .del:active{color:var(--danger);}
   .arrow-card .actions{display:flex; gap:8px; margin-top:12px;}
   .arrow-card .actions .btn{flex:1;}
- 
+
   .empty{
     text-align:center; padding:40px 20px; color:var(--dim);
   }
   .empty .glyph{font-size:26px; margin-bottom:10px; opacity:.5;}
   .empty p{font-size:13px; margin:0; line-height:1.5;}
- 
+
   .toast{
     position:fixed; left:50%; bottom:24px; transform:translateX(-50%);
     background:var(--panel-2); border:1px solid var(--line); color:var(--text);
@@ -105,11 +105,11 @@
     opacity:0; pointer-events:none; transition:opacity .2s ease;
   }
   .toast.show{opacity:1;}
- 
+
   .count-tag{
     font-size:11px; color:var(--dim); font-family:"SF Mono", ui-monospace, monospace;
   }
- 
+
   /* Modal / shot logger */
   .modal-backdrop{
     position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:50;
@@ -127,11 +127,11 @@
   .modal-handle{width:36px; height:4px; background:var(--line); border-radius:2px; margin:0 auto 14px;}
   .modal h3{margin:0 0 2px; font-size:17px;}
   .modal .sub{font-size:12.5px; color:var(--dim); margin:0 0 14px;}
- 
+
   .target-wrap{display:flex; justify-content:center; margin:10px 0 16px;}
   svg.target{touch-action:none; display:block;}
   .target-hint{text-align:center; font-size:12px; color:var(--dim); margin-top:-8px; margin-bottom:14px;}
- 
+
   .chip-row{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px;}
   .chip{
     padding:7px 11px; border-radius:16px; border:1px solid var(--line);
@@ -139,7 +139,7 @@
     font-family:"SF Mono", ui-monospace, monospace; cursor:pointer;
   }
   .chip.active{background:var(--accent); color:#1a1408; border-color:var(--accent);}
- 
+
   .shot-list{margin-top:14px;}
   .shot-row{
     display:flex; justify-content:space-between; align-items:center;
@@ -149,7 +149,7 @@
   .shot-row .oa{font-family:"SF Mono", ui-monospace, monospace; color:var(--dim);}
   .shot-row .rm{background:none; border:none; color:var(--dim); font-size:12px;}
   .shot-row .rm:active{color:var(--danger);}
- 
+
   .rec-panel{
     background:var(--panel-2); border:1px solid var(--line); border-radius:10px;
     padding:12px 14px; margin-top:14px;
@@ -159,29 +159,48 @@
   .rec-panel .rec-table{margin-top:10px; font-size:12px; font-family:"SF Mono",ui-monospace,monospace;}
   .rec-panel .rec-table div{display:flex; justify-content:space-between; padding:3px 0; color:var(--dim);}
   .rec-panel .rec-table div.best{color:var(--text);}
- 
+
   .close-modal{
     position:absolute; top:14px; right:16px; background:var(--panel-2);
     border:1px solid var(--line); color:var(--dim); width:30px; height:30px;
     border-radius:50%; font-size:15px; line-height:1;
   }
+
+  .field-row{display:flex; gap:8px; align-items:flex-end;}
+  .field-row .field{flex:1; margin-bottom:0;}
+  .field-row .btn{width:auto; white-space:nowrap;}
+  .hint{font-size:11px; color:var(--dim); margin-top:6px; line-height:1.4;}
+  .panel-actions{display:flex; gap:8px; margin-top:10px;}
+  .panel-actions .btn{flex:1;}
 </style>
 </head>
 <body>
- 
+
 <header>
   <div class="eyebrow">Arrow Tracker · v0.2</div>
   <h1>Fleet Log</h1>
   <p>Log each shaft's specs, then log shots by orientation to see what's actually working.</p>
 </header>
- 
+
 <main>
   <div class="panel">
     <h2>Add arrow</h2>
-    <div class="field">
-      <label for="f-id">Arrow ID</label>
-      <input id="f-id" type="text" placeholder="e.g. Arrow 7" autocomplete="off">
+    <div class="field-row">
+      <div class="field">
+        <label for="f-id-select">Arrow ID</label>
+        <select id="f-id-select">
+          <option value="">Import list below, or choose Other</option>
+          <option value="__other__">Other (type manually)</option>
+        </select>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="import-btn" type="button">Import list</button>
+      <input type="file" id="import-file" accept=".csv,text/csv" style="display:none;">
     </div>
+    <div class="field" id="f-id-custom-wrap" style="display:none;">
+      <label for="f-id-custom">Arrow ID (manual)</label>
+      <input id="f-id-custom" type="text" placeholder="e.g. Arrow 7 CustomName" autocomplete="off">
+    </div>
+    <p class="hint" id="import-hint">No arrow list imported yet. In Excel, export column A of the LSI Calculator sheet (Arrow ID) as a one-column CSV, then tap "Import list" and pick that file.</p>
     <div class="row3">
       <div class="field">
         <label for="f-spine">Spine (in)</label>
@@ -202,7 +221,7 @@
     </div>
     <button class="btn btn-primary" id="save-btn" style="margin-top:4px;">Save arrow</button>
   </div>
- 
+
   <div class="panel" style="padding-bottom:6px;">
     <h2 style="display:flex; justify-content:space-between; align-items:center;">
       <span>Fleet</span>
@@ -213,60 +232,81 @@
       <div class="glyph">◎</div>
       <p>No arrows logged yet.<br>Add your first one above.</p>
     </div>
+    <div class="panel-actions">
+      <button class="btn btn-ghost btn-sm" id="export-btn" style="width:100%;">Export shots to CSV (for Impact Data)</button>
+    </div>
   </div>
 </main>
- 
+
 <div class="toast" id="toast"></div>
- 
+
 <div class="modal-backdrop" id="modal-backdrop"></div>
 <div class="modal" id="modal">
   <button class="close-modal" id="modal-close">✕</button>
   <div class="modal-handle"></div>
   <h3 id="modal-title">Log shot</h3>
   <p class="sub" id="modal-sub"></p>
- 
+
   <div class="field">
     <label>Orientation (deg)</label>
     <div class="chip-row" id="orient-chips"></div>
   </div>
- 
+
+  <div class="row2">
+    <div class="field">
+      <label for="f-distance">Distance (yd)</label>
+      <input id="f-distance" type="number" inputmode="decimal" step="1" placeholder="20">
+    </div>
+    <div class="field">
+      <label for="f-bow">Bow (optional)</label>
+      <input id="f-bow" type="text" placeholder="e.g. Genesis (NASP)" autocomplete="off">
+    </div>
+  </div>
+
   <div class="target-wrap">
     <svg class="target" id="target-svg" width="260" height="260" viewBox="0 0 260 260"></svg>
   </div>
   <p class="target-hint">Tap where the shot landed relative to center</p>
- 
+  <div class="field-row" style="margin-bottom:14px;">
+    <div class="field">
+      <label for="f-radius">Target radius shown above (in)</label>
+      <input id="f-radius" type="number" inputmode="decimal" step="0.5" placeholder="6">
+    </div>
+  </div>
+  <p class="hint" style="margin-top:-8px; margin-bottom:14px;">Set this once to the real-world radius your tap circle represents (e.g. scoring ring radius on your paper). It's used to convert taps into LR/UD inches for export. Saved for next time.</p>
+
   <div class="rec-panel" id="rec-panel" style="display:none;">
     <div class="rec-label" style="font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--dim); font-family:'SF Mono',ui-monospace,monospace;">Recommended orientation</div>
     <div class="rec-orient" id="rec-orient">—</div>
     <div class="rec-conf" id="rec-conf">—</div>
     <div class="rec-table" id="rec-table"></div>
   </div>
- 
+
   <div class="shot-list" id="shot-list"></div>
 </div>
- 
+
 <script>
 const listEl = document.getElementById('list');
 const emptyEl = document.getElementById('empty-state');
 const countEl = document.getElementById('count-tag');
 const toastEl = document.getElementById('toast');
- 
+
 const ORIENTATIONS = Array.from({length:16}, (_,i)=> i*22.5);
- 
+
 function showToast(msg){
   toastEl.textContent = msg;
   toastEl.classList.add('show');
   setTimeout(()=> toastEl.classList.remove('show'), 1600);
 }
- 
+
 function escapeHtml(s){
   return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
- 
+
 function fmtDeg(d){
   return (Number.isInteger(d) ? d : d.toFixed(1)) + '\u00b0';
 }
- 
+
 // ---------- storage ----------
 function loadArrows(){
   try{
@@ -288,7 +328,26 @@ function saveShots(shots){
   try{ localStorage.setItem('shots', JSON.stringify(shots)); return true; }
   catch(e){ console.error('Storage error', e); return false; }
 }
- 
+function loadArrowIdList(){
+  try{
+    const raw = localStorage.getItem('arrowIdList');
+    return raw ? JSON.parse(raw) : [];
+  } catch(e){ console.error('Storage error', e); return []; }
+}
+function saveArrowIdList(list){
+  try{ localStorage.setItem('arrowIdList', JSON.stringify(list)); return true; }
+  catch(e){ console.error('Storage error', e); return false; }
+}
+function loadTargetRadius(){
+  const raw = localStorage.getItem('targetRadiusInches');
+  const n = raw ? parseFloat(raw) : NaN;
+  return Number.isFinite(n) && n > 0 ? n : 6; // default 6" if never set
+}
+function saveTargetRadius(inches){
+  try{ localStorage.setItem('targetRadiusInches', String(inches)); return true; }
+  catch(e){ console.error('Storage error', e); return false; }
+}
+
 // ---------- fleet render ----------
 function render(){
   const arrows = loadArrows();
@@ -301,7 +360,7 @@ function render(){
   }
   listEl.style.display = 'block';
   emptyEl.style.display = 'none';
- 
+
   listEl.innerHTML = arrows.slice().reverse().map(a => {
     const shotCount = shots.filter(s => s.arrowId === a.id).length;
     return `
@@ -320,18 +379,77 @@ function render(){
     </div>
   `;}).join('');
 }
- 
+
+// ---------- Arrow ID dropdown (sourced from imported workbook CSV) ----------
+const idSelect = document.getElementById('f-id-select');
+const idCustomWrap = document.getElementById('f-id-custom-wrap');
+const idCustomInput = document.getElementById('f-id-custom');
+const importBtn = document.getElementById('import-btn');
+const importFile = document.getElementById('import-file');
+const importHint = document.getElementById('import-hint');
+
+function renderArrowIdSelect(){
+  const list = loadArrowIdList();
+  const prev = idSelect.value;
+  idSelect.innerHTML =
+    (list.length ? '<option value="">Select an arrow\u2026</option>' : '<option value="">Import list below, or choose Other</option>') +
+    '<option value="__other__">Other (type manually)</option>' +
+    list.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('');
+  if ([...idSelect.options].some(o => o.value === prev)) idSelect.value = prev;
+  importHint.textContent = list.length
+    ? list.length + ' arrow ID' + (list.length === 1 ? '' : 's') + ' loaded from your last import. Re-import any time the workbook fleet list changes.'
+    : 'No arrow list imported yet. In Excel, export column A of the LSI Calculator sheet (Arrow ID) as a one-column CSV, then tap "Import list" and pick that file.';
+}
+
+function parseArrowIdCsv(text){
+  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const cleaned = lines.map(l => l.split(',')[0].replace(/^"|"$/g, '').trim()).filter(Boolean);
+  // Drop a header row like "Arrow ID" if present
+  if (cleaned.length && /^arrow\s*id$/i.test(cleaned[0])) cleaned.shift();
+  // De-dupe, preserve order
+  return [...new Set(cleaned)];
+}
+
+importBtn.addEventListener('click', () => importFile.click());
+importFile.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    const list = parseArrowIdCsv(String(reader.result));
+    if (!list.length){ showToast('No arrow IDs found in that file'); return; }
+    saveArrowIdList(list);
+    renderArrowIdSelect();
+    showToast(list.length + ' arrow ID' + (list.length === 1 ? '' : 's') + ' imported');
+  };
+  reader.onerror = () => showToast('Could not read that file');
+  reader.readAsText(file);
+  importFile.value = '';
+});
+
+idSelect.addEventListener('change', () => {
+  idCustomWrap.style.display = idSelect.value === '__other__' ? 'block' : 'none';
+  if (idSelect.value === '__other__') idCustomInput.focus();
+});
+
+renderArrowIdSelect();
+
 // ---------- add / delete arrow ----------
 document.getElementById('save-btn').addEventListener('click', () => {
-  const idInput = document.getElementById('f-id');
   const spineInput = document.getElementById('f-spine');
   const massInput = document.getElementById('f-mass');
   const pointInput = document.getElementById('f-point');
   const noteInput = document.getElementById('f-note');
- 
-  const arrowId = idInput.value.trim();
-  if (!arrowId){ idInput.focus(); showToast('Arrow ID is required'); return; }
- 
+
+  const arrowId = idSelect.value === '__other__'
+    ? idCustomInput.value.trim()
+    : idSelect.value.trim();
+  if (!arrowId){
+    (idSelect.value === '__other__' ? idCustomInput : idSelect).focus();
+    showToast('Arrow ID is required');
+    return;
+  }
+
   const entry = {
     id: 'a_' + Date.now(),
     arrowId,
@@ -341,21 +459,21 @@ document.getElementById('save-btn').addEventListener('click', () => {
     note: noteInput.value.trim(),
     createdAt: new Date().toISOString()
   };
- 
+
   const arrows = loadArrows();
   arrows.push(entry);
   const ok = saveArrows(arrows);
   render();
- 
+
   if (ok){
     showToast('Saved');
-    idInput.value = ''; spineInput.value = ''; massInput.value = ''; pointInput.value = ''; noteInput.value = '';
-    idInput.focus();
+    idSelect.value = ''; idCustomInput.value = ''; idCustomWrap.style.display = 'none';
+    spineInput.value = ''; massInput.value = ''; pointInput.value = ''; noteInput.value = '';
   } else {
     showToast('Could not save \u2014 try again');
   }
 });
- 
+
 listEl.addEventListener('click', (e) => {
   const delBtn = e.target.closest('[data-del]');
   if (delBtn){
@@ -373,7 +491,7 @@ listEl.addEventListener('click', (e) => {
     openShotLogger(logBtn.getAttribute('data-log'));
   }
 });
- 
+
 // ---------- shot logger modal ----------
 const backdrop = document.getElementById('modal-backdrop');
 const modal = document.getElementById('modal');
@@ -385,32 +503,43 @@ const recPanel = document.getElementById('rec-panel');
 const recOrient = document.getElementById('rec-orient');
 const recConf = document.getElementById('rec-conf');
 const recTable = document.getElementById('rec-table');
- 
+
 let activeArrowId = null;
 let activeOrientation = 0;
- 
+
+const distanceInput = document.getElementById('f-distance');
+const bowInput = document.getElementById('f-bow');
+const radiusInput = document.getElementById('f-radius');
+
+radiusInput.addEventListener('change', () => {
+  const v = parseFloat(radiusInput.value);
+  if (Number.isFinite(v) && v > 0) saveTargetRadius(v);
+});
+
 function openShotLogger(arrowId){
   const arrows = loadArrows();
   const arrow = arrows.find(a => a.id === arrowId);
   if (!arrow) return;
   activeArrowId = arrowId;
   activeOrientation = 0;
- 
+
   modalTitle.textContent = 'Log shot \u2014 ' + arrow.arrowId;
-  modalSub.textContent = 'Pick the nock orientation, then tap where it landed.';
- 
+  modalSub.textContent = 'Pick the nock orientation, distance, then tap where it landed.';
+
   orientChips.innerHTML = ORIENTATIONS.map(o =>
     `<button class="chip${o===0?' active':''}" data-o="${o}">${fmtDeg(o)}</button>`
   ).join('');
- 
+
+  radiusInput.value = loadTargetRadius();
+
   drawTarget();
   renderShotList();
   renderRecommendation();
- 
+
   backdrop.classList.add('show');
   modal.classList.add('show');
 }
- 
+
 function closeModal(){
   backdrop.classList.remove('show');
   modal.classList.remove('show');
@@ -418,14 +547,14 @@ function closeModal(){
 }
 document.getElementById('modal-close').addEventListener('click', closeModal);
 backdrop.addEventListener('click', closeModal);
- 
+
 orientChips.addEventListener('click', (e) => {
   const btn = e.target.closest('[data-o]');
   if (!btn) return;
   activeOrientation = parseFloat(btn.getAttribute('data-o'));
   [...orientChips.children].forEach(c => c.classList.toggle('active', c === btn));
 });
- 
+
 // ---- target SVG: tap-to-plot ----
 const svgNS = 'http://www.w3.org/2000/svg';
 const targetSvg = document.getElementById('target-svg');
@@ -437,7 +566,7 @@ const RINGS = [
   {frac:0.625,fill:'#c0392b'},
   {frac:0.375,fill:'#e8b923'}
 ];
- 
+
 function drawTarget(){
   targetSvg.innerHTML = '';
   RINGS.forEach(ring => {
@@ -452,26 +581,42 @@ function drawTarget(){
   cross.setAttribute('cx',CX); cross.setAttribute('cy',CY); cross.setAttribute('r',2);
   cross.setAttribute('fill','#00000055');
   targetSvg.appendChild(cross);
- 
+
   plotExistingShots();
- 
+
   targetSvg.addEventListener('click', onTargetTap);
 }
- 
+
 function onTargetTap(evt){
   if (!activeArrowId) return;
+
+  const distance = parseFloat(distanceInput.value);
+  if (!Number.isFinite(distance) || distance <= 0){
+    distanceInput.focus();
+    showToast('Enter distance (yd) before logging a shot');
+    return;
+  }
+  const radius = (Number.isFinite(parseFloat(radiusInput.value)) && parseFloat(radiusInput.value) > 0)
+    ? parseFloat(radiusInput.value) : loadTargetRadius();
+  saveTargetRadius(radius);
+
   const rect = targetSvg.getBoundingClientRect();
   const px = (evt.clientX - rect.left) * (SIZE / rect.width);
   const py = (evt.clientY - rect.top) * (SIZE / rect.height);
   const x = (px - CX) / R;   // normalized -1..1
   const y = (py - CY) / R;
   if (Math.hypot(x,y) > 1.25) return; // ignore taps way outside target
- 
+
   const shots = loadShots();
   shots.push({
     id: 's_' + Date.now(),
     arrowId: activeArrowId,
     orientation: activeOrientation,
+    distance: distance,
+    bow: bowInput.value.trim(),
+    radiusInches: radius,
+    lrIn: Math.round(x*radius*1000)/1000,
+    udIn: Math.round(-y*radius*1000)/1000, // SVG y is down-positive; flipped so up = positive UD
     x: Math.round(x*1000)/1000,
     y: Math.round(y*1000)/1000,
     createdAt: new Date().toISOString()
@@ -481,9 +626,9 @@ function onTargetTap(evt){
   renderShotList();
   renderRecommendation();
   render();
-  showToast('Shot logged \u2014 ' + fmtDeg(activeOrientation));
+  showToast('Shot logged \u2014 ' + fmtDeg(activeOrientation) + ' \u00b7 ' + distance + 'yd');
 }
- 
+
 function plotExistingShots(){
   const shots = loadShots().filter(s => s.arrowId === activeArrowId);
   shots.forEach(s => {
@@ -497,7 +642,7 @@ function plotExistingShots(){
     targetSvg.appendChild(dot);
   });
 }
- 
+
 function renderShotList(){
   const shots = loadShots().filter(s => s.arrowId === activeArrowId)
     .slice().sort((a,b)=> b.createdAt.localeCompare(a.createdAt));
@@ -507,12 +652,12 @@ function renderShotList(){
   }
   shotListEl.innerHTML = shots.map(s => `
     <div class="shot-row" data-shot="${s.id}">
-      <span class="oa">${fmtDeg(s.orientation)} \u00b7 (${s.x.toFixed(2)}, ${s.y.toFixed(2)})</span>
+      <span class="oa">${fmtDeg(s.orientation)} \u00b7 ${s.distance != null ? s.distance + 'yd' : '\u2014'} \u00b7 ${s.lrIn != null ? 'LR ' + s.lrIn.toFixed(2) + '" UD ' + s.udIn.toFixed(2) + '"' : '(' + s.x.toFixed(2) + ', ' + s.y.toFixed(2) + ')'}</span>
       <button class="rm" data-rmshot="${s.id}">remove</button>
     </div>
   `).join('');
 }
- 
+
 shotListEl.addEventListener('click', (e) => {
   const btn = e.target.closest('[data-rmshot]');
   if (!btn) return;
@@ -524,40 +669,40 @@ shotListEl.addEventListener('click', (e) => {
   renderRecommendation();
   render();
 });
- 
+
 // ---- recommendation: honest, sample-size gated ----
 function renderRecommendation(){
   const shots = loadShots().filter(s => s.arrowId === activeArrowId);
   if (shots.length === 0){ recPanel.style.display = 'none'; return; }
- 
+
   const byOrient = {};
   shots.forEach(s => {
     if (!byOrient[s.orientation]) byOrient[s.orientation] = [];
     byOrient[s.orientation].push(s);
   });
   const orientKeys = Object.keys(byOrient);
- 
+
   const stats = orientKeys.map(k => {
     const arr = byOrient[k];
     const avgR = arr.reduce((sum,s)=> sum + Math.hypot(s.x,s.y), 0) / arr.length;
     return { orientation: parseFloat(k), count: arr.length, avgR };
   }).sort((a,b)=> a.avgR - b.avgR);
- 
+
   recPanel.style.display = 'block';
- 
+
   if (orientKeys.length < 2){
     recOrient.textContent = fmtDeg(stats[0].orientation) + ' (only orientation tested)';
     recConf.textContent = 'Log shots at a different orientation to compare.';
     recTable.innerHTML = '';
     return;
   }
- 
+
   const best = stats[0];
   let confidence, confColor;
   if (best.count < 3){ confidence = 'Low confidence \u2014 too few shots at this orientation'; }
   else if (best.count < 6){ confidence = 'Moderate confidence \u2014 keep logging to confirm'; }
   else { confidence = 'Higher confidence \u2014 consistent across several shots'; }
- 
+
   recOrient.textContent = fmtDeg(best.orientation);
   recConf.textContent = confidence;
   recTable.innerHTML = stats.map(s => `
@@ -567,9 +712,55 @@ function renderRecommendation(){
     </div>
   `).join('');
 }
- 
+
+// ---------- export shots to CSV (matches Impact Data columns) ----------
+function csvEscape(v){
+  const s = (v === null || v === undefined) ? '' : String(v);
+  return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+}
+
+document.getElementById('export-btn').addEventListener('click', () => {
+  const arrows = loadArrows();
+  const shots = loadShots();
+  if (shots.length === 0){ showToast('No shots logged yet'); return; }
+
+  const rows = shots
+    .filter(s => s.lrIn !== undefined) // skip shots logged before distance/radius tracking existed
+    .slice().sort((a,b)=> a.createdAt.localeCompare(b.createdAt))
+    .map(s => {
+      const arrow = arrows.find(a => a.id === s.arrowId);
+      const dateStr = s.createdAt ? s.createdAt.slice(0,10) : '';
+      return [
+        arrow ? arrow.arrowId : s.arrowId,
+        s.orientation,
+        s.distance,
+        s.lrIn,
+        s.udIn,
+        s.bow || '',
+        dateStr
+      ];
+    });
+
+  const skipped = shots.length - rows.length;
+  const header = ['Arrow ID','Orientation (deg)','Distance (yd)','LR (in)','UD (in)','Bow','Date'];
+  const csv = [header, ...rows].map(r => r.map(csvEscape).join(',')).join('\r\n');
+
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'arrow_tracker_shots_' + new Date().toISOString().slice(0,10) + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+
+  showToast(skipped > 0
+    ? rows.length + ' shots exported (' + skipped + ' older shots skipped \u2014 no distance recorded)'
+    : rows.length + ' shots exported');
+});
+
 render();
 </script>
 </body>
 </html>
- 
