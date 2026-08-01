@@ -160,7 +160,7 @@
 </head>
 <body>
 <header>
-  <div class="eyebrow">Arrow Tracker · v0.5</div>
+  <div class="eyebrow">Arrow Tracker · v0.6</div>
   <h1>Fleet Log</h1>
   <p>Log each shaft's specs, then log shots by orientation to see what's actually working.</p>
 </header>
@@ -251,18 +251,34 @@
   <div class="target-wrap">
     <svg class="target" id="target-svg" width="260" height="260" viewBox="0 0 260 260"></svg>
   </div>
-  <p class="target-hint">Visual only, not tappable — type the coordinates below and it plots here.</p>
+  <p class="target-hint">Tap the target to get close, then dial in the exact numbers below.</p>
   <div class="row2">
     <div class="field">
-      <label for="f-lr-squares">LR (3/16" squares)</label>
-      <input id="f-lr-squares" type="number" inputmode="decimal" step="1" placeholder="e.g. 4 or -10">
+      <label>LR direction</label>
+      <div class="chip-row" id="lr-dir-chips">
+        <button type="button" class="chip" data-dir="left">&#9664; Left</button>
+        <button type="button" class="chip active" data-dir="right">Right &#9654;</button>
+      </div>
     </div>
     <div class="field">
-      <label for="f-ud-squares">UD (3/16" squares)</label>
-      <input id="f-ud-squares" type="number" inputmode="decimal" step="1" placeholder="e.g. 6 or -2">
+      <label for="f-lr-mag">LR (3/16" squares)</label>
+      <input id="f-lr-mag" type="number" inputmode="numeric" step="1" min="0" placeholder="e.g. 10">
     </div>
   </div>
-  <p class="hint" style="margin-top:-8px;">Same LR/UD square coordinates you already write on the graph paper, from point of aim. Positive LR = right, positive UD = up.</p>
+  <div class="row2">
+    <div class="field">
+      <label>UD direction</label>
+      <div class="chip-row" id="ud-dir-chips">
+        <button type="button" class="chip active" data-dir="up">&#9650; Up</button>
+        <button type="button" class="chip" data-dir="down">&#9660; Down</button>
+      </div>
+    </div>
+    <div class="field">
+      <label for="f-ud-mag">UD (3/16" squares)</label>
+      <input id="f-ud-mag" type="number" inputmode="numeric" step="1" min="0" placeholder="e.g. 6">
+    </div>
+  </div>
+  <p class="hint" style="margin-top:-8px;">Distance from point of aim, in the same 3/16" squares you already use on the graph paper. Tap the direction, type the number — no minus sign needed.</p>
   <button class="btn btn-primary" id="log-shot-btn" style="margin-top:10px;">Log shot</button>
   <div class="field-row" style="margin-top:16px; margin-bottom:14px;">
     <div class="field">
@@ -615,16 +631,44 @@ let activeOrientation = 0;
 const distanceInput = document.getElementById('f-distance');
 const bowInput = document.getElementById('f-bow');
 const radiusInput = document.getElementById('f-radius');
-const lrSquaresInput = document.getElementById('f-lr-squares');
-const udSquaresInput = document.getElementById('f-ud-squares');
+const lrMagInput = document.getElementById('f-lr-mag');
+const udMagInput = document.getElementById('f-ud-mag');
+const lrDirChips = document.getElementById('lr-dir-chips');
+const udDirChips = document.getElementById('ud-dir-chips');
 const logShotBtn = document.getElementById('log-shot-btn');
+let lrDirection = 'right';
+let udDirection = 'up';
 radiusInput.addEventListener('change', () => {
   const v = parseFloat(radiusInput.value);
   if (Number.isFinite(v) && v > 0) saveTargetRadius(v);
 });
 radiusInput.addEventListener('input', renderPreviewDot);
-lrSquaresInput.addEventListener('input', renderPreviewDot);
-udSquaresInput.addEventListener('input', renderPreviewDot);
+lrMagInput.addEventListener('input', renderPreviewDot);
+udMagInput.addEventListener('input', renderPreviewDot);
+lrDirChips.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-dir]');
+  if (!btn) return;
+  lrDirection = btn.getAttribute('data-dir');
+  [...lrDirChips.children].forEach(c => c.classList.toggle('active', c === btn));
+  renderPreviewDot();
+});
+udDirChips.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-dir]');
+  if (!btn) return;
+  udDirection = btn.getAttribute('data-dir');
+  [...udDirChips.children].forEach(c => c.classList.toggle('active', c === btn));
+  renderPreviewDot();
+});
+function currentLR(){
+  const mag = parseFloat(lrMagInput.value);
+  if (!Number.isFinite(mag)) return null;
+  return lrDirection === 'left' ? -Math.abs(mag) : Math.abs(mag);
+}
+function currentUD(){
+  const mag = parseFloat(udMagInput.value);
+  if (!Number.isFinite(mag)) return null;
+  return udDirection === 'down' ? -Math.abs(mag) : Math.abs(mag);
+}
 function openShotLogger(arrowId){
   const arrows = loadArrows();
   const arrow = arrows.find(a => a.id === arrowId);
@@ -633,14 +677,18 @@ function openShotLogger(arrowId){
   activeOrientation = 0;
   editingShotId = null;
   modalTitle.textContent = 'Log shot — ' + arrow.arrowId;
-  modalSub.textContent = 'Pick the nock orientation, distance, then type where it landed.';
+  modalSub.textContent = 'Pick the nock orientation and distance, tap the target to get close, then dial in the exact numbers.';
   orientChips.innerHTML = ORIENTATIONS.map(o =>
     `<button class="chip${o===0?' active':''}" data-o="${o}">${fmtDeg(o)}</button>`
   ).join('');
   distanceInput.value = '';
   bowInput.value = '';
-  lrSquaresInput.value = '';
-  udSquaresInput.value = '';
+  lrMagInput.value = '';
+  udMagInput.value = '';
+  lrDirection = 'right';
+  udDirection = 'up';
+  [...lrDirChips.children].forEach(c => c.classList.toggle('active', c.getAttribute('data-dir') === 'right'));
+  [...udDirChips.children].forEach(c => c.classList.toggle('active', c.getAttribute('data-dir') === 'up'));
   radiusInput.value = loadTargetRadius();
   drawTarget();
   renderShotList();
@@ -694,19 +742,16 @@ function currentRadius(){
   const v = parseFloat(radiusInput.value);
   return (Number.isFinite(v) && v > 0) ? v : loadTargetRadius();
 }
-// ---- preview dot: reflects whatever is currently typed in LR/UD, before it's logged ----
+// ---- preview dot: reflects whatever is currently dialed in below, before it's logged ----
 function renderPreviewDot(){
   const old = targetSvg.querySelector('#preview-dot');
   if (old) old.remove();
-  const lrRaw = lrSquaresInput.value.trim();
-  const udRaw = udSquaresInput.value.trim();
-  if (!lrRaw && !udRaw) return; // nothing typed yet, nothing to preview
-  const lr = lrRaw ? parseFloat(lrRaw) : 0;
-  const ud = udRaw ? parseFloat(udRaw) : 0;
-  if (!Number.isFinite(lr) || !Number.isFinite(ud)) return;
+  const lr = currentLR();
+  const ud = currentUD();
+  if (lr === null && ud === null) return; // nothing entered yet, nothing to preview
   const radius = currentRadius();
-  const lrIn = lr * 0.1875;
-  const udIn = ud * 0.1875;
+  const lrIn = (lr || 0) * 0.1875;
+  const udIn = (ud || 0) * 0.1875;
   const x = lrIn / radius;
   const y = -udIn / radius; // SVG y is down-positive; flipped so up = positive UD
   const dot = document.createElementNS(svgNS,'circle');
@@ -719,7 +764,31 @@ function renderPreviewDot(){
   dot.setAttribute('stroke-width', '2.5');
   targetSvg.appendChild(dot);
 }
-// ---- log shot: typed LR/UD squares are the only input; target is a visual only ----
+// ---- tap the target to get close: pre-fills direction + magnitude, doesn't log by itself ----
+// (listener attached once here, not inside drawTarget, so it never stacks on redraw)
+targetSvg.addEventListener('click', (evt) => {
+  if (!activeArrowId) return;
+  const radius = currentRadius();
+  const rect = targetSvg.getBoundingClientRect();
+  const px = (evt.clientX - rect.left) * (SIZE / rect.width);
+  const py = (evt.clientY - rect.top) * (SIZE / rect.height);
+  const x = (px - CX) / R;   // normalized -1..1
+  const y = (py - CY) / R;
+  if (Math.hypot(x,y) > 1.25) return; // ignore taps way outside target
+  const lrIn = x * radius;
+  const udIn = -y * radius; // SVG y is down-positive; flipped so up = positive UD
+  const lrSquaresApprox = Math.round(lrIn / 0.1875);
+  const udSquaresApprox = Math.round(udIn / 0.1875);
+  lrDirection = lrSquaresApprox < 0 ? 'left' : 'right';
+  udDirection = udSquaresApprox < 0 ? 'down' : 'up';
+  lrMagInput.value = Math.abs(lrSquaresApprox);
+  udMagInput.value = Math.abs(udSquaresApprox);
+  [...lrDirChips.children].forEach(c => c.classList.toggle('active', c.getAttribute('data-dir') === lrDirection));
+  [...udDirChips.children].forEach(c => c.classList.toggle('active', c.getAttribute('data-dir') === udDirection));
+  renderPreviewDot();
+  showToast('Got you close — adjust the exact numbers below');
+});
+// ---- log shot: direction + magnitude below are the source of truth; tap is just a starting point ----
 logShotBtn.addEventListener('click', () => {
   if (!activeArrowId) return;
   const distance = parseFloat(distanceInput.value);
@@ -728,19 +797,15 @@ logShotBtn.addEventListener('click', () => {
     showToast('Enter distance (yd) before logging a shot');
     return;
   }
-  const lrRaw = lrSquaresInput.value.trim();
-  const udRaw = udSquaresInput.value.trim();
-  if (!lrRaw && !udRaw){
-    lrSquaresInput.focus();
+  const lr = currentLR();
+  const ud = currentUD();
+  if (lr === null && ud === null){
+    lrMagInput.focus();
     showToast('Enter LR and/or UD before logging');
     return;
   }
-  const lrSquares = lrRaw ? parseFloat(lrRaw) : 0;
-  const udSquares = udRaw ? parseFloat(udRaw) : 0;
-  if (!Number.isFinite(lrSquares) || !Number.isFinite(udSquares)){
-    showToast('LR/UD must be numbers');
-    return;
-  }
+  const lrSquares = lr === null ? 0 : lr;
+  const udSquares = ud === null ? 0 : ud;
   const radius = currentRadius();
   saveTargetRadius(radius);
   const lrIn = Math.round(lrSquares * 0.1875 * 1000) / 1000;
@@ -762,8 +827,8 @@ logShotBtn.addEventListener('click', () => {
     createdAt: new Date().toISOString()
   });
   saveShots(shots);
-  lrSquaresInput.value = '';
-  udSquaresInput.value = '';
+  lrMagInput.value = '';
+  udMagInput.value = '';
   drawTarget();
   renderShotList();
   renderRecommendation();
