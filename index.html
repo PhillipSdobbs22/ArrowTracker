@@ -22,7 +22,6 @@
     font-family:-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
     -webkit-font-smoothing:antialiased;}
   .mono{font-family:"SF Mono", ui-monospace, Menlo, Consolas, monospace;}
-
   header{
     padding: max(18px, env(safe-area-inset-top)) 20px 16px;
     border-bottom:1px solid var(--line);
@@ -34,9 +33,7 @@
   }
   header h1{margin:0; font-size:22px; font-weight:650; letter-spacing:-.01em;}
   header p{margin:4px 0 0; font-size:13px; color:var(--dim);}
-
   main{padding:16px 16px 100px; max-width:640px; margin:0 auto;}
-
   .panel{
     background:var(--panel); border:1px solid var(--line); border-radius:14px;
     padding:16px; margin-bottom:16px;
@@ -45,7 +42,6 @@
     margin:0 0 14px; font-size:13px; text-transform:uppercase; letter-spacing:.1em;
     color:var(--dim); font-weight:600;
   }
-
   .field{margin-bottom:12px;}
   .field:last-child{margin-bottom:0;}
   .field label{
@@ -62,7 +58,6 @@
   }
   .row2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
   .row3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;}
-
   .btn{
     display:block; width:100%; text-align:center; padding:13px 16px;
     border-radius:10px; border:none; font-size:15px; font-weight:600;
@@ -72,7 +67,6 @@
   .btn-primary:active{background:var(--accent-dim);}
   .btn-ghost{background:transparent; color:var(--dim); border:1px solid var(--line);}
   .btn-sm{padding:9px 12px; font-size:13px; width:auto;}
-
   .arrow-card{
     background:var(--panel); border:1px solid var(--line); border-radius:12px;
     padding:14px 16px; margin-bottom:10px;
@@ -91,13 +85,11 @@
   .arrow-card .del:active{color:var(--danger);}
   .arrow-card .actions{display:flex; gap:8px; margin-top:12px;}
   .arrow-card .actions .btn{flex:1;}
-
   .empty{
     text-align:center; padding:40px 20px; color:var(--dim);
   }
   .empty .glyph{font-size:26px; margin-bottom:10px; opacity:.5;}
   .empty p{font-size:13px; margin:0; line-height:1.5;}
-
   .toast{
     position:fixed; left:50%; bottom:24px; transform:translateX(-50%);
     background:var(--panel-2); border:1px solid var(--line); color:var(--text);
@@ -105,11 +97,9 @@
     opacity:0; pointer-events:none; transition:opacity .2s ease;
   }
   .toast.show{opacity:1;}
-
   .count-tag{
     font-size:11px; color:var(--dim); font-family:"SF Mono", ui-monospace, monospace;
   }
-
   /* Modal / shot logger */
   .modal-backdrop{
     position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:50;
@@ -127,11 +117,9 @@
   .modal-handle{width:36px; height:4px; background:var(--line); border-radius:2px; margin:0 auto 14px;}
   .modal h3{margin:0 0 2px; font-size:17px;}
   .modal .sub{font-size:12.5px; color:var(--dim); margin:0 0 14px;}
-
   .target-wrap{display:flex; justify-content:center; margin:10px 0 16px;}
   svg.target{touch-action:none; display:block;}
   .target-hint{text-align:center; font-size:12px; color:var(--dim); margin-top:-8px; margin-bottom:14px;}
-
   .chip-row{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px;}
   .chip{
     padding:7px 11px; border-radius:16px; border:1px solid var(--line);
@@ -139,7 +127,6 @@
     font-family:"SF Mono", ui-monospace, monospace; cursor:pointer;
   }
   .chip.active{background:var(--accent); color:#1a1408; border-color:var(--accent);}
-
   .shot-list{margin-top:14px;}
   .shot-row{
     display:flex; justify-content:space-between; align-items:center;
@@ -147,9 +134,8 @@
   }
   .shot-row:last-child{border-bottom:none;}
   .shot-row .oa{font-family:"SF Mono", ui-monospace, monospace; color:var(--dim);}
-  .shot-row .rm{background:none; border:none; color:var(--dim); font-size:12px;}
+  .shot-row .rm{background:none; border:none; color:var(--dim); font-size:12px; margin-left:6px;}
   .shot-row .rm:active{color:var(--danger);}
-
   .rec-panel{
     background:var(--panel-2); border:1px solid var(--line); border-radius:10px;
     padding:12px 14px; margin-top:14px;
@@ -159,13 +145,11 @@
   .rec-panel .rec-table{margin-top:10px; font-size:12px; font-family:"SF Mono",ui-monospace,monospace;}
   .rec-panel .rec-table div{display:flex; justify-content:space-between; padding:3px 0; color:var(--dim);}
   .rec-panel .rec-table div.best{color:var(--text);}
-
   .close-modal{
     position:absolute; top:14px; right:16px; background:var(--panel-2);
     border:1px solid var(--line); color:var(--dim); width:30px; height:30px;
     border-radius:50%; font-size:15px; line-height:1;
   }
-
   .field-row{display:flex; gap:8px; align-items:flex-end;}
   .field-row .field{flex:1; margin-bottom:0;}
   .field-row .btn{width:auto; white-space:nowrap;}
@@ -175,16 +159,17 @@
 </style>
 </head>
 <body>
-
 <header>
-  <div class="eyebrow">Arrow Tracker · v0.2</div>
+  <div class="eyebrow">Arrow Tracker · v0.3</div>
   <h1>Fleet Log</h1>
   <p>Log each shaft's specs, then log shots by orientation to see what's actually working.</p>
 </header>
-
 <main>
   <div class="panel">
-    <h2>Add arrow</h2>
+    <h2 style="display:flex; justify-content:space-between; align-items:center;">
+      <span id="add-arrow-title">Add arrow</span>
+      <button class="btn btn-ghost btn-sm" id="cancel-edit-btn" style="display:none;">Cancel edit</button>
+    </h2>
     <div class="field-row">
       <div class="field">
         <label for="f-id-select">Arrow ID</label>
@@ -221,7 +206,6 @@
     </div>
     <button class="btn btn-primary" id="save-btn" style="margin-top:4px;">Save arrow</button>
   </div>
-
   <div class="panel" style="padding-bottom:6px;">
     <h2 style="display:flex; justify-content:space-between; align-items:center;">
       <span>Fleet</span>
@@ -235,23 +219,25 @@
     <div class="panel-actions">
       <button class="btn btn-ghost btn-sm" id="export-btn" style="width:100%;">Export shots to CSV (for Impact Data)</button>
     </div>
+    <div class="panel-actions">
+      <button class="btn btn-ghost btn-sm" id="backup-btn">Export full backup</button>
+      <button class="btn btn-ghost btn-sm" id="restore-btn">Restore from backup</button>
+    </div>
+    <input type="file" id="restore-file" accept="application/json" style="display:none;">
+    <p class="hint">Full backup saves every arrow (spine/mass/point/notes) and every shot to one file — the only way to recover your fleet if this browser's storage is ever cleared. Worth doing after any real logging session.</p>
   </div>
 </main>
-
 <div class="toast" id="toast"></div>
-
 <div class="modal-backdrop" id="modal-backdrop"></div>
 <div class="modal" id="modal">
   <button class="close-modal" id="modal-close">✕</button>
   <div class="modal-handle"></div>
   <h3 id="modal-title">Log shot</h3>
   <p class="sub" id="modal-sub"></p>
-
   <div class="field">
     <label>Orientation (deg)</label>
     <div class="chip-row" id="orient-chips"></div>
   </div>
-
   <div class="row2">
     <div class="field">
       <label for="f-distance">Distance (yd)</label>
@@ -262,7 +248,6 @@
       <input id="f-bow" type="text" placeholder="e.g. Genesis (NASP)" autocomplete="off">
     </div>
   </div>
-
   <div class="target-wrap">
     <svg class="target" id="target-svg" width="260" height="260" viewBox="0 0 260 260"></svg>
   </div>
@@ -274,39 +259,35 @@
     </div>
   </div>
   <p class="hint" style="margin-top:-8px; margin-bottom:14px;">Set this once to the real-world radius your tap circle represents (e.g. scoring ring radius on your paper). It's used to convert taps into LR/UD inches for export. Saved for next time.</p>
-
   <div class="rec-panel" id="rec-panel" style="display:none;">
     <div class="rec-label" style="font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--dim); font-family:'SF Mono',ui-monospace,monospace;">Recommended orientation</div>
     <div class="rec-orient" id="rec-orient">—</div>
     <div class="rec-conf" id="rec-conf">—</div>
     <div class="rec-table" id="rec-table"></div>
   </div>
-
   <div class="shot-list" id="shot-list"></div>
 </div>
-
 <script>
 const listEl = document.getElementById('list');
 const emptyEl = document.getElementById('empty-state');
 const countEl = document.getElementById('count-tag');
 const toastEl = document.getElementById('toast');
-
 const ORIENTATIONS = Array.from({length:16}, (_,i)=> i*22.5);
+
+let editingArrowId = null;
+let editingShotId = null;
 
 function showToast(msg){
   toastEl.textContent = msg;
   toastEl.classList.add('show');
   setTimeout(()=> toastEl.classList.remove('show'), 1600);
 }
-
 function escapeHtml(s){
   return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
-
 function fmtDeg(d){
-  return (Number.isInteger(d) ? d : d.toFixed(1)) + '\u00b0';
+  return (Number.isInteger(d) ? d : d.toFixed(1)) + '°';
 }
-
 // ---------- storage ----------
 function loadArrows(){
   try{
@@ -347,7 +328,6 @@ function saveTargetRadius(inches){
   try{ localStorage.setItem('targetRadiusInches', String(inches)); return true; }
   catch(e){ console.error('Storage error', e); return false; }
 }
-
 // ---------- fleet render ----------
 function render(){
   const arrows = loadArrows();
@@ -360,7 +340,6 @@ function render(){
   }
   listEl.style.display = 'block';
   emptyEl.style.display = 'none';
-
   listEl.innerHTML = arrows.slice().reverse().map(a => {
     const shotCount = shots.filter(s => s.arrowId === a.id).length;
     return `
@@ -368,18 +347,18 @@ function render(){
       <div class="top">
         <div style="flex:1; min-width:0;">
           <div class="id">${escapeHtml(a.arrowId)}</div>
-          <div class="meta">${a.spine != null ? 'spine ' + Number(a.spine).toFixed(3) + '"' : 'spine \u2014'} &nbsp;\u00b7&nbsp; ${a.mass != null ? Number(a.mass).toFixed(1) + ' gr' : 'mass \u2014'} &nbsp;\u00b7&nbsp; ${a.point != null ? Number(a.point).toFixed(0) + ' gr point' : 'point \u2014'}</div>
+          <div class="meta">${a.spine != null ? 'spine ' + Number(a.spine).toFixed(3) + '"' : 'spine —'} &nbsp;·&nbsp; ${a.mass != null ? Number(a.mass).toFixed(1) + ' gr' : 'mass —'} &nbsp;·&nbsp; ${a.point != null ? Number(a.point).toFixed(0) + ' gr point' : 'point —'}</div>
           ${a.note ? `<div class="note">${escapeHtml(a.note)}</div>` : ''}
         </div>
         <button class="del" data-del="${a.id}">Delete</button>
       </div>
       <div class="actions">
-        <button class="btn btn-ghost btn-sm" data-log="${a.id}" style="flex:1;">Log shot \u00b7 ${shotCount}</button>
+        <button class="btn btn-ghost btn-sm" data-edit="${a.id}">Edit</button>
+        <button class="btn btn-ghost btn-sm" data-log="${a.id}" style="flex:1;">Log shot · ${shotCount}</button>
       </div>
     </div>
   `;}).join('');
 }
-
 // ---------- Arrow ID dropdown (sourced from imported workbook CSV) ----------
 const idSelect = document.getElementById('f-id-select');
 const idCustomWrap = document.getElementById('f-id-custom-wrap');
@@ -387,12 +366,19 @@ const idCustomInput = document.getElementById('f-id-custom');
 const importBtn = document.getElementById('import-btn');
 const importFile = document.getElementById('import-file');
 const importHint = document.getElementById('import-hint');
+const addArrowTitle = document.getElementById('add-arrow-title');
+const cancelEditBtn = document.getElementById('cancel-edit-btn');
+const saveArrowBtn = document.getElementById('save-btn');
+const spineInputEl = document.getElementById('f-spine');
+const massInputEl = document.getElementById('f-mass');
+const pointInputEl = document.getElementById('f-point');
+const noteInputEl = document.getElementById('f-note');
 
 function renderArrowIdSelect(){
   const list = loadArrowIdList();
   const prev = idSelect.value;
   idSelect.innerHTML =
-    (list.length ? '<option value="">Select an arrow\u2026</option>' : '<option value="">Import list below, or choose Other</option>') +
+    (list.length ? '<option value="">Select an arrow…</option>' : '<option value="">Import list below, or choose Other</option>') +
     '<option value="__other__">Other (type manually)</option>' +
     list.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('');
   if ([...idSelect.options].some(o => o.value === prev)) idSelect.value = prev;
@@ -400,7 +386,6 @@ function renderArrowIdSelect(){
     ? list.length + ' arrow ID' + (list.length === 1 ? '' : 's') + ' loaded from your last import. Re-import any time the workbook fleet list changes.'
     : 'No arrow list imported yet. In Excel, export column A of the LSI Calculator sheet (Arrow ID) as a one-column CSV, then tap "Import list" and pick that file.';
 }
-
 function parseArrowIdCsv(text){
   const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
   const cleaned = lines.map(l => l.split(',')[0].replace(/^"|"$/g, '').trim()).filter(Boolean);
@@ -409,7 +394,6 @@ function parseArrowIdCsv(text){
   // De-dupe, preserve order
   return [...new Set(cleaned)];
 }
-
 importBtn.addEventListener('click', () => importFile.click());
 importFile.addEventListener('change', (e) => {
   const file = e.target.files[0];
@@ -426,21 +410,52 @@ importFile.addEventListener('change', (e) => {
   reader.readAsText(file);
   importFile.value = '';
 });
-
 idSelect.addEventListener('change', () => {
   idCustomWrap.style.display = idSelect.value === '__other__' ? 'block' : 'none';
   if (idSelect.value === '__other__') idCustomInput.focus();
 });
-
 renderArrowIdSelect();
 
-// ---------- add / delete arrow ----------
-document.getElementById('save-btn').addEventListener('click', () => {
-  const spineInput = document.getElementById('f-spine');
-  const massInput = document.getElementById('f-mass');
-  const pointInput = document.getElementById('f-point');
-  const noteInput = document.getElementById('f-note');
+// ---------- edit arrow in place ----------
+function startEditArrow(id){
+  const arrow = loadArrows().find(a => a.id === id);
+  if (!arrow) return;
+  editingArrowId = id;
+  const list = loadArrowIdList();
+  if (list.includes(arrow.arrowId)){
+    idSelect.value = arrow.arrowId;
+    idCustomWrap.style.display = 'none';
+  } else {
+    idSelect.value = '__other__';
+    idCustomWrap.style.display = 'block';
+    idCustomInput.value = arrow.arrowId;
+  }
+  spineInputEl.value = arrow.spine != null ? arrow.spine : '';
+  massInputEl.value = arrow.mass != null ? arrow.mass : '';
+  pointInputEl.value = arrow.point != null ? arrow.point : '';
+  noteInputEl.value = arrow.note || '';
+  addArrowTitle.textContent = 'Edit arrow — ' + arrow.arrowId;
+  saveArrowBtn.textContent = 'Update arrow';
+  cancelEditBtn.style.display = 'inline-block';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function cancelEditArrow(){
+  editingArrowId = null;
+  idSelect.value = '';
+  idCustomInput.value = '';
+  idCustomWrap.style.display = 'none';
+  spineInputEl.value = '';
+  massInputEl.value = '';
+  pointInputEl.value = '';
+  noteInputEl.value = '';
+  addArrowTitle.textContent = 'Add arrow';
+  saveArrowBtn.textContent = 'Save arrow';
+  cancelEditBtn.style.display = 'none';
+}
+cancelEditBtn.addEventListener('click', cancelEditArrow);
 
+// ---------- add / update / delete arrow ----------
+saveArrowBtn.addEventListener('click', () => {
   const arrowId = idSelect.value === '__other__'
     ? idCustomInput.value.trim()
     : idSelect.value.trim();
@@ -450,27 +465,58 @@ document.getElementById('save-btn').addEventListener('click', () => {
     return;
   }
 
+  // If a manually-typed ID isn't in the saved list yet, add it so it's selectable next time.
+  if (idSelect.value === '__other__'){
+    const list = loadArrowIdList();
+    if (!list.includes(arrowId)){
+      list.push(arrowId);
+      saveArrowIdList(list);
+      renderArrowIdSelect();
+    }
+  }
+
+  const arrows = loadArrows();
+
+  if (editingArrowId){
+    const idx = arrows.findIndex(a => a.id === editingArrowId);
+    if (idx === -1){
+      showToast('Could not find that arrow to update');
+      cancelEditArrow();
+      return;
+    }
+    arrows[idx] = {
+      ...arrows[idx],
+      arrowId,
+      spine: spineInputEl.value ? parseFloat(spineInputEl.value) : null,
+      mass: massInputEl.value ? parseFloat(massInputEl.value) : null,
+      point: pointInputEl.value ? parseFloat(pointInputEl.value) : null,
+      note: noteInputEl.value.trim()
+    };
+    const ok = saveArrows(arrows);
+    render();
+    if (ok){ showToast('Arrow updated'); cancelEditArrow(); }
+    else showToast('Could not save — try again');
+    return;
+  }
+
   const entry = {
     id: 'a_' + Date.now(),
     arrowId,
-    spine: spineInput.value ? parseFloat(spineInput.value) : null,
-    mass: massInput.value ? parseFloat(massInput.value) : null,
-    point: pointInput.value ? parseFloat(pointInput.value) : null,
-    note: noteInput.value.trim(),
+    spine: spineInputEl.value ? parseFloat(spineInputEl.value) : null,
+    mass: massInputEl.value ? parseFloat(massInputEl.value) : null,
+    point: pointInputEl.value ? parseFloat(pointInputEl.value) : null,
+    note: noteInputEl.value.trim(),
     createdAt: new Date().toISOString()
   };
-
-  const arrows = loadArrows();
   arrows.push(entry);
   const ok = saveArrows(arrows);
   render();
-
   if (ok){
     showToast('Saved');
     idSelect.value = ''; idCustomInput.value = ''; idCustomWrap.style.display = 'none';
-    spineInput.value = ''; massInput.value = ''; pointInput.value = ''; noteInput.value = '';
+    spineInputEl.value = ''; massInputEl.value = ''; pointInputEl.value = ''; noteInputEl.value = '';
   } else {
-    showToast('Could not save \u2014 try again');
+    showToast('Could not save — try again');
   }
 });
 
@@ -478,12 +524,25 @@ listEl.addEventListener('click', (e) => {
   const delBtn = e.target.closest('[data-del]');
   if (delBtn){
     const id = delBtn.getAttribute('data-del');
+    const arrow = loadArrows().find(a => a.id === id);
+    const shotCount = loadShots().filter(s => s.arrowId === id).length;
+    const label = arrow ? arrow.arrowId : 'this arrow';
+    const msg = shotCount > 0
+      ? `Delete ${label}? This will also delete its ${shotCount} logged shot${shotCount === 1 ? '' : 's'}. This cannot be undone.`
+      : `Delete ${label}? This cannot be undone.`;
+    if (!window.confirm(msg)) return;
     let arrows = loadArrows().filter(a => a.id !== id);
     saveArrows(arrows);
     let shots = loadShots().filter(s => s.arrowId !== id);
     saveShots(shots);
+    if (editingArrowId === id) cancelEditArrow();
     render();
     showToast('Arrow removed');
+    return;
+  }
+  const editBtn = e.target.closest('[data-edit]');
+  if (editBtn){
+    startEditArrow(editBtn.getAttribute('data-edit'));
     return;
   }
   const logBtn = e.target.closest('[data-log]');
@@ -503,58 +562,50 @@ const recPanel = document.getElementById('rec-panel');
 const recOrient = document.getElementById('rec-orient');
 const recConf = document.getElementById('rec-conf');
 const recTable = document.getElementById('rec-table');
-
 let activeArrowId = null;
 let activeOrientation = 0;
-
 const distanceInput = document.getElementById('f-distance');
 const bowInput = document.getElementById('f-bow');
 const radiusInput = document.getElementById('f-radius');
-
 radiusInput.addEventListener('change', () => {
   const v = parseFloat(radiusInput.value);
   if (Number.isFinite(v) && v > 0) saveTargetRadius(v);
 });
-
 function openShotLogger(arrowId){
   const arrows = loadArrows();
   const arrow = arrows.find(a => a.id === arrowId);
   if (!arrow) return;
   activeArrowId = arrowId;
   activeOrientation = 0;
-
-  modalTitle.textContent = 'Log shot \u2014 ' + arrow.arrowId;
+  editingShotId = null;
+  modalTitle.textContent = 'Log shot — ' + arrow.arrowId;
   modalSub.textContent = 'Pick the nock orientation, distance, then tap where it landed.';
-
   orientChips.innerHTML = ORIENTATIONS.map(o =>
     `<button class="chip${o===0?' active':''}" data-o="${o}">${fmtDeg(o)}</button>`
   ).join('');
-
+  distanceInput.value = '';
+  bowInput.value = '';
   radiusInput.value = loadTargetRadius();
-
   drawTarget();
   renderShotList();
   renderRecommendation();
-
   backdrop.classList.add('show');
   modal.classList.add('show');
 }
-
 function closeModal(){
   backdrop.classList.remove('show');
   modal.classList.remove('show');
   activeArrowId = null;
+  editingShotId = null;
 }
 document.getElementById('modal-close').addEventListener('click', closeModal);
 backdrop.addEventListener('click', closeModal);
-
 orientChips.addEventListener('click', (e) => {
   const btn = e.target.closest('[data-o]');
   if (!btn) return;
   activeOrientation = parseFloat(btn.getAttribute('data-o'));
   [...orientChips.children].forEach(c => c.classList.toggle('active', c === btn));
 });
-
 // ---- target SVG: tap-to-plot ----
 const svgNS = 'http://www.w3.org/2000/svg';
 const targetSvg = document.getElementById('target-svg');
@@ -566,7 +617,6 @@ const RINGS = [
   {frac:0.625,fill:'#c0392b'},
   {frac:0.375,fill:'#e8b923'}
 ];
-
 function drawTarget(){
   targetSvg.innerHTML = '';
   RINGS.forEach(ring => {
@@ -581,15 +631,11 @@ function drawTarget(){
   cross.setAttribute('cx',CX); cross.setAttribute('cy',CY); cross.setAttribute('r',2);
   cross.setAttribute('fill','#00000055');
   targetSvg.appendChild(cross);
-
   plotExistingShots();
-
   targetSvg.addEventListener('click', onTargetTap);
 }
-
 function onTargetTap(evt){
   if (!activeArrowId) return;
-
   const distance = parseFloat(distanceInput.value);
   if (!Number.isFinite(distance) || distance <= 0){
     distanceInput.focus();
@@ -599,14 +645,12 @@ function onTargetTap(evt){
   const radius = (Number.isFinite(parseFloat(radiusInput.value)) && parseFloat(radiusInput.value) > 0)
     ? parseFloat(radiusInput.value) : loadTargetRadius();
   saveTargetRadius(radius);
-
   const rect = targetSvg.getBoundingClientRect();
   const px = (evt.clientX - rect.left) * (SIZE / rect.width);
   const py = (evt.clientY - rect.top) * (SIZE / rect.height);
   const x = (px - CX) / R;   // normalized -1..1
   const y = (py - CY) / R;
   if (Math.hypot(x,y) > 1.25) return; // ignore taps way outside target
-
   const shots = loadShots();
   shots.push({
     id: 's_' + Date.now(),
@@ -626,9 +670,8 @@ function onTargetTap(evt){
   renderShotList();
   renderRecommendation();
   render();
-  showToast('Shot logged \u2014 ' + fmtDeg(activeOrientation) + ' \u00b7 ' + distance + 'yd');
+  showToast('Shot logged — ' + fmtDeg(activeOrientation) + ' · ' + distance + 'yd');
 }
-
 function plotExistingShots(){
   const shots = loadShots().filter(s => s.arrowId === activeArrowId);
   shots.forEach(s => {
@@ -642,7 +685,6 @@ function plotExistingShots(){
     targetSvg.appendChild(dot);
   });
 }
-
 function renderShotList(){
   const shots = loadShots().filter(s => s.arrowId === activeArrowId)
     .slice().sort((a,b)=> b.createdAt.localeCompare(a.createdAt));
@@ -650,80 +692,133 @@ function renderShotList(){
     shotListEl.innerHTML = '<div style="font-size:12.5px; color:var(--dim); padding:6px 0;">No shots logged yet for this arrow.</div>';
     return;
   }
-  shotListEl.innerHTML = shots.map(s => `
+  shotListEl.innerHTML = shots.map(s => {
+    if (s.id === editingShotId){
+      return `
+      <div class="shot-row" data-shot="${s.id}" style="display:block; padding:10px 0;">
+        <div class="row3" style="margin-bottom:8px;">
+          <div class="field" style="margin-bottom:0;">
+            <label>Orientation</label>
+            <select data-edit-orient="${s.id}">
+              ${ORIENTATIONS.map(o => `<option value="${o}"${o===s.orientation?' selected':''}>${fmtDeg(o)}</option>`).join('')}
+            </select>
+          </div>
+          <div class="field" style="margin-bottom:0;">
+            <label>Distance (yd)</label>
+            <input type="number" inputmode="decimal" step="1" data-edit-distance="${s.id}" value="${s.distance != null ? s.distance : ''}">
+          </div>
+          <div class="field" style="margin-bottom:0;">
+            <label>Bow</label>
+            <input type="text" data-edit-bow="${s.id}" value="${escapeHtml(s.bow || '')}">
+          </div>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-primary btn-sm" data-save-shot="${s.id}" style="flex:1;">Save</button>
+          <button class="btn btn-ghost btn-sm" data-cancel-shot="${s.id}" style="flex:1;">Cancel</button>
+        </div>
+      </div>`;
+    }
+    return `
     <div class="shot-row" data-shot="${s.id}">
-      <span class="oa">${fmtDeg(s.orientation)} \u00b7 ${s.distance != null ? s.distance + 'yd' : '\u2014'} \u00b7 ${s.lrIn != null ? 'LR ' + s.lrIn.toFixed(2) + '" UD ' + s.udIn.toFixed(2) + '"' : '(' + s.x.toFixed(2) + ', ' + s.y.toFixed(2) + ')'}</span>
-      <button class="rm" data-rmshot="${s.id}">remove</button>
+      <span class="oa">${fmtDeg(s.orientation)} · ${s.distance != null ? s.distance + 'yd' : '—'} · ${s.lrIn != null ? 'LR ' + s.lrIn.toFixed(2) + '" UD ' + s.udIn.toFixed(2) + '"' : '(' + s.x.toFixed(2) + ', ' + s.y.toFixed(2) + ')'}${s.bow ? ' · ' + escapeHtml(s.bow) : ''}</span>
+      <span>
+        <button class="rm" data-editshot="${s.id}">edit</button>
+        <button class="rm" data-rmshot="${s.id}">remove</button>
+      </span>
     </div>
-  `).join('');
+  `;}).join('');
 }
-
 shotListEl.addEventListener('click', (e) => {
-  const btn = e.target.closest('[data-rmshot]');
-  if (!btn) return;
-  const id = btn.getAttribute('data-rmshot');
-  const shots = loadShots().filter(s => s.id !== id);
-  saveShots(shots);
-  drawTarget();
-  renderShotList();
-  renderRecommendation();
-  render();
+  const rmBtn = e.target.closest('[data-rmshot]');
+  if (rmBtn){
+    const id = rmBtn.getAttribute('data-rmshot');
+    const shots = loadShots().filter(s => s.id !== id);
+    saveShots(shots);
+    if (editingShotId === id) editingShotId = null;
+    drawTarget();
+    renderShotList();
+    renderRecommendation();
+    render();
+    return;
+  }
+  const editBtn = e.target.closest('[data-editshot]');
+  if (editBtn){
+    editingShotId = editBtn.getAttribute('data-editshot');
+    renderShotList();
+    return;
+  }
+  const cancelShotBtn = e.target.closest('[data-cancel-shot]');
+  if (cancelShotBtn){
+    editingShotId = null;
+    renderShotList();
+    return;
+  }
+  const saveShotBtn = e.target.closest('[data-save-shot]');
+  if (saveShotBtn){
+    const id = saveShotBtn.getAttribute('data-save-shot');
+    const orientSel = shotListEl.querySelector(`[data-edit-orient="${id}"]`);
+    const distEl = shotListEl.querySelector(`[data-edit-distance="${id}"]`);
+    const bowEl = shotListEl.querySelector(`[data-edit-bow="${id}"]`);
+    const newOrientation = parseFloat(orientSel.value);
+    const newDistance = distEl.value ? parseFloat(distEl.value) : null;
+    const newBow = bowEl.value.trim();
+    const shots = loadShots().map(s => s.id === id
+      ? { ...s, orientation: newOrientation, distance: newDistance, bow: newBow }
+      : s);
+    saveShots(shots);
+    editingShotId = null;
+    drawTarget();
+    renderShotList();
+    renderRecommendation();
+    render();
+    showToast('Shot updated');
+  }
 });
-
 // ---- recommendation: honest, sample-size gated ----
 function renderRecommendation(){
   const shots = loadShots().filter(s => s.arrowId === activeArrowId);
   if (shots.length === 0){ recPanel.style.display = 'none'; return; }
-
   const byOrient = {};
   shots.forEach(s => {
     if (!byOrient[s.orientation]) byOrient[s.orientation] = [];
     byOrient[s.orientation].push(s);
   });
   const orientKeys = Object.keys(byOrient);
-
   const stats = orientKeys.map(k => {
     const arr = byOrient[k];
     const avgR = arr.reduce((sum,s)=> sum + Math.hypot(s.x,s.y), 0) / arr.length;
     return { orientation: parseFloat(k), count: arr.length, avgR };
   }).sort((a,b)=> a.avgR - b.avgR);
-
   recPanel.style.display = 'block';
-
   if (orientKeys.length < 2){
     recOrient.textContent = fmtDeg(stats[0].orientation) + ' (only orientation tested)';
     recConf.textContent = 'Log shots at a different orientation to compare.';
     recTable.innerHTML = '';
     return;
   }
-
   const best = stats[0];
-  let confidence, confColor;
-  if (best.count < 3){ confidence = 'Low confidence \u2014 too few shots at this orientation'; }
-  else if (best.count < 6){ confidence = 'Moderate confidence \u2014 keep logging to confirm'; }
-  else { confidence = 'Higher confidence \u2014 consistent across several shots'; }
-
+  let confidence;
+  if (best.count < 3){ confidence = 'Low confidence — too few shots at this orientation'; }
+  else if (best.count < 6){ confidence = 'Moderate confidence — keep logging to confirm'; }
+  else { confidence = 'Higher confidence — consistent across several shots'; }
   recOrient.textContent = fmtDeg(best.orientation);
   recConf.textContent = confidence;
   recTable.innerHTML = stats.map(s => `
     <div class="${s===best?'best':''}">
       <span>${fmtDeg(s.orientation)}</span>
-      <span>${s.count} shot${s.count===1?'':'s'} \u00b7 avg r ${s.avgR.toFixed(2)}</span>
+      <span>${s.count} shot${s.count===1?'':'s'} · avg r ${s.avgR.toFixed(2)}</span>
     </div>
   `).join('');
 }
-
 // ---------- export shots to CSV (matches Impact Data columns) ----------
 function csvEscape(v){
   const s = (v === null || v === undefined) ? '' : String(v);
   return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
 }
-
 document.getElementById('export-btn').addEventListener('click', () => {
   const arrows = loadArrows();
   const shots = loadShots();
   if (shots.length === 0){ showToast('No shots logged yet'); return; }
-
   const rows = shots
     .filter(s => s.lrIn !== undefined) // skip shots logged before distance/radius tracking existed
     .slice().sort((a,b)=> a.createdAt.localeCompare(b.createdAt))
@@ -742,11 +837,9 @@ document.getElementById('export-btn').addEventListener('click', () => {
         dateStr
       ];
     });
-
   const skipped = shots.length - rows.length;
   const header = ['Arrow ID','Orientation (deg)','Distance (yd)','LR (3/16in sq)','UD (3/16in sq)','Bow','Date'];
   const csv = [header, ...rows].map(r => r.map(csvEscape).join(',')).join('\r\n');
-
   const blob = new Blob([csv], {type:'text/csv'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -756,12 +849,65 @@ document.getElementById('export-btn').addEventListener('click', () => {
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
-
   showToast(skipped > 0
-    ? rows.length + ' shots exported (' + skipped + ' older shots skipped \u2014 no distance recorded)'
+    ? rows.length + ' shots exported (' + skipped + ' older shots skipped — no distance recorded)'
     : rows.length + ' shots exported');
 });
-
+// ---------- full backup / restore (fixes: fleet had no recovery path) ----------
+const backupBtn = document.getElementById('backup-btn');
+const restoreBtn = document.getElementById('restore-btn');
+const restoreFile = document.getElementById('restore-file');
+backupBtn.addEventListener('click', () => {
+  const payload = {
+    exportedAt: new Date().toISOString(),
+    arrows: loadArrows(),
+    shots: loadShots(),
+    arrowIdList: loadArrowIdList(),
+    targetRadiusInches: loadTargetRadius()
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'arrow_tracker_backup_' + new Date().toISOString().slice(0,10) + '.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  showToast('Backup exported — ' + payload.arrows.length + ' arrows, ' + payload.shots.length + ' shots');
+});
+restoreBtn.addEventListener('click', () => restoreFile.click());
+restoreFile.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    let data;
+    try{ data = JSON.parse(String(reader.result)); }
+    catch(err){ showToast('That file is not valid backup JSON'); restoreFile.value = ''; return; }
+    if (!Array.isArray(data.arrows) || !Array.isArray(data.shots)){
+      showToast('That file does not look like an Arrow Tracker backup');
+      restoreFile.value = '';
+      return;
+    }
+    const current = loadArrows();
+    const msg = current.length > 0
+      ? `Restore this backup? It will replace your current ${current.length} arrow(s) and their shots with ${data.arrows.length} arrow(s) and ${data.shots.length} shot(s) from the file. This cannot be undone.`
+      : `Restore ${data.arrows.length} arrow(s) and ${data.shots.length} shot(s) from this backup?`;
+    if (!window.confirm(msg)){ restoreFile.value = ''; return; }
+    saveArrows(data.arrows);
+    saveShots(data.shots);
+    if (Array.isArray(data.arrowIdList)) saveArrowIdList(data.arrowIdList);
+    if (Number.isFinite(data.targetRadiusInches) && data.targetRadiusInches > 0) saveTargetRadius(data.targetRadiusInches);
+    renderArrowIdSelect();
+    cancelEditArrow();
+    render();
+    showToast('Backup restored');
+    restoreFile.value = '';
+  };
+  reader.onerror = () => { showToast('Could not read that file'); restoreFile.value = ''; };
+  reader.readAsText(file);
+});
 render();
 </script>
 </body>
