@@ -160,7 +160,7 @@
 </head>
 <body>
 <header>
-  <div class="eyebrow">Arrow Tracker · v0.3</div>
+  <div class="eyebrow">Arrow Tracker · v0.4</div>
   <h1>Fleet Log</h1>
   <p>Log each shaft's specs, then log shots by orientation to see what's actually working.</p>
 </header>
@@ -185,7 +185,7 @@
       <label for="f-id-custom">Arrow ID (manual)</label>
       <input id="f-id-custom" type="text" placeholder="e.g. Arrow 7 CustomName" autocomplete="off">
     </div>
-    <p class="hint" id="import-hint">No arrow list imported yet. In Excel, export column A of the LSI Calculator sheet (Arrow ID) as a one-column CSV, then tap "Import list" and pick that file.</p>
+    <p class="hint" id="import-hint">No arrow list imported yet. Export the workbook's "Arrow ID Export" tab as CSV (Arrow ID in column A, Guidance in column B), then tap "Import list" and pick that file. Guidance auto-fills into Notes when you pick an arrow below.</p>
     <div class="row3">
       <div class="field">
         <label for="f-spine">Spine (in)</label>
@@ -319,6 +319,16 @@ function saveArrowIdList(list){
   try{ localStorage.setItem('arrowIdList', JSON.stringify(list)); return true; }
   catch(e){ console.error('Storage error', e); return false; }
 }
+function loadArrowGuidanceMap(){
+  try{
+    const raw = localStorage.getItem('arrowGuidanceMap');
+    return raw ? JSON.parse(raw) : {};
+  } catch(e){ console.error('Storage error', e); return {}; }
+}
+function saveArrowGuidanceMap(map){
+  try{ localStorage.setItem('arrowGuidanceMap', JSON.stringify(map)); return true; }
+  catch(e){ console.error('Storage error', e); return false; }
+}
 function loadTargetRadius(){
   const raw = localStorage.getItem('targetRadiusInches');
   const n = raw ? parseFloat(raw) : NaN;
@@ -383,16 +393,28 @@ function renderArrowIdSelect(){
     list.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('');
   if ([...idSelect.options].some(o => o.value === prev)) idSelect.value = prev;
   importHint.textContent = list.length
-    ? list.length + ' arrow ID' + (list.length === 1 ? '' : 's') + ' loaded from your last import. Re-import any time the workbook fleet list changes.'
-    : 'No arrow list imported yet. In Excel, export column A of the LSI Calculator sheet (Arrow ID) as a one-column CSV, then tap "Import list" and pick that file.';
+    ? list.length + ' arrow ID' + (list.length === 1 ? '' : 's') + ' loaded from your last import, with guidance where available. Re-import any time the workbook\'s Arrow ID Export tab changes.'
+    : 'No arrow list imported yet. Export the workbook\'s "Arrow ID Export" tab as CSV (Arrow ID in column A, Guidance in column B), then tap "Import list" and pick that file.';
 }
 function parseArrowIdCsv(text){
   const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-  const cleaned = lines.map(l => l.split(',')[0].replace(/^"|"$/g, '').trim()).filter(Boolean);
-  // Drop a header row like "Arrow ID" if present
-  if (cleaned.length && /^arrow\s*id$/i.test(cleaned[0])) cleaned.shift();
-  // De-dupe, preserve order
-  return [...new Set(cleaned)];
+  const rows = lines.map(l => {
+    const parts = l.split(',');
+    const id = (parts[0] || '').replace(/^"|"$/g, '').trim();
+    const guidance = parts.length > 1 ? parts.slice(1).join(',').replace(/^"|"$/g, '').trim() : '';
+    return { id, guidance };
+  }).filter(r => r.id);
+  // Drop a header row like "Arrow ID" (optionally with a "Guidance" second column) if present
+  if (rows.length && /^arrow\s*id$/i.test(rows[0].id)) rows.shift();
+  // De-dupe by id, preserve order, keep first occurrence's guidance
+  const seen = new Set();
+  const deduped = [];
+  for (const r of rows){
+    if (seen.has(r.id)) continue;
+    seen.add(r.id);
+    deduped.push(r);
+  }
+  return deduped;
 }
 importBtn.addEventListener('click', () => importFile.click());
 importFile.addEventListener('change', (e) => {
@@ -400,9 +422,13 @@ importFile.addEventListener('change', (e) => {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = () => {
-    const list = parseArrowIdCsv(String(reader.result));
-    if (!list.length){ showToast('No arrow IDs found in that file'); return; }
+    const rows = parseArrowIdCsv(String(reader.result));
+    if (!rows.length){ showToast('No arrow IDs found in that file'); return; }
+    const list = rows.map(r => r.id);
     saveArrowIdList(list);
+    const guidanceMap = loadArrowGuidanceMap();
+    rows.forEach(r => { if (r.guidance) guidanceMap[r.id] = r.guidance; });
+    saveArrowGuidanceMap(guidanceMap);
     renderArrowIdSelect();
     showToast(list.length + ' arrow ID' + (list.length === 1 ? '' : 's') + ' imported');
   };
@@ -412,7 +438,17 @@ importFile.addEventListener('change', (e) => {
 });
 idSelect.addEventListener('change', () => {
   idCustomWrap.style.display = idSelect.value === '__other__' ? 'block' : 'none';
-  if (idSelect.value === '__other__') idCustomInput.focus();
+  if (idSelect.value === '__other__'){
+    idCustomInput.focus();
+    return;
+  }
+  if (idSelect.value){
+    const guidance = loadArrowGuidanceMap()[idSelect.value];
+    if (guidance && !noteInputEl.value.trim()){
+      noteInputEl.value = guidance;
+      showToast('Guidance filled into Notes');
+    }
+  }
 });
 renderArrowIdSelect();
 
@@ -863,6 +899,7 @@ backupBtn.addEventListener('click', () => {
     arrows: loadArrows(),
     shots: loadShots(),
     arrowIdList: loadArrowIdList(),
+    arrowGuidanceMap: loadArrowGuidanceMap(),
     targetRadiusInches: loadTargetRadius()
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
@@ -898,6 +935,7 @@ restoreFile.addEventListener('change', (e) => {
     saveArrows(data.arrows);
     saveShots(data.shots);
     if (Array.isArray(data.arrowIdList)) saveArrowIdList(data.arrowIdList);
+    if (data.arrowGuidanceMap && typeof data.arrowGuidanceMap === 'object') saveArrowGuidanceMap(data.arrowGuidanceMap);
     if (Number.isFinite(data.targetRadiusInches) && data.targetRadiusInches > 0) saveTargetRadius(data.targetRadiusInches);
     renderArrowIdSelect();
     cancelEditArrow();
