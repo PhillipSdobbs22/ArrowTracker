@@ -160,7 +160,7 @@
 </head>
 <body>
 <header>
-  <div class="eyebrow">Arrow Tracker · v0.4</div>
+  <div class="eyebrow">Arrow Tracker · v0.5</div>
   <h1>Fleet Log</h1>
   <p>Log each shaft's specs, then log shots by orientation to see what's actually working.</p>
 </header>
@@ -251,14 +251,26 @@
   <div class="target-wrap">
     <svg class="target" id="target-svg" width="260" height="260" viewBox="0 0 260 260"></svg>
   </div>
-  <p class="target-hint">Tap where the shot landed relative to center</p>
-  <div class="field-row" style="margin-bottom:14px;">
+  <p class="target-hint">Visual only, not tappable — type the coordinates below and it plots here.</p>
+  <div class="row2">
+    <div class="field">
+      <label for="f-lr-squares">LR (3/16" squares)</label>
+      <input id="f-lr-squares" type="number" inputmode="decimal" step="1" placeholder="e.g. 4 or -10">
+    </div>
+    <div class="field">
+      <label for="f-ud-squares">UD (3/16" squares)</label>
+      <input id="f-ud-squares" type="number" inputmode="decimal" step="1" placeholder="e.g. 6 or -2">
+    </div>
+  </div>
+  <p class="hint" style="margin-top:-8px;">Same LR/UD square coordinates you already write on the graph paper, from point of aim. Positive LR = right, positive UD = up.</p>
+  <button class="btn btn-primary" id="log-shot-btn" style="margin-top:10px;">Log shot</button>
+  <div class="field-row" style="margin-top:16px; margin-bottom:14px;">
     <div class="field">
       <label for="f-radius">Target radius shown above (in)</label>
       <input id="f-radius" type="number" inputmode="decimal" step="0.5" placeholder="6">
     </div>
   </div>
-  <p class="hint" style="margin-top:-8px; margin-bottom:14px;">Set this once to the real-world radius your tap circle represents (e.g. scoring ring radius on your paper). It's used to convert taps into LR/UD inches for export. Saved for next time.</p>
+  <p class="hint" style="margin-top:-8px; margin-bottom:14px;">The real-world radius this target graphic represents (e.g. scoring ring radius on your paper). Used to scale where your typed coordinates land on the visual, and to convert them to inches for export. Saved for next time.</p>
   <div class="rec-panel" id="rec-panel" style="display:none;">
     <div class="rec-label" style="font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--dim); font-family:'SF Mono',ui-monospace,monospace;">Recommended orientation</div>
     <div class="rec-orient" id="rec-orient">—</div>
@@ -603,10 +615,16 @@ let activeOrientation = 0;
 const distanceInput = document.getElementById('f-distance');
 const bowInput = document.getElementById('f-bow');
 const radiusInput = document.getElementById('f-radius');
+const lrSquaresInput = document.getElementById('f-lr-squares');
+const udSquaresInput = document.getElementById('f-ud-squares');
+const logShotBtn = document.getElementById('log-shot-btn');
 radiusInput.addEventListener('change', () => {
   const v = parseFloat(radiusInput.value);
   if (Number.isFinite(v) && v > 0) saveTargetRadius(v);
 });
+radiusInput.addEventListener('input', renderPreviewDot);
+lrSquaresInput.addEventListener('input', renderPreviewDot);
+udSquaresInput.addEventListener('input', renderPreviewDot);
 function openShotLogger(arrowId){
   const arrows = loadArrows();
   const arrow = arrows.find(a => a.id === arrowId);
@@ -615,12 +633,14 @@ function openShotLogger(arrowId){
   activeOrientation = 0;
   editingShotId = null;
   modalTitle.textContent = 'Log shot — ' + arrow.arrowId;
-  modalSub.textContent = 'Pick the nock orientation, distance, then tap where it landed.';
+  modalSub.textContent = 'Pick the nock orientation, distance, then type where it landed.';
   orientChips.innerHTML = ORIENTATIONS.map(o =>
     `<button class="chip${o===0?' active':''}" data-o="${o}">${fmtDeg(o)}</button>`
   ).join('');
   distanceInput.value = '';
   bowInput.value = '';
+  lrSquaresInput.value = '';
+  udSquaresInput.value = '';
   radiusInput.value = loadTargetRadius();
   drawTarget();
   renderShotList();
@@ -668,9 +688,39 @@ function drawTarget(){
   cross.setAttribute('fill','#00000055');
   targetSvg.appendChild(cross);
   plotExistingShots();
-  targetSvg.addEventListener('click', onTargetTap);
+  renderPreviewDot();
 }
-function onTargetTap(evt){
+function currentRadius(){
+  const v = parseFloat(radiusInput.value);
+  return (Number.isFinite(v) && v > 0) ? v : loadTargetRadius();
+}
+// ---- preview dot: reflects whatever is currently typed in LR/UD, before it's logged ----
+function renderPreviewDot(){
+  const old = targetSvg.querySelector('#preview-dot');
+  if (old) old.remove();
+  const lrRaw = lrSquaresInput.value.trim();
+  const udRaw = udSquaresInput.value.trim();
+  if (!lrRaw && !udRaw) return; // nothing typed yet, nothing to preview
+  const lr = lrRaw ? parseFloat(lrRaw) : 0;
+  const ud = udRaw ? parseFloat(udRaw) : 0;
+  if (!Number.isFinite(lr) || !Number.isFinite(ud)) return;
+  const radius = currentRadius();
+  const lrIn = lr * 0.1875;
+  const udIn = ud * 0.1875;
+  const x = lrIn / radius;
+  const y = -udIn / radius; // SVG y is down-positive; flipped so up = positive UD
+  const dot = document.createElementNS(svgNS,'circle');
+  dot.setAttribute('id', 'preview-dot');
+  dot.setAttribute('cx', CX + x*R);
+  dot.setAttribute('cy', CY + y*R);
+  dot.setAttribute('r', 7);
+  dot.setAttribute('fill', 'none');
+  dot.setAttribute('stroke', '#c9822f');
+  dot.setAttribute('stroke-width', '2.5');
+  targetSvg.appendChild(dot);
+}
+// ---- log shot: typed LR/UD squares are the only input; target is a visual only ----
+logShotBtn.addEventListener('click', () => {
   if (!activeArrowId) return;
   const distance = parseFloat(distanceInput.value);
   if (!Number.isFinite(distance) || distance <= 0){
@@ -678,15 +728,25 @@ function onTargetTap(evt){
     showToast('Enter distance (yd) before logging a shot');
     return;
   }
-  const radius = (Number.isFinite(parseFloat(radiusInput.value)) && parseFloat(radiusInput.value) > 0)
-    ? parseFloat(radiusInput.value) : loadTargetRadius();
+  const lrRaw = lrSquaresInput.value.trim();
+  const udRaw = udSquaresInput.value.trim();
+  if (!lrRaw && !udRaw){
+    lrSquaresInput.focus();
+    showToast('Enter LR and/or UD before logging');
+    return;
+  }
+  const lrSquares = lrRaw ? parseFloat(lrRaw) : 0;
+  const udSquares = udRaw ? parseFloat(udRaw) : 0;
+  if (!Number.isFinite(lrSquares) || !Number.isFinite(udSquares)){
+    showToast('LR/UD must be numbers');
+    return;
+  }
+  const radius = currentRadius();
   saveTargetRadius(radius);
-  const rect = targetSvg.getBoundingClientRect();
-  const px = (evt.clientX - rect.left) * (SIZE / rect.width);
-  const py = (evt.clientY - rect.top) * (SIZE / rect.height);
-  const x = (px - CX) / R;   // normalized -1..1
-  const y = (py - CY) / R;
-  if (Math.hypot(x,y) > 1.25) return; // ignore taps way outside target
+  const lrIn = Math.round(lrSquares * 0.1875 * 1000) / 1000;
+  const udIn = Math.round(udSquares * 0.1875 * 1000) / 1000;
+  const x = Math.round((lrIn / radius) * 1000) / 1000;
+  const y = Math.round((-udIn / radius) * 1000) / 1000;
   const shots = loadShots();
   shots.push({
     id: 's_' + Date.now(),
@@ -695,19 +755,21 @@ function onTargetTap(evt){
     distance: distance,
     bow: bowInput.value.trim(),
     radiusInches: radius,
-    lrIn: Math.round(x*radius*1000)/1000,
-    udIn: Math.round(-y*radius*1000)/1000, // SVG y is down-positive; flipped so up = positive UD
-    x: Math.round(x*1000)/1000,
-    y: Math.round(y*1000)/1000,
+    lrIn: lrIn,
+    udIn: udIn,
+    x: x,
+    y: y,
     createdAt: new Date().toISOString()
   });
   saveShots(shots);
+  lrSquaresInput.value = '';
+  udSquaresInput.value = '';
   drawTarget();
   renderShotList();
   renderRecommendation();
   render();
-  showToast('Shot logged — ' + fmtDeg(activeOrientation) + ' · ' + distance + 'yd');
-}
+  showToast('Shot logged — ' + fmtDeg(activeOrientation) + ' · ' + distance + 'yd · LR ' + lrSquares + ' UD ' + udSquares);
+});
 function plotExistingShots(){
   const shots = loadShots().filter(s => s.arrowId === activeArrowId);
   shots.forEach(s => {
