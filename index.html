@@ -181,7 +181,7 @@
 </head>
 <body>
 <header>
-  <div class="eyebrow">Arrow Tracker · v1.6</div>
+  <div class="eyebrow">Arrow Tracker · v1.8</div>
   <h1>Fleet Log</h1>
   <p>Log each shaft's specs, then log shots by orientation to see what's actually working.</p>
 </header>
@@ -211,7 +211,7 @@
       <label for="f-id-custom">Arrow ID (manual)</label>
       <input id="f-id-custom" type="text" placeholder="e.g. Arrow 7 CustomName" autocomplete="off">
     </div>
-    <p class="hint" id="import-hint">No arrow list imported yet. Export the workbook's "Arrow ID Export" tab as CSV (Arrow ID in column A, Guidance in column B), then tap "Import list" and pick that file. Guidance fills in automatically as you browse arrows below.</p>
+    <p class="hint" id="import-hint">No arrow list imported yet. Export the workbook's "Arrow ID Export" tab as CSV (Arrow ID, Guidance, Priority Rank, Mean Spine, Mass, Point Weight), then tap "Import list" and pick that file. Guidance and starting Spine/Mass/Point fill in automatically as you browse arrows below.</p>
     <div class="row3">
       <div class="field">
         <label for="f-spine">Spine (in)</label>
@@ -512,6 +512,19 @@ function saveArrowGuidanceMap(map){
   try{ localStorage.setItem('arrowGuidanceMap', JSON.stringify(map)); return true; }
   catch(e){ console.error('Storage error', e); return false; }
 }
+// Starting Spine/Mass/Point values imported from the workbook (Mean Spine, Mass, Point Weight
+// on Arrow ID Export) -- a fallback for arrows that haven't been through the app's own Lab Data
+// wizard yet. Local Fleet/Lab Data records always take priority over this when both exist.
+function loadArrowWorkbookDataMap(){
+  try{
+    const raw = localStorage.getItem('arrowWorkbookDataMap');
+    return raw ? JSON.parse(raw) : {};
+  } catch(e){ console.error('Storage error', e); return {}; }
+}
+function saveArrowWorkbookDataMap(map){
+  try{ localStorage.setItem('arrowWorkbookDataMap', JSON.stringify(map)); return true; }
+  catch(e){ console.error('Storage error', e); return false; }
+}
 function loadTargetRadius(){
   const raw = localStorage.getItem('targetRadiusInches');
   const n = raw ? parseFloat(raw) : NaN;
@@ -576,8 +589,8 @@ function renderArrowIdSelect(){
     list.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('');
   if ([...idSelect.options].some(o => o.value === prev)) idSelect.value = prev;
   importHint.textContent = list.length
-    ? list.length + ' arrow ID' + (list.length === 1 ? '' : 's') + ' loaded from your last import, with guidance where available. Re-import any time the workbook\'s Arrow ID Export tab changes.'
-    : 'No arrow list imported yet. Export the workbook\'s "Arrow ID Export" tab as CSV (Arrow ID in column A, Guidance in column B), then tap "Import list" and pick that file.';
+    ? list.length + ' arrow ID' + (list.length === 1 ? '' : 's') + ' loaded from your last import, with guidance and starting spine/mass/point where available. Re-import any time the workbook\'s Arrow ID Export tab changes.'
+    : 'No arrow list imported yet. Export the workbook\'s "Arrow ID Export" tab as CSV (Arrow ID, Guidance, Priority Rank, Mean Spine, Mass, Point Weight), then tap "Import list" and pick that file.';
 }
 // Proper quote-aware CSV parser (RFC 4180 style) -- needed because guidance text
 // routinely contains commas, which a naive split(',') would misread.
@@ -613,10 +626,20 @@ function parseCsvRows(text){
   return rows.filter(r => r.length > 1 || (r.length === 1 && r[0] !== ''));
 }
 function parseArrowIdCsv(text){
+  const num = (s) => {
+    const n = parseFloat((s || '').trim());
+    return Number.isFinite(n) ? n : null;
+  };
   const rows = parseCsvRows(text).map(cols => {
     const id = (cols[0] || '').trim();
     const guidance = cols.length > 1 ? (cols[1] || '').trim() : '';
-    return { id, guidance };
+    // cols[2] is Priority Rank (for reference) -- not used by the app.
+    // cols[3..5] are Mean Spine (in), Mass (gr), Point Weight (gr), added so the app has real
+    // starting values for an arrow immediately on import, even before Lab Data's been run for it.
+    const spine = cols.length > 3 ? num(cols[3]) : null;
+    const mass = cols.length > 4 ? num(cols[4]) : null;
+    const point = cols.length > 5 ? num(cols[5]) : null;
+    return { id, guidance, spine, mass, point };
   }).filter(r => r.id);
   // Drop a header row like "Arrow ID" (optionally with a "Guidance" second column) if present
   if (rows.length && /^arrow\s*id$/i.test(rows[0].id)) rows.shift();
@@ -643,6 +666,13 @@ importFile.addEventListener('change', (e) => {
     const guidanceMap = loadArrowGuidanceMap();
     rows.forEach(r => { if (r.guidance) guidanceMap[r.id] = r.guidance; });
     saveArrowGuidanceMap(guidanceMap);
+    const workbookDataMap = loadArrowWorkbookDataMap();
+    rows.forEach(r => {
+      if (r.spine != null || r.mass != null || r.point != null){
+        workbookDataMap[r.id] = { spine: r.spine, mass: r.mass, point: r.point };
+      }
+    });
+    saveArrowWorkbookDataMap(workbookDataMap);
     renderArrowIdSelect();
     renderLabIdSelect();
     showToast(list.length + ' arrow ID' + (list.length === 1 ? '' : 's') + ' imported');
@@ -656,11 +686,23 @@ idSelect.addEventListener('change', () => {
   if (idSelect.value === '__other__'){
     idCustomInput.focus();
     noteInputEl.value = '';
+    spineInputEl.value = ''; massInputEl.value = ''; pointInputEl.value = '';
     return;
   }
   // Guidance always mirrors the currently selected arrow -- the app follows the
   // workbook's lead here, so there's no "don't overwrite" guard like other fields.
   noteInputEl.value = idSelect.value ? (loadArrowGuidanceMap()[idSelect.value] || '') : '';
+  // Spine/Mass/Point should likewise always reflect whatever's already on file for this
+  // arrow -- not whatever was left over in the form from the last arrow you looked at.
+  // Priority: local Fleet record (manual save or Lab Data -- freshest, actual measurements)
+  // first; if this arrow hasn't been through either of those yet, fall back to the starting
+  // value imported from the workbook (Mean Spine/Mass/Point Weight); blank if neither exists.
+  const existing = idSelect.value ? loadArrows().find(a => a.arrowId === idSelect.value) : null;
+  const wbData = idSelect.value ? loadArrowWorkbookDataMap()[idSelect.value] : null;
+  const pick = (localVal, wbVal) => localVal != null ? localVal : (wbVal != null ? wbVal : '');
+  spineInputEl.value = pick(existing && existing.spine, wbData && wbData.spine);
+  massInputEl.value = pick(existing && existing.mass, wbData && wbData.mass);
+  pointInputEl.value = pick(existing && existing.point, wbData && wbData.point);
 });
 renderArrowIdSelect();
 
@@ -1211,6 +1253,7 @@ backupBtn.addEventListener('click', () => {
     shots: loadShots(),
     arrowIdList: loadArrowIdList(),
     arrowGuidanceMap: loadArrowGuidanceMap(),
+    arrowWorkbookDataMap: loadArrowWorkbookDataMap(),
     targetRadiusInches: loadTargetRadius(),
     labData: loadLabData()
   };
@@ -1248,6 +1291,7 @@ restoreFile.addEventListener('change', (e) => {
     saveShots(data.shots);
     if (Array.isArray(data.arrowIdList)) saveArrowIdList(data.arrowIdList);
     if (data.arrowGuidanceMap && typeof data.arrowGuidanceMap === 'object') saveArrowGuidanceMap(data.arrowGuidanceMap);
+    if (data.arrowWorkbookDataMap && typeof data.arrowWorkbookDataMap === 'object') saveArrowWorkbookDataMap(data.arrowWorkbookDataMap);
     if (Number.isFinite(data.targetRadiusInches) && data.targetRadiusInches > 0) saveTargetRadius(data.targetRadiusInches);
     if (data.labData && typeof data.labData === 'object') saveLabData(data.labData);
     renderArrowIdSelect();
