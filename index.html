@@ -181,7 +181,7 @@
 </head>
 <body>
 <header>
-  <div class="eyebrow">Arrow Tracker · v2.0</div>
+  <div class="eyebrow">Arrow Tracker · v2.1</div>
   <h1>Fleet Log</h1>
   <p>Log each shaft's specs, then log shots by orientation to see what's actually working.</p>
 </header>
@@ -256,12 +256,17 @@
   <div id="view-labdata" class="view" style="display:none;">
     <div class="panel">
       <h2>Lab Data — Spine Wizard</h2>
-      <div class="field">
-        <label for="lab-id-select">Arrow ID</label>
-        <select id="lab-id-select">
-          <option value="">Select an arrow…</option>
-        </select>
+      <div class="field-row">
+        <div class="field">
+          <label for="lab-id-select">Arrow ID</label>
+          <select id="lab-id-select">
+            <option value="">Select an arrow…</option>
+          </select>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="lab-import-btn" type="button">Import angle data</button>
+        <input type="file" id="lab-import-file" accept=".csv,text/csv" style="display:none;">
       </div>
+      <p class="hint" id="lab-import-hint">No per-angle spine data imported yet. Export the workbook's "Spine By Angle Export" tab as CSV (Arrow ID, 0°, 22.5°, 45°... 337.5°), then tap "Import angle data" and pick that file. This is your actual measured reading at each angle -- separate from the Guidance tab's Mean Spine, which is an average and isn't accurate for any single position.</p>
       <p class="hint" id="lab-existing-hint"></p>
       <div class="field">
         <label for="lab-baseline">0&deg; baseline spine (in)</label>
@@ -541,6 +546,19 @@ function loadArrowWorkbookDataMap(){
 }
 function saveArrowWorkbookDataMap(map){
   try{ localStorage.setItem('arrowWorkbookDataMap', JSON.stringify(map)); return true; }
+  catch(e){ console.error('Storage error', e); return false; }
+}
+// Real per-angle spine readings imported from the workbook's "Spine By Angle Export" tab --
+// the actual measured value at each of the 16 angles, not the Mean Spine average. Keyed by
+// arrowId -> { '0': val, '22.5': val, ... } using the same angle-string keys as labSpine.
+function loadArrowSpineByAngleMap(){
+  try{
+    const raw = localStorage.getItem('arrowSpineByAngleMap');
+    return raw ? JSON.parse(raw) : {};
+  } catch(e){ console.error('Storage error', e); return {}; }
+}
+function saveArrowSpineByAngleMap(map){
+  try{ localStorage.setItem('arrowSpineByAngleMap', JSON.stringify(map)); return true; }
   catch(e){ console.error('Storage error', e); return false; }
 }
 function loadTargetRadius(){
@@ -1268,6 +1286,7 @@ backupBtn.addEventListener('click', () => {
     arrowIdList: loadArrowIdList(),
     arrowGuidanceMap: loadArrowGuidanceMap(),
     arrowWorkbookDataMap: loadArrowWorkbookDataMap(),
+    arrowSpineByAngleMap: loadArrowSpineByAngleMap(),
     targetRadiusInches: loadTargetRadius(),
     labData: loadLabData()
   };
@@ -1306,10 +1325,12 @@ restoreFile.addEventListener('change', (e) => {
     if (Array.isArray(data.arrowIdList)) saveArrowIdList(data.arrowIdList);
     if (data.arrowGuidanceMap && typeof data.arrowGuidanceMap === 'object') saveArrowGuidanceMap(data.arrowGuidanceMap);
     if (data.arrowWorkbookDataMap && typeof data.arrowWorkbookDataMap === 'object') saveArrowWorkbookDataMap(data.arrowWorkbookDataMap);
+    if (data.arrowSpineByAngleMap && typeof data.arrowSpineByAngleMap === 'object') saveArrowSpineByAngleMap(data.arrowSpineByAngleMap);
     if (Number.isFinite(data.targetRadiusInches) && data.targetRadiusInches > 0) saveTargetRadius(data.targetRadiusInches);
     if (data.labData && typeof data.labData === 'object') saveLabData(data.labData);
     renderArrowIdSelect();
     renderLabIdSelect();
+    renderLabImportHint();
     renderLabList();
     cancelEditArrow();
     render();
@@ -1359,6 +1380,9 @@ let labReadings = [];   // readings added via "Measure again" for the position i
 let labDir = 'cw';
 let labRollBehavior = 'None';
 const labIdSelect = document.getElementById('lab-id-select');
+const labImportBtn = document.getElementById('lab-import-btn');
+const labImportFile = document.getElementById('lab-import-file');
+const labImportHint = document.getElementById('lab-import-hint');
 const labExistingHint = document.getElementById('lab-existing-hint');
 const labBaselineInput = document.getElementById('lab-baseline');
 const labStartBtn = document.getElementById('lab-start-btn');
@@ -1400,6 +1424,61 @@ function renderLabIdSelect(){
   if ([...labIdSelect.options].some(o => o.value === prev)) labIdSelect.value = prev;
 }
 renderLabIdSelect();
+// ---------- import per-angle spine data (Spine By Angle Export tab) ----------
+// Column headers are matched by their numeric angle (degree symbol optional), not by
+// position, so column order in the exported CSV doesn't matter.
+function parseSpineByAngleCsv(text){
+  const rows = parseCsvRows(text);
+  if (!rows.length) return {};
+  const headers = rows[0].map(h => h.trim());
+  const angleColIndex = {};
+  headers.forEach((h, i) => {
+    if (i === 0) return; // Arrow ID column
+    const num = h.replace(/[^0-9.]/g, '');
+    if (num) angleColIndex[num] = i;
+  });
+  const map = {};
+  rows.slice(1).forEach(cols => {
+    const id = (cols[0] || '').trim();
+    if (!id || /^arrow\s*id$/i.test(id)) return;
+    const entry = {};
+    Object.keys(angleColIndex).forEach(angle => {
+      const raw = cols[angleColIndex[angle]];
+      const n = parseFloat((raw || '').trim());
+      if (Number.isFinite(n)) entry[angle] = n;
+    });
+    if (Object.keys(entry).length) map[id] = entry;
+  });
+  return map;
+}
+function renderLabImportHint(){
+  const map = loadArrowSpineByAngleMap();
+  const count = Object.keys(map).length;
+  labImportHint.textContent = count
+    ? count + ' arrow' + (count === 1 ? '' : 's') + ' with real per-angle spine data loaded from your last import. Re-import any time the workbook\'s Spine By Angle Export tab changes.'
+    : 'No per-angle spine data imported yet. Export the workbook\'s "Spine By Angle Export" tab as CSV (Arrow ID, 0°, 22.5°, 45°... 337.5°), then tap "Import angle data" and pick that file. This is your actual measured reading at each angle -- separate from the Guidance tab\'s Mean Spine, which is an average and isn\'t accurate for any single position.';
+}
+labImportBtn.addEventListener('click', () => labImportFile.click());
+labImportFile.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    let map;
+    try{ map = parseSpineByAngleCsv(String(reader.result)); }
+    catch(err){ console.error(err); showToast('Could not read that file'); labImportFile.value = ''; return; }
+    const count = Object.keys(map).length;
+    if (!count){ showToast('No per-angle spine data found in that file'); labImportFile.value = ''; return; }
+    saveArrowSpineByAngleMap(map);
+    renderLabImportHint();
+    if (labIdSelect.value) labIdSelect.dispatchEvent(new Event('change'));
+    showToast(count + ' arrow' + (count === 1 ? '' : 's') + ' with per-angle spine data imported');
+    labImportFile.value = '';
+  };
+  reader.onerror = () => { showToast('Could not read that file'); labImportFile.value = ''; };
+  reader.readAsText(file);
+});
+renderLabImportHint();
 labIdSelect.addEventListener('change', () => {
   const id = labIdSelect.value;
   labWizardPanel.style.display = 'none';
@@ -1412,16 +1491,22 @@ labIdSelect.addEventListener('change', () => {
   const data = loadLabData()[id];
   const fleetArrow = loadArrows().find(a => a.arrowId === id);
   const wbData = loadArrowWorkbookDataMap()[id];
-  // Baseline priority: completed Lab Data wizard (most authoritative) > Fleet record (manual save
-  // or a prior wizard sync) > imported workbook Mean Spine (starting value only).
+  const angleData = loadArrowSpineByAngleMap()[id];
+  const wbZeroDeg = angleData && angleData['0'] != null ? angleData['0'] : null;
+  // Baseline priority: completed Lab Data wizard (most authoritative -- you measured it
+  // yourself) > Fleet record (manual save or a prior wizard sync) > the workbook's REAL 0deg
+  // reading from Spine By Angle Export (a single measurement, not an average) > Mean Spine
+  // (last resort only -- it's an average across all 16 angles, not the 0deg reading, and
+  // should not be presented as if it were).
   const pick = (localVal, wbVal) => localVal != null ? localVal : (wbVal != null ? wbVal : '');
-  // Same rule as the Guidance tab: a saved Lab Data baseline or Fleet spine is a single
-  // reading -- raw resolution. Only the imported workbook's Mean Spine is a multi-reading
-  // average and earns the extra digit.
-  function pickSpine(labVal, fleetVal, wbVal){
+  // Same precision rule as the Guidance tab: a saved Lab Data baseline, Fleet spine, or the
+  // workbook's real per-angle reading is a single measurement -- raw resolution. Only Mean
+  // Spine is a multi-reading average and earns the extra digit.
+  function pickSpine(labVal, fleetVal, wbZero, wbMean){
     if (labVal != null) return fmtSpine(labVal, false);
     if (fleetVal != null) return fmtSpine(fleetVal, false);
-    if (wbVal != null) return fmtSpine(wbVal, true);
+    if (wbZero != null) return fmtSpine(wbZero, false);
+    if (wbMean != null) return fmtSpine(wbMean, true);
     return '';
   }
   function pickMass(labVal, fleetVal, wbVal){
@@ -1430,7 +1515,7 @@ labIdSelect.addEventListener('change', () => {
   }
   if (data){
     labExistingHint.textContent = 'Existing lab data found for this arrow' + (data.updatedAt ? ' (saved ' + data.updatedAt.slice(0,10) + ')' : '') + '. Starting the wizard will let you re-measure and overwrite it.';
-    labBaselineInput.value = pickSpine(data.spine && data.spine['0'], fleetArrow && fleetArrow.spine, wbData && wbData.spine);
+    labBaselineInput.value = pickSpine(data.spine && data.spine['0'], fleetArrow && fleetArrow.spine, wbZeroDeg, wbData && wbData.spine);
     labMassInput.value = pickMass(data.mass, fleetArrow && fleetArrow.mass, wbData && wbData.mass);
     labPointInput.value = pick(data.point, fleetArrow && fleetArrow.point, wbData && wbData.point);
     labFloInput.value = data.flo != null ? data.flo : '';
@@ -1438,9 +1523,11 @@ labIdSelect.addEventListener('change', () => {
     labMassAsymInput.value = data.massAsymMag != null ? data.massAsymMag : '';
     labRollBehavior = data.rollingBehavior || 'None';
   } else {
-    const source = (fleetArrow && fleetArrow.spine != null) ? 'your Fleet record' : ((wbData && wbData.spine != null) ? 'the imported workbook' : null);
+    const source = (fleetArrow && fleetArrow.spine != null) ? 'your Fleet record'
+      : (wbZeroDeg != null ? 'the workbook\'s real 0° reading (Spine By Angle Export)'
+      : ((wbData && wbData.spine != null) ? 'the imported workbook\'s Mean Spine (an average across all 16 angles -- not the actual 0° reading; import the workbook\'s Spine By Angle Export tab above for the real value)' : null));
     labExistingHint.textContent = source ? 'No completed spine wizard yet — baseline below is pre-filled from ' + source + '. Adjust it if your actual 0° measurement differs.' : '';
-    labBaselineInput.value = pickSpine(null, fleetArrow && fleetArrow.spine, wbData && wbData.spine);
+    labBaselineInput.value = pickSpine(null, fleetArrow && fleetArrow.spine, wbZeroDeg, wbData && wbData.spine);
     labMassInput.value = pickMass(null, fleetArrow && fleetArrow.mass, wbData && wbData.mass);
     labPointInput.value = pick(null, fleetArrow && fleetArrow.point, wbData && wbData.point);
     labFloInput.value = '';
@@ -1824,8 +1911,21 @@ labStartBtn.addEventListener('click', () => {
     labArrowId = id;
     labBaseline = baseline;
     labSpine = { '0': baseline };
+    // Seed any other position that already has a real measured value from the imported
+    // workbook (Spine By Angle Export) -- no need to re-measure something already on the
+    // bench sheet. Any position missing from that import stays blank for you to fill in
+    // with the dial as normal.
+    let seeded = 0;
+    const angleData = loadArrowSpineByAngleMap()[id];
+    if (angleData){
+      LAB_POSITIONS.forEach(angle => {
+        const v = angleData[String(angle)];
+        if (v != null){ labSpine[String(angle)] = roundTo(v, SPINE_RAW_DECIMALS); seeded++; }
+      });
+    }
     labIndex = 0;
     saveLabDraft();
+    if (seeded > 0) showToast('Pre-filled ' + seeded + ' of 16 positions from your workbook import');
   }
   labWizardPanel.style.display = 'block';
   labDetailsPanel.style.display = 'none';
