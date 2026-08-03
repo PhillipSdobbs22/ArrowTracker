@@ -181,7 +181,7 @@
 </head>
 <body>
 <header>
-  <div class="eyebrow">Arrow Tracker · v1.8</div>
+  <div class="eyebrow">Arrow Tracker · v1.9</div>
   <h1>Fleet Log</h1>
   <p>Log each shaft's specs, then log shots by orientation to see what's actually working.</p>
 </header>
@@ -270,14 +270,12 @@
       <p class="hint">Spin the shaft to find its weakest axis, measure with calipers, set that as 0&deg; here, and zero the dial indicator there.</p>
       <button class="btn btn-primary" id="lab-start-btn" style="margin-top:6px;">Start / resume wizard</button>
     </div>
-
     <div class="panel" id="lab-wizard-panel" style="display:none;">
       <h2 style="display:flex; justify-content:space-between; align-items:center;">
         <span id="lab-step-label">Position 2 of 16</span>
         <span class="count-tag" id="lab-progress-tag">1 / 16 recorded</span>
       </h2>
       <div class="chip-row" id="lab-position-chips"></div>
-
       <div class="lab-visuals">
         <div class="target-wrap">
           <svg class="target" id="lab-dial-svg" width="220" height="220" viewBox="0 0 260 260"></svg>
@@ -288,7 +286,6 @@
       </div>
       <p class="target-hint" id="lab-dial-caption">Enter a dial reading to see the calculated spine.</p>
       <p class="target-hint" id="lab-radar-caption" style="margin-top:-12px;">Left: this reading. Right: the whole shaft's spine pattern so far.</p>
-
       <div id="lab-add-reading-wrap">
         <div class="row2">
           <div class="field" style="margin-bottom:0;">
@@ -305,16 +302,13 @@
         </div>
         <p class="hint" id="lab-wizard-hint" style="margin-top:8px; margin-bottom:14px;"></p>
       </div>
-
       <button class="btn btn-primary" id="lab-next-btn" style="margin-top:4px;">Save &amp; next</button>
       <div class="panel-actions" style="margin-top:10px;">
         <button class="btn btn-ghost btn-sm" id="lab-add-measure-btn">Measure again</button>
         <button class="btn btn-ghost btn-sm" id="lab-back-btn">Back</button>
       </div>
-
       <div class="shot-list" id="lab-reading-rows"></div>
     </div>
-
     <div class="panel" id="lab-details-panel" style="display:none;">
       <h2>Mass &amp; axis details</h2>
       <div class="row3">
@@ -356,7 +350,6 @@
       <button class="btn btn-primary" id="lab-save-btn" style="margin-top:14px;">Save lab data for this arrow</button>
       <p class="hint">Saving updates this arrow's spine/mass/point on the Guidance tab too, and makes it exportable below.</p>
     </div>
-
     <div class="panel">
       <h2 style="display:flex; justify-content:space-between; align-items:center;">
         <span>Lab data logged</span>
@@ -456,10 +449,8 @@ const ORIENTATIONS = Array.from({length:16}, (_,i)=> i*22.5); // canonical ascen
 // storage still keys every value by its real angle, so export to the workbook is
 // unaffected regardless of the order things were entered on screen.
 const ORIENT_CCW_ORDER = [0,337.5,315,292.5,270,247.5,225,202.5,180,157.5,135,112.5,90,67.5,45,22.5];
-
 let editingArrowId = null;
 let editingShotId = null;
-
 function showToast(msg){
   toastEl.textContent = msg;
   toastEl.classList.add('show');
@@ -579,7 +570,6 @@ const spineInputEl = document.getElementById('f-spine');
 const massInputEl = document.getElementById('f-mass');
 const pointInputEl = document.getElementById('f-point');
 const noteInputEl = document.getElementById('f-note');
-
 function renderArrowIdSelect(){
   const list = loadArrowIdList();
   const prev = idSelect.value;
@@ -705,7 +695,6 @@ idSelect.addEventListener('change', () => {
   pointInputEl.value = pick(existing && existing.point, wbData && wbData.point);
 });
 renderArrowIdSelect();
-
 // ---------- edit arrow in place ----------
 function startEditArrow(id){
   const arrow = loadArrows().find(a => a.id === id);
@@ -743,7 +732,6 @@ function cancelEditArrow(){
   cancelEditBtn.style.display = 'none';
 }
 cancelEditBtn.addEventListener('click', cancelEditArrow);
-
 // ---------- add / update / delete arrow ----------
 saveArrowBtn.addEventListener('click', () => {
   const arrowId = idSelect.value === '__other__'
@@ -754,7 +742,6 @@ saveArrowBtn.addEventListener('click', () => {
     showToast('Arrow ID is required');
     return;
   }
-
   // If a manually-typed ID isn't in the saved list yet, add it so it's selectable next time.
   if (idSelect.value === '__other__'){
     const list = loadArrowIdList();
@@ -764,9 +751,7 @@ saveArrowBtn.addEventListener('click', () => {
       renderArrowIdSelect();
     }
   }
-
   const arrows = loadArrows();
-
   if (editingArrowId){
     const idx = arrows.findIndex(a => a.id === editingArrowId);
     if (idx === -1){
@@ -788,7 +773,6 @@ saveArrowBtn.addEventListener('click', () => {
     else showToast('Could not save — try again');
     return;
   }
-
   const entry = {
     id: 'a_' + Date.now(),
     arrowId,
@@ -809,7 +793,6 @@ saveArrowBtn.addEventListener('click', () => {
     showToast('Could not save — try again');
   }
 });
-
 listEl.addEventListener('click', (e) => {
   const delBtn = e.target.closest('[data-del]');
   if (delBtn){
@@ -840,7 +823,6 @@ listEl.addEventListener('click', (e) => {
     openShotLogger(logBtn.getAttribute('data-log'));
   }
 });
-
 // ---------- shot logger modal ----------
 const backdrop = document.getElementById('modal-backdrop');
 const modal = document.getElementById('modal');
@@ -1332,7 +1314,6 @@ function saveLabDraft(){
 function clearLabDraft(){
   try{ localStorage.removeItem('labSpineDraft'); } catch(e){}
 }
-
 // ---------- Lab Data: spine wizard state ----------
 // Order matches the physical measurement procedure: 0deg baseline first (entered above,
 // not part of this array), then rotate 22.5deg counter-clockwise each step. Derived from
@@ -1345,7 +1326,6 @@ let labIndex = 0;       // how many of LAB_POSITIONS have been saved so far
 let labReadings = [];   // readings added via "Measure again" for the position in progress
 let labDir = 'cw';
 let labRollBehavior = 'None';
-
 const labIdSelect = document.getElementById('lab-id-select');
 const labExistingHint = document.getElementById('lab-existing-hint');
 const labBaselineInput = document.getElementById('lab-baseline');
@@ -1380,7 +1360,6 @@ const labEmptyEl = document.getElementById('lab-empty-state');
 const labCountEl = document.getElementById('lab-count-tag');
 const labExportSpineBtn = document.getElementById('lab-export-spine-btn');
 const labExportMassBtn = document.getElementById('lab-export-mass-btn');
-
 function renderLabIdSelect(){
   const list = loadArrowIdList();
   const prev = labIdSelect.value;
@@ -1389,7 +1368,6 @@ function renderLabIdSelect(){
   if ([...labIdSelect.options].some(o => o.value === prev)) labIdSelect.value = prev;
 }
 renderLabIdSelect();
-
 labIdSelect.addEventListener('change', () => {
   const id = labIdSelect.value;
   labWizardPanel.style.display = 'none';
@@ -1402,6 +1380,8 @@ labIdSelect.addEventListener('change', () => {
   const data = loadLabData()[id];
   const fleetArrow = loadArrows().find(a => a.arrowId === id);
   const wbData = loadArrowWorkbookDataMap()[id];
+  // Baseline priority: completed Lab Data wizard (most authoritative) > Fleet record (manual save
+  // or a prior wizard sync) > imported workbook Mean Spine (starting value only).
   const pick = (labVal, fleetVal, wbVal) => labVal != null ? labVal : (fleetVal != null ? fleetVal : (wbVal != null ? wbVal : ''));
   if (data){
     labExistingHint.textContent = 'Existing lab data found for this arrow' + (data.updatedAt ? ' (saved ' + data.updatedAt.slice(0,10) + ')' : '') + '. Starting the wizard will let you re-measure and overwrite it.';
@@ -1424,14 +1404,12 @@ labIdSelect.addEventListener('change', () => {
   }
   [...labRollChips.children].forEach(c => c.classList.toggle('active', c.getAttribute('data-roll') === labRollBehavior));
 });
-
 labRollChips.addEventListener('click', (e) => {
   const btn = e.target.closest('[data-roll]');
   if (!btn) return;
   labRollBehavior = btn.getAttribute('data-roll');
   [...labRollChips.children].forEach(c => c.classList.toggle('active', c === btn));
 });
-
 labDirChips.addEventListener('click', (e) => {
   const btn = e.target.closest('[data-dir]');
   if (!btn) return;
@@ -1440,10 +1418,8 @@ labDirChips.addEventListener('click', (e) => {
   renderLabCalc();
 });
 labMagInput.addEventListener('input', renderLabCalc);
-
 // Clockwise = stiffer = subtract from baseline. Counter-clockwise = weaker = add to baseline.
 function signedReading(r){ return r.dir === 'ccw' ? Math.abs(r.mag) : -Math.abs(r.mag); }
-
 function renderLabReadingRows(){
   if (!labReadings.length){ labReadingRows.innerHTML = ''; return; }
   labReadingRows.innerHTML = '<div class="hint" style="margin-bottom:6px;">Readings for this position:</div>' +
@@ -1490,7 +1466,6 @@ labAddMeasureBtn.addEventListener('click', () => {
   renderLabReadingRows();
   renderLabCalc();
 });
-
 function computeWeakStiffAxis(spineObj){
   const entries = Object.keys(spineObj).map(k => ({angle: parseFloat(k), val: spineObj[k]}))
     .filter(e => Number.isFinite(e.val));
@@ -1499,7 +1474,6 @@ function computeWeakStiffAxis(spineObj){
   const stiff = entries.reduce((a,b)=> b.val < a.val ? b : a);
   return {weakAxis: weak.angle, weakVal: weak.val, stiffAxis: stiff.angle, stiffVal: stiff.val};
 }
-
 // Position chips mirror the shot-log orientation row: one compact wrapping row, same
 // 0, 337.5, 315... order. Each tile is two lines (angle + recorded value) so the sequence
 // is still readable at a glance without needing a tall list -- the dial below carries the
@@ -1532,7 +1506,6 @@ labPositionChips.addEventListener('click', (e) => {
   saveLabDraft();
   renderLabStep();
 });
-
 // ---- dial indicator: mirrors the target face concept for spine readings ----
 // Needle points straight up at zero. Clockwise (stiffer) swings it right, counter-clockwise
 // (weaker) swings it left, proportional to magnitude. Repeat "Measure again" readings for
@@ -1631,7 +1604,6 @@ function drawLabDial(){
   hub.setAttribute('fill', '#e8e6dd');
   labDialSvg.appendChild(hub);
 }
-
 // ---- radar/polar chart: pattern of spine behavior across all 16 angles, same idea as
 // the target face showing pattern of shot impacts. Angles sit at their true geometric
 // position (0deg at top, clockwise) regardless of what order you measured them in. The
@@ -1754,7 +1726,6 @@ function drawLabRadar(){
     labRadarSvg.appendChild(dot);
   });
 }
-
 function renderLabStep(){
   if (labIndex >= LAB_POSITIONS.length){
     labStepLabel.textContent = 'All 16 positions recorded';
@@ -1792,7 +1763,6 @@ function renderLabStep(){
   drawLabRadar();
   labWizardHint.textContent = 'Rotate the shaft 22.5° further counter-clockwise from the last position, then read the dial.';
 }
-
 labStartBtn.addEventListener('click', () => {
   const id = labIdSelect.value;
   if (!id){ showToast('Select an Arrow ID first'); labIdSelect.focus(); return; }
@@ -1817,14 +1787,12 @@ labStartBtn.addEventListener('click', () => {
   renderLabStep();
   labWizardPanel.scrollIntoView({behavior:'smooth', block:'start'});
 });
-
 labBackBtn.addEventListener('click', () => {
   if (labIndex === 0){ showToast('Already at the first position after baseline'); return; }
   labIndex -= 1;
   saveLabDraft();
   renderLabStep();
 });
-
 labNextBtn.addEventListener('click', () => {
   const angle = LAB_POSITIONS[labIndex];
   const pending = parseFloat(labMagInput.value);
@@ -1850,7 +1818,6 @@ labNextBtn.addEventListener('click', () => {
   saveLabDraft();
   renderLabStep();
 });
-
 function showLabDetails(){
   labDetailsPanel.style.display = 'block';
   const axis = computeWeakStiffAxis(labSpine);
@@ -1863,7 +1830,6 @@ function showLabDetails(){
     labAxisSummary.textContent = '—';
   }
 }
-
 labSaveBtn.addEventListener('click', () => {
   if (!labArrowId || Object.keys(labSpine).length < 16){
     showToast('Complete all 16 spine positions first');
@@ -1875,7 +1841,6 @@ labSaveBtn.addEventListener('click', () => {
   const heavyAxis = labHeavyAxisInput.value ? parseFloat(labHeavyAxisInput.value) : null;
   const massAsymMag = labMassAsymInput.value ? parseFloat(labMassAsymInput.value) : null;
   const axis = computeWeakStiffAxis(labSpine);
-
   const labMap = loadLabData();
   labMap[labArrowId] = {
     spine: labSpine,
@@ -1886,7 +1851,6 @@ labSaveBtn.addEventListener('click', () => {
     updatedAt: new Date().toISOString()
   };
   saveLabData(labMap);
-
   // Sync into the shared Fleet arrow record (Guidance tab) -- mass/point/baseline spine only.
   // Guidance text is left untouched; it comes from the workbook import, not from here.
   const arrows = loadArrows();
@@ -1909,7 +1873,6 @@ labSaveBtn.addEventListener('click', () => {
     };
   }
   saveArrows(arrows);
-
   clearLabDraft();
   labWizardPanel.style.display = 'none';
   labDetailsPanel.style.display = 'none';
@@ -1923,7 +1886,6 @@ labSaveBtn.addEventListener('click', () => {
   renderLabList();
   showToast('Lab data saved — Fleet record updated');
 });
-
 function renderLabList(){
   const map = loadLabData();
   const ids = Object.keys(map);
@@ -1950,7 +1912,6 @@ function renderLabList(){
   }).join('');
 }
 renderLabList();
-
 // ---------- Lab Data: CSV exports (Piece 6) ----------
 labExportSpineBtn.addEventListener('click', () => {
   const map = loadLabData();
@@ -1995,7 +1956,6 @@ labExportMassBtn.addEventListener('click', () => {
   URL.revokeObjectURL(url);
   showToast(rows.length + ' arrow(s) exported for Mass Asymmetry tab');
 });
-
 // ---------- tab navigation (Guidance / Lab Data) ----------
 const tabButtons = document.querySelectorAll('#tabbar .tab');
 const tabViews = {
