@@ -181,7 +181,7 @@
 </head>
 <body>
 <header>
-  <div class="eyebrow">Arrow Tracker · v1.9</div>
+  <div class="eyebrow">Arrow Tracker · v2.0</div>
   <h1>Fleet Log</h1>
   <p>Log each shaft's specs, then log shots by orientation to see what's actually working.</p>
 </header>
@@ -462,6 +462,33 @@ function escapeHtml(s){
 function fmtDeg(d){
   return (Number.isInteger(d) ? d : d.toFixed(1)) + '°';
 }
+// ---------- measurement precision (display/export only -- never mutates stored raw values) ----------
+// A reading can't honestly carry more decimal places than the instrument that produced it.
+// Dial indicator / calipers resolve to 0.001". A mass scale here resolves to 0.1gr. A value
+// that's a genuine average of several independent readings (e.g. the workbook's imported
+// Mean Spine, typically averaged across the 16-position sweep) can earn ONE extra digit --
+// standard error shrinks roughly as 1/sqrt(n) -- but not the 4-7 extra decimals that floating-
+// point division happens to leave behind. Raw storage keeps full precision so downstream math
+// never compounds rounding error; only what's shown or exported gets rounded.
+const SPINE_RAW_DECIMALS = 3;   // single dial/caliper reading: 0.001"
+const SPINE_AVG_DECIMALS = 4;   // spine value known to be an average of several readings
+const MASS_DECIMALS = 1;        // mass scale: 0.1gr
+function roundTo(value, decimals){
+  if (value == null || !Number.isFinite(value)) return null;
+  const f = Math.pow(10, decimals);
+  return Math.round(value * f) / f;
+}
+// isAverage: true when the value is a known multi-reading average (e.g. imported workbook
+// Mean Spine) rather than a single fresh instrument reading.
+function fmtSpine(value, isAverage){
+  if (value == null || !Number.isFinite(value)) return null;
+  const decimals = isAverage ? SPINE_AVG_DECIMALS : SPINE_RAW_DECIMALS;
+  return roundTo(value, decimals).toFixed(decimals);
+}
+function fmtMass(value){
+  if (value == null || !Number.isFinite(value)) return null;
+  return roundTo(value, MASS_DECIMALS).toFixed(MASS_DECIMALS);
+}
 // ---------- storage ----------
 function loadArrows(){
   try{
@@ -544,7 +571,7 @@ function render(){
       <div class="top">
         <div style="flex:1; min-width:0;">
           <div class="id">${escapeHtml(a.arrowId)}</div>
-          <div class="meta">${a.spine != null ? 'spine ' + Number(a.spine).toFixed(3) + '"' : 'spine —'} &nbsp;·&nbsp; ${a.mass != null ? Number(a.mass).toFixed(1) + ' gr' : 'mass —'} &nbsp;·&nbsp; ${a.point != null ? Number(a.point).toFixed(0) + ' gr point' : 'point —'}</div>
+          <div class="meta">${a.spine != null ? 'spine ' + fmtSpine(a.spine, false) + '"' : 'spine —'} &nbsp;·&nbsp; ${a.mass != null ? fmtMass(a.mass) + ' gr' : 'mass —'} &nbsp;·&nbsp; ${a.point != null ? Number(a.point).toFixed(0) + ' gr point' : 'point —'}</div>
           ${a.note ? `<div class="note">${escapeHtml(a.note)}</div>` : ''}
         </div>
         <button class="del" data-del="${a.id}">Delete</button>
@@ -689,9 +716,14 @@ idSelect.addEventListener('change', () => {
   // value imported from the workbook (Mean Spine/Mass/Point Weight); blank if neither exists.
   const existing = idSelect.value ? loadArrows().find(a => a.arrowId === idSelect.value) : null;
   const wbData = idSelect.value ? loadArrowWorkbookDataMap()[idSelect.value] : null;
+  // Fleet's own spine is a single caliper/baseline reading -- raw resolution. The workbook's
+  // Mean Spine is a multi-reading average -- earns one extra digit, never full float precision.
+  if (existing && existing.spine != null) spineInputEl.value = fmtSpine(existing.spine, false);
+  else if (wbData && wbData.spine != null) spineInputEl.value = fmtSpine(wbData.spine, true);
+  else spineInputEl.value = '';
+  const massVal = (existing && existing.mass != null) ? existing.mass : (wbData && wbData.mass != null ? wbData.mass : null);
+  massInputEl.value = massVal != null ? fmtMass(massVal) : '';
   const pick = (localVal, wbVal) => localVal != null ? localVal : (wbVal != null ? wbVal : '');
-  spineInputEl.value = pick(existing && existing.spine, wbData && wbData.spine);
-  massInputEl.value = pick(existing && existing.mass, wbData && wbData.mass);
   pointInputEl.value = pick(existing && existing.point, wbData && wbData.point);
 });
 renderArrowIdSelect();
@@ -1382,11 +1414,24 @@ labIdSelect.addEventListener('change', () => {
   const wbData = loadArrowWorkbookDataMap()[id];
   // Baseline priority: completed Lab Data wizard (most authoritative) > Fleet record (manual save
   // or a prior wizard sync) > imported workbook Mean Spine (starting value only).
-  const pick = (labVal, fleetVal, wbVal) => labVal != null ? labVal : (fleetVal != null ? fleetVal : (wbVal != null ? wbVal : ''));
+  const pick = (localVal, wbVal) => localVal != null ? localVal : (wbVal != null ? wbVal : '');
+  // Same rule as the Guidance tab: a saved Lab Data baseline or Fleet spine is a single
+  // reading -- raw resolution. Only the imported workbook's Mean Spine is a multi-reading
+  // average and earns the extra digit.
+  function pickSpine(labVal, fleetVal, wbVal){
+    if (labVal != null) return fmtSpine(labVal, false);
+    if (fleetVal != null) return fmtSpine(fleetVal, false);
+    if (wbVal != null) return fmtSpine(wbVal, true);
+    return '';
+  }
+  function pickMass(labVal, fleetVal, wbVal){
+    const v = labVal != null ? labVal : (fleetVal != null ? fleetVal : (wbVal != null ? wbVal : null));
+    return v != null ? fmtMass(v) : '';
+  }
   if (data){
     labExistingHint.textContent = 'Existing lab data found for this arrow' + (data.updatedAt ? ' (saved ' + data.updatedAt.slice(0,10) + ')' : '') + '. Starting the wizard will let you re-measure and overwrite it.';
-    labBaselineInput.value = pick(data.spine && data.spine['0'], fleetArrow && fleetArrow.spine, wbData && wbData.spine);
-    labMassInput.value = pick(data.mass, fleetArrow && fleetArrow.mass, wbData && wbData.mass);
+    labBaselineInput.value = pickSpine(data.spine && data.spine['0'], fleetArrow && fleetArrow.spine, wbData && wbData.spine);
+    labMassInput.value = pickMass(data.mass, fleetArrow && fleetArrow.mass, wbData && wbData.mass);
     labPointInput.value = pick(data.point, fleetArrow && fleetArrow.point, wbData && wbData.point);
     labFloInput.value = data.flo != null ? data.flo : '';
     labHeavyAxisInput.value = data.heavyAxis != null ? data.heavyAxis : '';
@@ -1395,8 +1440,8 @@ labIdSelect.addEventListener('change', () => {
   } else {
     const source = (fleetArrow && fleetArrow.spine != null) ? 'your Fleet record' : ((wbData && wbData.spine != null) ? 'the imported workbook' : null);
     labExistingHint.textContent = source ? 'No completed spine wizard yet — baseline below is pre-filled from ' + source + '. Adjust it if your actual 0° measurement differs.' : '';
-    labBaselineInput.value = pick(null, fleetArrow && fleetArrow.spine, wbData && wbData.spine);
-    labMassInput.value = pick(null, fleetArrow && fleetArrow.mass, wbData && wbData.mass);
+    labBaselineInput.value = pickSpine(null, fleetArrow && fleetArrow.spine, wbData && wbData.spine);
+    labMassInput.value = pickMass(null, fleetArrow && fleetArrow.mass, wbData && wbData.mass);
     labPointInput.value = pick(null, fleetArrow && fleetArrow.point, wbData && wbData.point);
     labFloInput.value = '';
     labHeavyAxisInput.value = ''; labMassAsymInput.value = '';
@@ -1904,7 +1949,7 @@ function renderLabList(){
       <div class="top">
         <div style="flex:1; min-width:0;">
           <div class="id">${escapeHtml(id)}</div>
-          <div class="meta">weak ${d.weakAxis != null ? fmtDeg(d.weakAxis) : '—'} &nbsp;·&nbsp; stiff ${d.stiffAxis != null ? fmtDeg(d.stiffAxis) : '—'} &nbsp;·&nbsp; ${d.mass != null ? Number(d.mass).toFixed(1) + ' gr' : 'mass —'}</div>
+          <div class="meta">weak ${d.weakAxis != null ? fmtDeg(d.weakAxis) : '—'} &nbsp;·&nbsp; stiff ${d.stiffAxis != null ? fmtDeg(d.stiffAxis) : '—'} &nbsp;·&nbsp; ${d.mass != null ? fmtMass(d.mass) + ' gr' : 'mass —'}</div>
         </div>
       </div>
     </div>
@@ -1919,8 +1964,8 @@ labExportSpineBtn.addEventListener('click', () => {
     .map(id => ({id, d: map[id]}))
     .filter(({d}) => d.spine && Object.keys(d.spine).length >= 16)
     .map(({id,d}) => {
-      const spineCols = ORIENTATIONS.map(o => d.spine[String(o)] != null ? d.spine[String(o)] : '');
-      return [id, ...spineCols, d.mass != null ? d.mass : '', d.point != null ? d.point : '', d.flo != null ? d.flo : ''];
+      const spineCols = ORIENTATIONS.map(o => d.spine[String(o)] != null ? fmtSpine(d.spine[String(o)], false) : '');
+      return [id, ...spineCols, d.mass != null ? fmtMass(d.mass) : '', d.point != null ? d.point : '', d.flo != null ? d.flo : ''];
     });
   if (!rows.length){ showToast('No complete spine data to export yet'); return; }
   const header = ['Arrow ID', ...ORIENTATIONS.map(o => fmtDeg(o)), 'Mass (gr)', 'Point Weight (gr)', 'FLO Axis (deg)'];
