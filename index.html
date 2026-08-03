@@ -22,7 +22,6 @@
     font-family:-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
     -webkit-font-smoothing:antialiased;}
   .mono{font-family:"SF Mono", ui-monospace, Menlo, Consolas, monospace;}
-
   header{
     padding: max(18px, env(safe-area-inset-top)) 20px 16px;
     border-bottom:1px solid var(--line);
@@ -34,9 +33,15 @@
   }
   header h1{margin:0; font-size:22px; font-weight:650; letter-spacing:-.01em;}
   header p{margin:4px 0 0; font-size:13px; color:var(--dim);}
-
   main{padding:16px 16px 100px; max-width:640px; margin:0 auto;}
-
+  .tabbar{display:flex; gap:0; margin-bottom:16px; border-bottom:1px solid var(--line);}
+  .tabbar .tab{
+    flex:1; padding:12px 16px; background:none; border:none; color:var(--dim);
+    font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:.06em;
+    font-family:"SF Mono", ui-monospace, monospace; border-bottom:2px solid transparent;
+    cursor:pointer;
+  }
+  .tabbar .tab.active{color:var(--accent); border-bottom-color:var(--accent);}
   .panel{
     background:var(--panel); border:1px solid var(--line); border-radius:14px;
     padding:16px; margin-bottom:16px;
@@ -45,7 +50,6 @@
     margin:0 0 14px; font-size:13px; text-transform:uppercase; letter-spacing:.1em;
     color:var(--dim); font-weight:600;
   }
-
   .field{margin-bottom:12px;}
   .field:last-child{margin-bottom:0;}
   .field label{
@@ -62,7 +66,6 @@
   }
   .row2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
   .row3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px;}
-
   .btn{
     display:block; width:100%; text-align:center; padding:13px 16px;
     border-radius:10px; border:none; font-size:15px; font-weight:600;
@@ -72,7 +75,6 @@
   .btn-primary:active{background:var(--accent-dim);}
   .btn-ghost{background:transparent; color:var(--dim); border:1px solid var(--line);}
   .btn-sm{padding:9px 12px; font-size:13px; width:auto;}
-
   .arrow-card{
     background:var(--panel); border:1px solid var(--line); border-radius:12px;
     padding:14px 16px; margin-bottom:10px;
@@ -91,13 +93,11 @@
   .arrow-card .del:active{color:var(--danger);}
   .arrow-card .actions{display:flex; gap:8px; margin-top:12px;}
   .arrow-card .actions .btn{flex:1;}
-
   .empty{
     text-align:center; padding:40px 20px; color:var(--dim);
   }
   .empty .glyph{font-size:26px; margin-bottom:10px; opacity:.5;}
   .empty p{font-size:13px; margin:0; line-height:1.5;}
-
   .toast{
     position:fixed; left:50%; bottom:24px; transform:translateX(-50%);
     background:var(--panel-2); border:1px solid var(--line); color:var(--text);
@@ -105,11 +105,9 @@
     opacity:0; pointer-events:none; transition:opacity .2s ease;
   }
   .toast.show{opacity:1;}
-
   .count-tag{
     font-size:11px; color:var(--dim); font-family:"SF Mono", ui-monospace, monospace;
   }
-
   /* Modal / shot logger */
   .modal-backdrop{
     position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:50;
@@ -127,11 +125,11 @@
   .modal-handle{width:36px; height:4px; background:var(--line); border-radius:2px; margin:0 auto 14px;}
   .modal h3{margin:0 0 2px; font-size:17px;}
   .modal .sub{font-size:12.5px; color:var(--dim); margin:0 0 14px;}
-
   .target-wrap{display:flex; justify-content:center; margin:10px 0 16px;}
+  .lab-visuals{display:flex; flex-wrap:wrap; justify-content:center; gap:4px 20px;}
+  .lab-visuals .target-wrap{margin:10px 0 4px;}
   svg.target{touch-action:none; display:block;}
   .target-hint{text-align:center; font-size:12px; color:var(--dim); margin-top:-8px; margin-bottom:14px;}
-
   .chip-row{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px;}
   .chip{
     padding:7px 11px; border-radius:16px; border:1px solid var(--line);
@@ -139,7 +137,17 @@
     font-family:"SF Mono", ui-monospace, monospace; cursor:pointer;
   }
   .chip.active{background:var(--accent); color:#1a1408; border-color:var(--accent);}
-
+  .lab-pos-chip{
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
+    padding:8px 10px; min-width:60px; border-radius:12px; border:1px solid var(--line);
+    background:var(--panel-2); color:var(--dim); font-family:"SF Mono", ui-monospace, monospace;
+    cursor:pointer;
+  }
+  .lab-pos-chip .lpc-a{font-size:11px;}
+  .lab-pos-chip .lpc-v{font-size:12px; font-weight:650; color:var(--text);}
+  .lab-pos-chip.active{background:var(--accent); border-color:var(--accent);}
+  .lab-pos-chip.active .lpc-a, .lab-pos-chip.active .lpc-v{color:#1a1408;}
+  .lab-pos-chip.baseline{opacity:.75;}
   .shot-list{margin-top:14px;}
   .shot-row{
     display:flex; justify-content:space-between; align-items:center;
@@ -147,9 +155,8 @@
   }
   .shot-row:last-child{border-bottom:none;}
   .shot-row .oa{font-family:"SF Mono", ui-monospace, monospace; color:var(--dim);}
-  .shot-row .rm{background:none; border:none; color:var(--dim); font-size:12px;}
+  .shot-row .rm{background:none; border:none; color:var(--dim); font-size:12px; margin-left:6px;}
   .shot-row .rm:active{color:var(--danger);}
-
   .rec-panel{
     background:var(--panel-2); border:1px solid var(--line); border-radius:10px;
     padding:12px 14px; margin-top:14px;
@@ -159,49 +166,52 @@
   .rec-panel .rec-table{margin-top:10px; font-size:12px; font-family:"SF Mono",ui-monospace,monospace;}
   .rec-panel .rec-table div{display:flex; justify-content:space-between; padding:3px 0; color:var(--dim);}
   .rec-panel .rec-table div.best{color:var(--text);}
-
   .close-modal{
     position:absolute; top:14px; right:16px; background:var(--panel-2);
     border:1px solid var(--line); color:var(--dim); width:30px; height:30px;
     border-radius:50%; font-size:15px; line-height:1;
   }
-
-  input[type="file"]{color:var(--dim); font-size:12.5px;}
-  .hint{font-size:12px; color:var(--dim); line-height:1.4; margin:8px 0 0;}
-  .hint:first-child{margin-top:0;}
+  .field-row{display:flex; gap:8px; align-items:flex-end;}
+  .field-row .field{flex:1; margin-bottom:0;}
+  .field-row .btn{width:auto; white-space:nowrap;}
+  .hint{font-size:11px; color:var(--dim); margin-top:6px; line-height:1.4;}
+  .panel-actions{display:flex; gap:8px; margin-top:10px;}
+  .panel-actions .btn{flex:1;}
 </style>
 </head>
 <body>
-
 <header>
-  <div class="eyebrow">Arrow Tracker · v0.3</div>
+  <div class="eyebrow">Arrow Tracker · v1.8</div>
   <h1>Fleet Log</h1>
   <p>Log each shaft's specs, then log shots by orientation to see what's actually working.</p>
 </header>
-
 <main>
-  <div class="panel">
-    <h2>Import &amp; sync</h2>
-    <div class="field">
-      <label for="csv-import">Import arrow list (CSV)</label>
-      <input id="csv-import" type="file" accept=".csv,text/csv">
-    </div>
-    <p class="hint">Adds arrows from a workbook CSV (Arrow ID, Spine, Mass, Point Weight, Guidance columns). Arrows already in your fleet by name are skipped.</p>
-
-    <div class="row2" style="margin-top:14px;">
-      <button class="btn btn-ghost btn-sm" id="export-backup-btn">Export backup</button>
-      <label class="btn btn-ghost btn-sm" for="backup-import" style="text-align:center; margin:0;">Import backup</label>
-    </div>
-    <input id="backup-import" type="file" accept=".json,application/json" style="display:none;">
-    <p class="hint">To move data between your phone and iPad: tap Export backup on one device, send yourself the file (AirDrop, Files, email), then Import backup on the other. Safe to import more than once — duplicates are skipped.</p>
+  <div class="tabbar" id="tabbar">
+    <button type="button" class="tab active" data-tab="guidance">Guidance</button>
+    <button type="button" class="tab" data-tab="labdata">Lab Data</button>
   </div>
-
+  <div id="view-guidance" class="view">
   <div class="panel">
-    <h2>Add arrow</h2>
-    <div class="field">
-      <label for="f-id">Arrow ID</label>
-      <input id="f-id" type="text" placeholder="e.g. Arrow 7" autocomplete="off">
+    <h2 style="display:flex; justify-content:space-between; align-items:center;">
+      <span id="add-arrow-title">Add arrow</span>
+      <button class="btn btn-ghost btn-sm" id="cancel-edit-btn" style="display:none;">Cancel edit</button>
+    </h2>
+    <div class="field-row">
+      <div class="field">
+        <label for="f-id-select">Arrow ID</label>
+        <select id="f-id-select">
+          <option value="">Import list below, or choose Other</option>
+          <option value="__other__">Other (type manually)</option>
+        </select>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="import-btn" type="button">Import list</button>
+      <input type="file" id="import-file" accept=".csv,text/csv" style="display:none;">
     </div>
+    <div class="field" id="f-id-custom-wrap" style="display:none;">
+      <label for="f-id-custom">Arrow ID (manual)</label>
+      <input id="f-id-custom" type="text" placeholder="e.g. Arrow 7 CustomName" autocomplete="off">
+    </div>
+    <p class="hint" id="import-hint">No arrow list imported yet. Export the workbook's "Arrow ID Export" tab as CSV (Arrow ID, Guidance, Priority Rank, Mean Spine, Mass, Point Weight), then tap "Import list" and pick that file. Guidance and starting Spine/Mass/Point fill in automatically as you browse arrows below.</p>
     <div class="row3">
       <div class="field">
         <label for="f-spine">Spine (in)</label>
@@ -217,12 +227,11 @@
       </div>
     </div>
     <div class="field">
-      <label for="f-note">Notes</label>
-      <textarea id="f-note" rows="2" placeholder="Optional — batch, condition, anything worth remembering"></textarea>
+      <label for="f-note">Guidance</label>
+      <textarea id="f-note" rows="2" placeholder="Fills in automatically from the workbook when you pick an Arrow ID above"></textarea>
     </div>
     <button class="btn btn-primary" id="save-btn" style="margin-top:4px;">Save arrow</button>
   </div>
-
   <div class="panel" style="padding-bottom:6px;">
     <h2 style="display:flex; justify-content:space-between; align-items:center;">
       <span>Fleet</span>
@@ -233,60 +242,235 @@
       <div class="glyph">◎</div>
       <p>No arrows logged yet.<br>Add your first one above.</p>
     </div>
+    <div class="panel-actions">
+      <button class="btn btn-ghost btn-sm" id="export-btn" style="width:100%;">Export shots to CSV (for Impact Data)</button>
+    </div>
+    <div class="panel-actions">
+      <button class="btn btn-ghost btn-sm" id="backup-btn">Export full backup</button>
+      <button class="btn btn-ghost btn-sm" id="restore-btn">Restore from backup</button>
+    </div>
+    <input type="file" id="restore-file" accept="application/json" style="display:none;">
+    <p class="hint">Full backup saves every arrow (spine/mass/point/notes) and every shot to one file — the only way to recover your fleet if this browser's storage is ever cleared. Worth doing after any real logging session.</p>
+  </div>
+  </div>
+  <div id="view-labdata" class="view" style="display:none;">
+    <div class="panel">
+      <h2>Lab Data — Spine Wizard</h2>
+      <div class="field">
+        <label for="lab-id-select">Arrow ID</label>
+        <select id="lab-id-select">
+          <option value="">Select an arrow…</option>
+        </select>
+      </div>
+      <p class="hint" id="lab-existing-hint"></p>
+      <div class="field">
+        <label for="lab-baseline">0&deg; baseline spine (in)</label>
+        <input id="lab-baseline" type="number" inputmode="decimal" step="0.001" placeholder="0.595">
+      </div>
+      <p class="hint">Spin the shaft to find its weakest axis, measure with calipers, set that as 0&deg; here, and zero the dial indicator there.</p>
+      <button class="btn btn-primary" id="lab-start-btn" style="margin-top:6px;">Start / resume wizard</button>
+    </div>
+
+    <div class="panel" id="lab-wizard-panel" style="display:none;">
+      <h2 style="display:flex; justify-content:space-between; align-items:center;">
+        <span id="lab-step-label">Position 2 of 16</span>
+        <span class="count-tag" id="lab-progress-tag">1 / 16 recorded</span>
+      </h2>
+      <div class="chip-row" id="lab-position-chips"></div>
+
+      <div class="lab-visuals">
+        <div class="target-wrap">
+          <svg class="target" id="lab-dial-svg" width="220" height="220" viewBox="0 0 260 260"></svg>
+        </div>
+        <div class="target-wrap">
+          <svg class="target" id="lab-radar-svg" width="220" height="220" viewBox="0 0 260 260"></svg>
+        </div>
+      </div>
+      <p class="target-hint" id="lab-dial-caption">Enter a dial reading to see the calculated spine.</p>
+      <p class="target-hint" id="lab-radar-caption" style="margin-top:-12px;">Left: this reading. Right: the whole shaft's spine pattern so far.</p>
+
+      <div id="lab-add-reading-wrap">
+        <div class="row2">
+          <div class="field" style="margin-bottom:0;">
+            <label>Dial direction</label>
+            <div class="chip-row" id="lab-dir-chips" style="margin-bottom:0;">
+              <button type="button" class="chip active" data-dir="cw">Clockwise (stiffer)</button>
+              <button type="button" class="chip" data-dir="ccw">Counter-clockwise (weaker)</button>
+            </div>
+          </div>
+          <div class="field" style="margin-bottom:0;">
+            <label for="lab-mag">Dial reading (in)</label>
+            <input id="lab-mag" type="number" inputmode="decimal" step="0.001" min="0" placeholder="0.004">
+          </div>
+        </div>
+        <p class="hint" id="lab-wizard-hint" style="margin-top:8px; margin-bottom:14px;"></p>
+      </div>
+
+      <button class="btn btn-primary" id="lab-next-btn" style="margin-top:4px;">Save &amp; next</button>
+      <div class="panel-actions" style="margin-top:10px;">
+        <button class="btn btn-ghost btn-sm" id="lab-add-measure-btn">Measure again</button>
+        <button class="btn btn-ghost btn-sm" id="lab-back-btn">Back</button>
+      </div>
+
+      <div class="shot-list" id="lab-reading-rows"></div>
+    </div>
+
+    <div class="panel" id="lab-details-panel" style="display:none;">
+      <h2>Mass &amp; axis details</h2>
+      <div class="row3">
+        <div class="field">
+          <label for="lab-mass">Mass (gr)</label>
+          <input id="lab-mass" type="number" inputmode="decimal" step="0.1" placeholder="425.0">
+        </div>
+        <div class="field">
+          <label for="lab-point">Point (gr)</label>
+          <input id="lab-point" type="number" inputmode="decimal" step="1" placeholder="100">
+        </div>
+        <div class="field">
+          <label for="lab-flo">FLO axis (deg)</label>
+          <input id="lab-flo" type="number" inputmode="decimal" step="0.1" placeholder="112.5">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label for="lab-heavy-axis">Heavy/mass axis (deg)</label>
+          <input id="lab-heavy-axis" type="number" inputmode="decimal" step="0.1" placeholder="45.0">
+        </div>
+        <div class="field">
+          <label for="lab-mass-asym">Mass asymmetry magnitude (gf)</label>
+          <input id="lab-mass-asym" type="number" inputmode="decimal" step="0.1" placeholder="1.2">
+        </div>
+      </div>
+      <div class="field">
+        <label>Rolling settle behavior</label>
+        <div class="chip-row" id="lab-roll-chips">
+          <button type="button" class="chip active" data-roll="None">None</button>
+          <button type="button" class="chip" data-roll="Clean settle">Clean settle</button>
+          <button type="button" class="chip" data-roll="Rocking settle">Rocking settle</button>
+        </div>
+      </div>
+      <div class="rec-panel">
+        <div class="rec-label" style="font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--dim); font-family:'SF Mono',ui-monospace,monospace;">Auto-computed from the 16 spine readings</div>
+        <div class="rec-table" id="lab-axis-summary">—</div>
+      </div>
+      <button class="btn btn-primary" id="lab-save-btn" style="margin-top:14px;">Save lab data for this arrow</button>
+      <p class="hint">Saving updates this arrow's spine/mass/point on the Guidance tab too, and makes it exportable below.</p>
+    </div>
+
+    <div class="panel">
+      <h2 style="display:flex; justify-content:space-between; align-items:center;">
+        <span>Lab data logged</span>
+        <span class="count-tag" id="lab-count-tag">0 arrows</span>
+      </h2>
+      <div id="lab-list"></div>
+      <div class="empty" id="lab-empty-state">
+        <div class="glyph">◎</div>
+        <p>No lab data recorded yet.</p>
+      </div>
+      <div class="panel-actions">
+        <button class="btn btn-ghost btn-sm" id="lab-export-spine-btn" style="width:100%;">Export spine data (for LSI Calculator)</button>
+      </div>
+      <div class="panel-actions">
+        <button class="btn btn-ghost btn-sm" id="lab-export-mass-btn" style="width:100%;">Export mass asymmetry (for Mass Asymmetry tab)</button>
+      </div>
+    </div>
   </div>
 </main>
-
 <div class="toast" id="toast"></div>
-
 <div class="modal-backdrop" id="modal-backdrop"></div>
 <div class="modal" id="modal">
   <button class="close-modal" id="modal-close">✕</button>
   <div class="modal-handle"></div>
   <h3 id="modal-title">Log shot</h3>
   <p class="sub" id="modal-sub"></p>
-
   <div class="field">
     <label>Orientation (deg)</label>
     <div class="chip-row" id="orient-chips"></div>
   </div>
-
+  <div class="row2">
+    <div class="field">
+      <label for="f-distance">Distance (yd)</label>
+      <input id="f-distance" type="number" inputmode="decimal" step="1" placeholder="20">
+    </div>
+    <div class="field">
+      <label for="f-bow">Bow (optional)</label>
+      <input id="f-bow" type="text" placeholder="e.g. Genesis (NASP)" autocomplete="off">
+    </div>
+  </div>
   <div class="target-wrap">
     <svg class="target" id="target-svg" width="260" height="260" viewBox="0 0 260 260"></svg>
   </div>
-  <p class="target-hint">Tap where the shot landed relative to center</p>
-
+  <p class="target-hint">Tap the target to get close, then dial in the exact numbers below.</p>
+  <div class="row2">
+    <div class="field">
+      <label>LR direction</label>
+      <div class="chip-row" id="lr-dir-chips">
+        <button type="button" class="chip" data-dir="left">&#9664; Left</button>
+        <button type="button" class="chip active" data-dir="right">Right &#9654;</button>
+      </div>
+    </div>
+    <div class="field">
+      <label for="f-lr-mag">LR (3/16" squares)</label>
+      <input id="f-lr-mag" type="number" inputmode="numeric" step="1" min="0" placeholder="e.g. 10">
+    </div>
+  </div>
+  <div class="row2">
+    <div class="field">
+      <label>UD direction</label>
+      <div class="chip-row" id="ud-dir-chips">
+        <button type="button" class="chip active" data-dir="up">&#9650; Up</button>
+        <button type="button" class="chip" data-dir="down">&#9660; Down</button>
+      </div>
+    </div>
+    <div class="field">
+      <label for="f-ud-mag">UD (3/16" squares)</label>
+      <input id="f-ud-mag" type="number" inputmode="numeric" step="1" min="0" placeholder="e.g. 6">
+    </div>
+  </div>
+  <p class="hint" style="margin-top:-8px;">Distance from point of aim, in the same 3/16" squares you already use on the graph paper. Tap the direction, type the number — no minus sign needed.</p>
+  <button class="btn btn-primary" id="log-shot-btn" style="margin-top:10px;">Log shot</button>
+  <div class="field-row" style="margin-top:16px; margin-bottom:14px;">
+    <div class="field">
+      <label for="f-radius">Target radius shown above (in)</label>
+      <input id="f-radius" type="number" inputmode="decimal" step="0.5" placeholder="6">
+    </div>
+  </div>
+  <p class="hint" style="margin-top:-8px; margin-bottom:14px;">The real-world radius this target graphic represents (e.g. scoring ring radius on your paper). Used to scale where your typed coordinates land on the visual, and to convert them to inches for export. Saved for next time.</p>
   <div class="rec-panel" id="rec-panel" style="display:none;">
     <div class="rec-label" style="font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--dim); font-family:'SF Mono',ui-monospace,monospace;">Recommended orientation</div>
     <div class="rec-orient" id="rec-orient">—</div>
     <div class="rec-conf" id="rec-conf">—</div>
     <div class="rec-table" id="rec-table"></div>
   </div>
-
   <div class="shot-list" id="shot-list"></div>
 </div>
-
 <script>
 const listEl = document.getElementById('list');
 const emptyEl = document.getElementById('empty-state');
 const countEl = document.getElementById('count-tag');
 const toastEl = document.getElementById('toast');
+const ORIENTATIONS = Array.from({length:16}, (_,i)=> i*22.5); // canonical ascending order -- used only for CSV export alignment with the workbook's B:Q columns, never for on-screen ordering
+// Physical measurement/shot order: 0deg baseline, then 22.5deg counter-clockwise steps
+// (337.5, 315, 292.5, ...). This is what's shown on screen everywhere (shot log chips,
+// Lab Data wizard) so entry order always matches how the shaft is actually rotated --
+// storage still keys every value by its real angle, so export to the workbook is
+// unaffected regardless of the order things were entered on screen.
+const ORIENT_CCW_ORDER = [0,337.5,315,292.5,270,247.5,225,202.5,180,157.5,135,112.5,90,67.5,45,22.5];
 
-const ORIENTATIONS = Array.from({length:16}, (_,i)=> i*22.5);
+let editingArrowId = null;
+let editingShotId = null;
 
 function showToast(msg){
   toastEl.textContent = msg;
   toastEl.classList.add('show');
   setTimeout(()=> toastEl.classList.remove('show'), 1600);
 }
-
 function escapeHtml(s){
   return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
-
 function fmtDeg(d){
-  return (Number.isInteger(d) ? d : d.toFixed(1)) + '\u00b0';
+  return (Number.isInteger(d) ? d : d.toFixed(1)) + '°';
 }
-
 // ---------- storage ----------
 function loadArrows(){
   try{
@@ -308,7 +492,48 @@ function saveShots(shots){
   try{ localStorage.setItem('shots', JSON.stringify(shots)); return true; }
   catch(e){ console.error('Storage error', e); return false; }
 }
-
+function loadArrowIdList(){
+  try{
+    const raw = localStorage.getItem('arrowIdList');
+    return raw ? JSON.parse(raw) : [];
+  } catch(e){ console.error('Storage error', e); return []; }
+}
+function saveArrowIdList(list){
+  try{ localStorage.setItem('arrowIdList', JSON.stringify(list)); return true; }
+  catch(e){ console.error('Storage error', e); return false; }
+}
+function loadArrowGuidanceMap(){
+  try{
+    const raw = localStorage.getItem('arrowGuidanceMap');
+    return raw ? JSON.parse(raw) : {};
+  } catch(e){ console.error('Storage error', e); return {}; }
+}
+function saveArrowGuidanceMap(map){
+  try{ localStorage.setItem('arrowGuidanceMap', JSON.stringify(map)); return true; }
+  catch(e){ console.error('Storage error', e); return false; }
+}
+// Starting Spine/Mass/Point values imported from the workbook (Mean Spine, Mass, Point Weight
+// on Arrow ID Export) -- a fallback for arrows that haven't been through the app's own Lab Data
+// wizard yet. Local Fleet/Lab Data records always take priority over this when both exist.
+function loadArrowWorkbookDataMap(){
+  try{
+    const raw = localStorage.getItem('arrowWorkbookDataMap');
+    return raw ? JSON.parse(raw) : {};
+  } catch(e){ console.error('Storage error', e); return {}; }
+}
+function saveArrowWorkbookDataMap(map){
+  try{ localStorage.setItem('arrowWorkbookDataMap', JSON.stringify(map)); return true; }
+  catch(e){ console.error('Storage error', e); return false; }
+}
+function loadTargetRadius(){
+  const raw = localStorage.getItem('targetRadiusInches');
+  const n = raw ? parseFloat(raw) : NaN;
+  return Number.isFinite(n) && n > 0 ? n : 6; // default 6" if never set
+}
+function saveTargetRadius(inches){
+  try{ localStorage.setItem('targetRadiusInches', String(inches)); return true; }
+  catch(e){ console.error('Storage error', e); return false; }
+}
 // ---------- fleet render ----------
 function render(){
   const arrows = loadArrows();
@@ -321,7 +546,6 @@ function render(){
   }
   listEl.style.display = 'block';
   emptyEl.style.display = 'none';
-
   listEl.innerHTML = arrows.slice().reverse().map(a => {
     const shotCount = shots.filter(s => s.arrowId === a.id).length;
     return `
@@ -329,191 +553,260 @@ function render(){
       <div class="top">
         <div style="flex:1; min-width:0;">
           <div class="id">${escapeHtml(a.arrowId)}</div>
-          <div class="meta">${a.spine != null ? 'spine ' + Number(a.spine).toFixed(3) + '"' : 'spine \u2014'} &nbsp;\u00b7&nbsp; ${a.mass != null ? Number(a.mass).toFixed(1) + ' gr' : 'mass \u2014'} &nbsp;\u00b7&nbsp; ${a.point != null ? Number(a.point).toFixed(0) + ' gr point' : 'point \u2014'}</div>
+          <div class="meta">${a.spine != null ? 'spine ' + Number(a.spine).toFixed(3) + '"' : 'spine —'} &nbsp;·&nbsp; ${a.mass != null ? Number(a.mass).toFixed(1) + ' gr' : 'mass —'} &nbsp;·&nbsp; ${a.point != null ? Number(a.point).toFixed(0) + ' gr point' : 'point —'}</div>
           ${a.note ? `<div class="note">${escapeHtml(a.note)}</div>` : ''}
         </div>
         <button class="del" data-del="${a.id}">Delete</button>
       </div>
       <div class="actions">
-        <button class="btn btn-ghost btn-sm" data-log="${a.id}" style="flex:1;">Log shot \u00b7 ${shotCount}</button>
+        <button class="btn btn-ghost btn-sm" data-edit="${a.id}">Edit</button>
+        <button class="btn btn-ghost btn-sm" data-log="${a.id}" style="flex:1;">Log shot · ${shotCount}</button>
       </div>
     </div>
   `;}).join('');
 }
+// ---------- Arrow ID dropdown (sourced from imported workbook CSV) ----------
+const idSelect = document.getElementById('f-id-select');
+const idCustomWrap = document.getElementById('f-id-custom-wrap');
+const idCustomInput = document.getElementById('f-id-custom');
+const importBtn = document.getElementById('import-btn');
+const importFile = document.getElementById('import-file');
+const importHint = document.getElementById('import-hint');
+const addArrowTitle = document.getElementById('add-arrow-title');
+const cancelEditBtn = document.getElementById('cancel-edit-btn');
+const saveArrowBtn = document.getElementById('save-btn');
+const spineInputEl = document.getElementById('f-spine');
+const massInputEl = document.getElementById('f-mass');
+const pointInputEl = document.getElementById('f-point');
+const noteInputEl = document.getElementById('f-note');
 
-// ---------- CSV parsing (handles quoted fields with embedded commas) ----------
-function parseCSV(text){
+function renderArrowIdSelect(){
+  const list = loadArrowIdList();
+  const prev = idSelect.value;
+  idSelect.innerHTML =
+    (list.length ? '<option value="">Select an arrow…</option>' : '<option value="">Import list below, or choose Other</option>') +
+    '<option value="__other__">Other (type manually)</option>' +
+    list.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('');
+  if ([...idSelect.options].some(o => o.value === prev)) idSelect.value = prev;
+  importHint.textContent = list.length
+    ? list.length + ' arrow ID' + (list.length === 1 ? '' : 's') + ' loaded from your last import, with guidance and starting spine/mass/point where available. Re-import any time the workbook\'s Arrow ID Export tab changes.'
+    : 'No arrow list imported yet. Export the workbook\'s "Arrow ID Export" tab as CSV (Arrow ID, Guidance, Priority Rank, Mean Spine, Mass, Point Weight), then tap "Import list" and pick that file.';
+}
+// Proper quote-aware CSV parser (RFC 4180 style) -- needed because guidance text
+// routinely contains commas, which a naive split(',') would misread.
+function parseCsvRows(text){
   const rows = [];
-  let row = [], field = '', inQuotes = false;
+  let row = [];
+  let field = '';
+  let inQuotes = false;
   for (let i = 0; i < text.length; i++){
     const c = text[i];
     if (inQuotes){
       if (c === '"'){
         if (text[i+1] === '"'){ field += '"'; i++; }
-        else inQuotes = false;
-      } else field += c;
+        else { inQuotes = false; }
+      } else {
+        field += c;
+      }
     } else {
-      if (c === '"') inQuotes = true;
-      else if (c === ','){ row.push(field); field = ''; }
-      else if (c === '\n'){ row.push(field); rows.push(row); row = []; field = ''; }
-      else if (c === '\r'){ /* ignore */ }
-      else field += c;
+      if (c === '"'){
+        inQuotes = true;
+      } else if (c === ','){
+        row.push(field); field = '';
+      } else if (c === '\n' || c === '\r'){
+        if (c === '\r' && text[i+1] === '\n') i++;
+        row.push(field); field = '';
+        rows.push(row); row = [];
+      } else {
+        field += c;
+      }
     }
   }
   if (field.length || row.length){ row.push(field); rows.push(row); }
-  if (!rows.length) return [];
-  const headers = rows[0].map(h => h.trim());
-  return rows.slice(1)
-    .filter(r => r.some(c => c.trim() !== ''))
-    .map(r => {
-      const obj = {};
-      headers.forEach((h, i) => obj[h] = (r[i] !== undefined ? r[i].trim() : ''));
-      return obj;
-    });
+  return rows.filter(r => r.length > 1 || (r.length === 1 && r[0] !== ''));
 }
-
-function findCol(rec, ...names){
-  const keys = Object.keys(rec);
-  for (const name of names){
-    const key = keys.find(k => k.toLowerCase() === name.toLowerCase());
-    if (key && rec[key]) return rec[key];
+function parseArrowIdCsv(text){
+  const num = (s) => {
+    const n = parseFloat((s || '').trim());
+    return Number.isFinite(n) ? n : null;
+  };
+  const rows = parseCsvRows(text).map(cols => {
+    const id = (cols[0] || '').trim();
+    const guidance = cols.length > 1 ? (cols[1] || '').trim() : '';
+    // cols[2] is Priority Rank (for reference) -- not used by the app.
+    // cols[3..5] are Mean Spine (in), Mass (gr), Point Weight (gr), added so the app has real
+    // starting values for an arrow immediately on import, even before Lab Data's been run for it.
+    const spine = cols.length > 3 ? num(cols[3]) : null;
+    const mass = cols.length > 4 ? num(cols[4]) : null;
+    const point = cols.length > 5 ? num(cols[5]) : null;
+    return { id, guidance, spine, mass, point };
+  }).filter(r => r.id);
+  // Drop a header row like "Arrow ID" (optionally with a "Guidance" second column) if present
+  if (rows.length && /^arrow\s*id$/i.test(rows[0].id)) rows.shift();
+  // De-dupe by id, preserve order, keep first occurrence's guidance
+  const seen = new Set();
+  const deduped = [];
+  for (const r of rows){
+    if (seen.has(r.id)) continue;
+    seen.add(r.id);
+    deduped.push(r);
   }
-  return '';
+  return deduped;
 }
-
-// ---------- import arrow list CSV ----------
-document.getElementById('csv-import').addEventListener('change', (e) => {
+importBtn.addEventListener('click', () => importFile.click());
+importFile.addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (!file) return;
   const reader = new FileReader();
   reader.onload = () => {
-    let records;
-    try{ records = parseCSV(reader.result); }
-    catch(err){ console.error(err); showToast('Could not read CSV'); e.target.value=''; return; }
-
-    const arrows = loadArrows();
-    const existingNames = new Set(arrows.map(a => a.arrowId.toLowerCase()));
-    let added = 0, skipped = 0, seq = 0;
-
-    records.forEach(rec => {
-      const arrowId = findCol(rec, 'Arrow ID', 'ArrowId', 'id').trim();
-      if (!arrowId) return;
-      if (existingNames.has(arrowId.toLowerCase())){ skipped++; return; }
-
-      const spineRaw = findCol(rec, 'Mean Spine (in)', 'Spine (in)', 'Spine');
-      const massRaw = findCol(rec, 'Mass (gr)', 'Mass');
-      const pointRaw = findCol(rec, 'Point Weight (gr)', 'Point (gr)', 'Point');
-      const guidance = findCol(rec, 'Guidance');
-      const priority = findCol(rec, 'Priority Rank (for reference)', 'Priority Rank', 'Priority');
-
-      let note = guidance || '';
-      if (priority) note = note ? `Priority ${priority} — ${note}` : `Priority ${priority}`;
-
-      arrows.push({
-        id: 'a_' + Date.now() + '_' + (seq++),
-        arrowId,
-        spine: spineRaw ? parseFloat(spineRaw) : null,
-        mass: massRaw ? parseFloat(massRaw) : null,
-        point: pointRaw ? parseFloat(pointRaw) : null,
-        note,
-        createdAt: new Date().toISOString()
-      });
-      existingNames.add(arrowId.toLowerCase());
-      added++;
+    const rows = parseArrowIdCsv(String(reader.result));
+    if (!rows.length){ showToast('No arrow IDs found in that file'); return; }
+    const list = rows.map(r => r.id);
+    saveArrowIdList(list);
+    const guidanceMap = loadArrowGuidanceMap();
+    rows.forEach(r => { if (r.guidance) guidanceMap[r.id] = r.guidance; });
+    saveArrowGuidanceMap(guidanceMap);
+    const workbookDataMap = loadArrowWorkbookDataMap();
+    rows.forEach(r => {
+      if (r.spine != null || r.mass != null || r.point != null){
+        workbookDataMap[r.id] = { spine: r.spine, mass: r.mass, point: r.point };
+      }
     });
-
-    saveArrows(arrows);
-    render();
-    showToast(`Imported ${added}${skipped ? `, skipped ${skipped} duplicate${skipped===1?'':'s'}` : ''}`);
-    e.target.value = '';
+    saveArrowWorkbookDataMap(workbookDataMap);
+    renderArrowIdSelect();
+    renderLabIdSelect();
+    showToast(list.length + ' arrow ID' + (list.length === 1 ? '' : 's') + ' imported');
   };
+  reader.onerror = () => showToast('Could not read that file');
   reader.readAsText(file);
+  importFile.value = '';
 });
-
-// ---------- full backup export / import (device-to-device sync) ----------
-document.getElementById('export-backup-btn').addEventListener('click', () => {
-  const backup = { arrows: loadArrows(), shots: loadShots(), exportedAt: new Date().toISOString() };
-  const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'arrow-tracker-backup-' + new Date().toISOString().slice(0,10) + '.json';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-  showToast('Backup downloaded');
+idSelect.addEventListener('change', () => {
+  idCustomWrap.style.display = idSelect.value === '__other__' ? 'block' : 'none';
+  if (idSelect.value === '__other__'){
+    idCustomInput.focus();
+    noteInputEl.value = '';
+    spineInputEl.value = ''; massInputEl.value = ''; pointInputEl.value = '';
+    return;
+  }
+  // Guidance always mirrors the currently selected arrow -- the app follows the
+  // workbook's lead here, so there's no "don't overwrite" guard like other fields.
+  noteInputEl.value = idSelect.value ? (loadArrowGuidanceMap()[idSelect.value] || '') : '';
+  // Spine/Mass/Point should likewise always reflect whatever's already on file for this
+  // arrow -- not whatever was left over in the form from the last arrow you looked at.
+  // Priority: local Fleet record (manual save or Lab Data -- freshest, actual measurements)
+  // first; if this arrow hasn't been through either of those yet, fall back to the starting
+  // value imported from the workbook (Mean Spine/Mass/Point Weight); blank if neither exists.
+  const existing = idSelect.value ? loadArrows().find(a => a.arrowId === idSelect.value) : null;
+  const wbData = idSelect.value ? loadArrowWorkbookDataMap()[idSelect.value] : null;
+  const pick = (localVal, wbVal) => localVal != null ? localVal : (wbVal != null ? wbVal : '');
+  spineInputEl.value = pick(existing && existing.spine, wbData && wbData.spine);
+  massInputEl.value = pick(existing && existing.mass, wbData && wbData.mass);
+  pointInputEl.value = pick(existing && existing.point, wbData && wbData.point);
 });
+renderArrowIdSelect();
 
-document.getElementById('backup-import').addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    try{
-      const data = JSON.parse(reader.result);
-      const incomingArrows = Array.isArray(data.arrows) ? data.arrows : [];
-      const incomingShots = Array.isArray(data.shots) ? data.shots : [];
+// ---------- edit arrow in place ----------
+function startEditArrow(id){
+  const arrow = loadArrows().find(a => a.id === id);
+  if (!arrow) return;
+  editingArrowId = id;
+  const list = loadArrowIdList();
+  if (list.includes(arrow.arrowId)){
+    idSelect.value = arrow.arrowId;
+    idCustomWrap.style.display = 'none';
+  } else {
+    idSelect.value = '__other__';
+    idCustomWrap.style.display = 'block';
+    idCustomInput.value = arrow.arrowId;
+  }
+  spineInputEl.value = arrow.spine != null ? arrow.spine : '';
+  massInputEl.value = arrow.mass != null ? arrow.mass : '';
+  pointInputEl.value = arrow.point != null ? arrow.point : '';
+  noteInputEl.value = arrow.note || '';
+  addArrowTitle.textContent = 'Edit arrow — ' + arrow.arrowId;
+  saveArrowBtn.textContent = 'Update arrow';
+  cancelEditBtn.style.display = 'inline-block';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function cancelEditArrow(){
+  editingArrowId = null;
+  idSelect.value = '';
+  idCustomInput.value = '';
+  idCustomWrap.style.display = 'none';
+  spineInputEl.value = '';
+  massInputEl.value = '';
+  pointInputEl.value = '';
+  noteInputEl.value = '';
+  addArrowTitle.textContent = 'Add arrow';
+  saveArrowBtn.textContent = 'Save arrow';
+  cancelEditBtn.style.display = 'none';
+}
+cancelEditBtn.addEventListener('click', cancelEditArrow);
 
-      const arrows = loadArrows();
-      const arrowIds = new Set(arrows.map(a => a.id));
-      let addedArrows = 0;
-      incomingArrows.forEach(a => {
-        if (a && a.id && !arrowIds.has(a.id)){ arrows.push(a); arrowIds.add(a.id); addedArrows++; }
-      });
+// ---------- add / update / delete arrow ----------
+saveArrowBtn.addEventListener('click', () => {
+  const arrowId = idSelect.value === '__other__'
+    ? idCustomInput.value.trim()
+    : idSelect.value.trim();
+  if (!arrowId){
+    (idSelect.value === '__other__' ? idCustomInput : idSelect).focus();
+    showToast('Arrow ID is required');
+    return;
+  }
 
-      const shots = loadShots();
-      const shotIds = new Set(shots.map(s => s.id));
-      let addedShots = 0;
-      incomingShots.forEach(s => {
-        if (s && s.id && !shotIds.has(s.id)){ shots.push(s); shotIds.add(s.id); addedShots++; }
-      });
-
-      saveArrows(arrows);
-      saveShots(shots);
-      render();
-      showToast(`Synced — +${addedArrows} arrows, +${addedShots} shots`);
-    } catch(err){
-      console.error(err);
-      showToast('Could not read backup file');
+  // If a manually-typed ID isn't in the saved list yet, add it so it's selectable next time.
+  if (idSelect.value === '__other__'){
+    const list = loadArrowIdList();
+    if (!list.includes(arrowId)){
+      list.push(arrowId);
+      saveArrowIdList(list);
+      renderArrowIdSelect();
     }
-    e.target.value = '';
-  };
-  reader.readAsText(file);
-});
+  }
 
-// ---------- add / delete arrow ----------
-document.getElementById('save-btn').addEventListener('click', () => {
-  const idInput = document.getElementById('f-id');
-  const spineInput = document.getElementById('f-spine');
-  const massInput = document.getElementById('f-mass');
-  const pointInput = document.getElementById('f-point');
-  const noteInput = document.getElementById('f-note');
+  const arrows = loadArrows();
 
-  const arrowId = idInput.value.trim();
-  if (!arrowId){ idInput.focus(); showToast('Arrow ID is required'); return; }
+  if (editingArrowId){
+    const idx = arrows.findIndex(a => a.id === editingArrowId);
+    if (idx === -1){
+      showToast('Could not find that arrow to update');
+      cancelEditArrow();
+      return;
+    }
+    arrows[idx] = {
+      ...arrows[idx],
+      arrowId,
+      spine: spineInputEl.value ? parseFloat(spineInputEl.value) : null,
+      mass: massInputEl.value ? parseFloat(massInputEl.value) : null,
+      point: pointInputEl.value ? parseFloat(pointInputEl.value) : null,
+      note: noteInputEl.value.trim()
+    };
+    const ok = saveArrows(arrows);
+    render();
+    if (ok){ showToast('Arrow updated'); cancelEditArrow(); }
+    else showToast('Could not save — try again');
+    return;
+  }
 
   const entry = {
     id: 'a_' + Date.now(),
     arrowId,
-    spine: spineInput.value ? parseFloat(spineInput.value) : null,
-    mass: massInput.value ? parseFloat(massInput.value) : null,
-    point: pointInput.value ? parseFloat(pointInput.value) : null,
-    note: noteInput.value.trim(),
+    spine: spineInputEl.value ? parseFloat(spineInputEl.value) : null,
+    mass: massInputEl.value ? parseFloat(massInputEl.value) : null,
+    point: pointInputEl.value ? parseFloat(pointInputEl.value) : null,
+    note: noteInputEl.value.trim(),
     createdAt: new Date().toISOString()
   };
-
-  const arrows = loadArrows();
   arrows.push(entry);
   const ok = saveArrows(arrows);
   render();
-
   if (ok){
     showToast('Saved');
-    idInput.value = ''; spineInput.value = ''; massInput.value = ''; pointInput.value = ''; noteInput.value = '';
-    idInput.focus();
+    idSelect.value = ''; idCustomInput.value = ''; idCustomWrap.style.display = 'none';
+    spineInputEl.value = ''; massInputEl.value = ''; pointInputEl.value = ''; noteInputEl.value = '';
   } else {
-    showToast('Could not save \u2014 try again');
+    showToast('Could not save — try again');
   }
 });
 
@@ -521,12 +814,25 @@ listEl.addEventListener('click', (e) => {
   const delBtn = e.target.closest('[data-del]');
   if (delBtn){
     const id = delBtn.getAttribute('data-del');
+    const arrow = loadArrows().find(a => a.id === id);
+    const shotCount = loadShots().filter(s => s.arrowId === id).length;
+    const label = arrow ? arrow.arrowId : 'this arrow';
+    const msg = shotCount > 0
+      ? `Delete ${label}? This will also delete its ${shotCount} logged shot${shotCount === 1 ? '' : 's'}. This cannot be undone.`
+      : `Delete ${label}? This cannot be undone.`;
+    if (!window.confirm(msg)) return;
     let arrows = loadArrows().filter(a => a.id !== id);
     saveArrows(arrows);
     let shots = loadShots().filter(s => s.arrowId !== id);
     saveShots(shots);
+    if (editingArrowId === id) cancelEditArrow();
     render();
     showToast('Arrow removed');
+    return;
+  }
+  const editBtn = e.target.closest('[data-edit]');
+  if (editBtn){
+    startEditArrow(editBtn.getAttribute('data-edit'));
     return;
   }
   const logBtn = e.target.closest('[data-log]');
@@ -546,47 +852,90 @@ const recPanel = document.getElementById('rec-panel');
 const recOrient = document.getElementById('rec-orient');
 const recConf = document.getElementById('rec-conf');
 const recTable = document.getElementById('rec-table');
-
 let activeArrowId = null;
 let activeOrientation = 0;
-
+const distanceInput = document.getElementById('f-distance');
+const bowInput = document.getElementById('f-bow');
+const radiusInput = document.getElementById('f-radius');
+const lrMagInput = document.getElementById('f-lr-mag');
+const udMagInput = document.getElementById('f-ud-mag');
+const lrDirChips = document.getElementById('lr-dir-chips');
+const udDirChips = document.getElementById('ud-dir-chips');
+const logShotBtn = document.getElementById('log-shot-btn');
+let lrDirection = 'right';
+let udDirection = 'up';
+radiusInput.addEventListener('change', () => {
+  const v = parseFloat(radiusInput.value);
+  if (Number.isFinite(v) && v > 0) saveTargetRadius(v);
+});
+radiusInput.addEventListener('input', renderPreviewDot);
+lrMagInput.addEventListener('input', renderPreviewDot);
+udMagInput.addEventListener('input', renderPreviewDot);
+lrDirChips.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-dir]');
+  if (!btn) return;
+  lrDirection = btn.getAttribute('data-dir');
+  [...lrDirChips.children].forEach(c => c.classList.toggle('active', c === btn));
+  renderPreviewDot();
+});
+udDirChips.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-dir]');
+  if (!btn) return;
+  udDirection = btn.getAttribute('data-dir');
+  [...udDirChips.children].forEach(c => c.classList.toggle('active', c === btn));
+  renderPreviewDot();
+});
+function currentLR(){
+  const mag = parseFloat(lrMagInput.value);
+  if (!Number.isFinite(mag)) return null;
+  return lrDirection === 'left' ? -Math.abs(mag) : Math.abs(mag);
+}
+function currentUD(){
+  const mag = parseFloat(udMagInput.value);
+  if (!Number.isFinite(mag)) return null;
+  return udDirection === 'down' ? -Math.abs(mag) : Math.abs(mag);
+}
 function openShotLogger(arrowId){
   const arrows = loadArrows();
   const arrow = arrows.find(a => a.id === arrowId);
   if (!arrow) return;
   activeArrowId = arrowId;
   activeOrientation = 0;
-
-  modalTitle.textContent = 'Log shot \u2014 ' + arrow.arrowId;
-  modalSub.textContent = 'Pick the nock orientation, then tap where it landed.';
-
-  orientChips.innerHTML = ORIENTATIONS.map(o =>
+  editingShotId = null;
+  modalTitle.textContent = 'Log shot — ' + arrow.arrowId;
+  modalSub.textContent = 'Pick the nock orientation and distance, tap the target to get close, then dial in the exact numbers.';
+  orientChips.innerHTML = ORIENT_CCW_ORDER.map(o =>
     `<button class="chip${o===0?' active':''}" data-o="${o}">${fmtDeg(o)}</button>`
   ).join('');
-
+  distanceInput.value = '';
+  bowInput.value = '';
+  lrMagInput.value = '';
+  udMagInput.value = '';
+  lrDirection = 'right';
+  udDirection = 'up';
+  [...lrDirChips.children].forEach(c => c.classList.toggle('active', c.getAttribute('data-dir') === 'right'));
+  [...udDirChips.children].forEach(c => c.classList.toggle('active', c.getAttribute('data-dir') === 'up'));
+  radiusInput.value = loadTargetRadius();
   drawTarget();
   renderShotList();
   renderRecommendation();
-
   backdrop.classList.add('show');
   modal.classList.add('show');
 }
-
 function closeModal(){
   backdrop.classList.remove('show');
   modal.classList.remove('show');
   activeArrowId = null;
+  editingShotId = null;
 }
 document.getElementById('modal-close').addEventListener('click', closeModal);
 backdrop.addEventListener('click', closeModal);
-
 orientChips.addEventListener('click', (e) => {
   const btn = e.target.closest('[data-o]');
   if (!btn) return;
   activeOrientation = parseFloat(btn.getAttribute('data-o'));
   [...orientChips.children].forEach(c => c.classList.toggle('active', c === btn));
 });
-
 // ---- target SVG: tap-to-plot ----
 const svgNS = 'http://www.w3.org/2000/svg';
 const targetSvg = document.getElementById('target-svg');
@@ -598,7 +947,6 @@ const RINGS = [
   {frac:0.625,fill:'#c0392b'},
   {frac:0.375,fill:'#e8b923'}
 ];
-
 function drawTarget(){
   targetSvg.innerHTML = '';
   RINGS.forEach(ring => {
@@ -613,38 +961,106 @@ function drawTarget(){
   cross.setAttribute('cx',CX); cross.setAttribute('cy',CY); cross.setAttribute('r',2);
   cross.setAttribute('fill','#00000055');
   targetSvg.appendChild(cross);
-
   plotExistingShots();
-
-  targetSvg.addEventListener('click', onTargetTap);
+  renderPreviewDot();
 }
-
-function onTargetTap(evt){
+function currentRadius(){
+  const v = parseFloat(radiusInput.value);
+  return (Number.isFinite(v) && v > 0) ? v : loadTargetRadius();
+}
+// ---- preview dot: reflects whatever is currently dialed in below, before it's logged ----
+function renderPreviewDot(){
+  const old = targetSvg.querySelector('#preview-dot');
+  if (old) old.remove();
+  const lr = currentLR();
+  const ud = currentUD();
+  if (lr === null && ud === null) return; // nothing entered yet, nothing to preview
+  const radius = currentRadius();
+  const lrIn = (lr || 0) * 0.1875;
+  const udIn = (ud || 0) * 0.1875;
+  const x = lrIn / radius;
+  const y = -udIn / radius; // SVG y is down-positive; flipped so up = positive UD
+  const dot = document.createElementNS(svgNS,'circle');
+  dot.setAttribute('id', 'preview-dot');
+  dot.setAttribute('cx', CX + x*R);
+  dot.setAttribute('cy', CY + y*R);
+  dot.setAttribute('r', 7);
+  dot.setAttribute('fill', 'none');
+  dot.setAttribute('stroke', '#c9822f');
+  dot.setAttribute('stroke-width', '2.5');
+  targetSvg.appendChild(dot);
+}
+// ---- tap the target to get close: pre-fills direction + magnitude, doesn't log by itself ----
+// (listener attached once here, not inside drawTarget, so it never stacks on redraw)
+targetSvg.addEventListener('click', (evt) => {
   if (!activeArrowId) return;
+  const radius = currentRadius();
   const rect = targetSvg.getBoundingClientRect();
   const px = (evt.clientX - rect.left) * (SIZE / rect.width);
   const py = (evt.clientY - rect.top) * (SIZE / rect.height);
   const x = (px - CX) / R;   // normalized -1..1
   const y = (py - CY) / R;
   if (Math.hypot(x,y) > 1.25) return; // ignore taps way outside target
-
+  const lrIn = x * radius;
+  const udIn = -y * radius; // SVG y is down-positive; flipped so up = positive UD
+  const lrSquaresApprox = Math.round(lrIn / 0.1875);
+  const udSquaresApprox = Math.round(udIn / 0.1875);
+  lrDirection = lrSquaresApprox < 0 ? 'left' : 'right';
+  udDirection = udSquaresApprox < 0 ? 'down' : 'up';
+  lrMagInput.value = Math.abs(lrSquaresApprox);
+  udMagInput.value = Math.abs(udSquaresApprox);
+  [...lrDirChips.children].forEach(c => c.classList.toggle('active', c.getAttribute('data-dir') === lrDirection));
+  [...udDirChips.children].forEach(c => c.classList.toggle('active', c.getAttribute('data-dir') === udDirection));
+  renderPreviewDot();
+  showToast('Got you close — adjust the exact numbers below');
+});
+// ---- log shot: direction + magnitude below are the source of truth; tap is just a starting point ----
+logShotBtn.addEventListener('click', () => {
+  if (!activeArrowId) return;
+  const distance = parseFloat(distanceInput.value);
+  if (!Number.isFinite(distance) || distance <= 0){
+    distanceInput.focus();
+    showToast('Enter distance (yd) before logging a shot');
+    return;
+  }
+  const lr = currentLR();
+  const ud = currentUD();
+  if (lr === null && ud === null){
+    lrMagInput.focus();
+    showToast('Enter LR and/or UD before logging');
+    return;
+  }
+  const lrSquares = lr === null ? 0 : lr;
+  const udSquares = ud === null ? 0 : ud;
+  const radius = currentRadius();
+  saveTargetRadius(radius);
+  const lrIn = Math.round(lrSquares * 0.1875 * 1000) / 1000;
+  const udIn = Math.round(udSquares * 0.1875 * 1000) / 1000;
+  const x = Math.round((lrIn / radius) * 1000) / 1000;
+  const y = Math.round((-udIn / radius) * 1000) / 1000;
   const shots = loadShots();
   shots.push({
     id: 's_' + Date.now(),
     arrowId: activeArrowId,
     orientation: activeOrientation,
-    x: Math.round(x*1000)/1000,
-    y: Math.round(y*1000)/1000,
+    distance: distance,
+    bow: bowInput.value.trim(),
+    radiusInches: radius,
+    lrIn: lrIn,
+    udIn: udIn,
+    x: x,
+    y: y,
     createdAt: new Date().toISOString()
   });
   saveShots(shots);
+  lrMagInput.value = '';
+  udMagInput.value = '';
   drawTarget();
   renderShotList();
   renderRecommendation();
   render();
-  showToast('Shot logged \u2014 ' + fmtDeg(activeOrientation));
-}
-
+  showToast('Shot logged — ' + fmtDeg(activeOrientation) + ' · ' + distance + 'yd · LR ' + lrSquares + ' UD ' + udSquares);
+});
 function plotExistingShots(){
   const shots = loadShots().filter(s => s.arrowId === activeArrowId);
   shots.forEach(s => {
@@ -658,7 +1074,6 @@ function plotExistingShots(){
     targetSvg.appendChild(dot);
   });
 }
-
 function renderShotList(){
   const shots = loadShots().filter(s => s.arrowId === activeArrowId)
     .slice().sort((a,b)=> b.createdAt.localeCompare(a.createdAt));
@@ -666,69 +1081,930 @@ function renderShotList(){
     shotListEl.innerHTML = '<div style="font-size:12.5px; color:var(--dim); padding:6px 0;">No shots logged yet for this arrow.</div>';
     return;
   }
-  shotListEl.innerHTML = shots.map(s => `
+  shotListEl.innerHTML = shots.map(s => {
+    if (s.id === editingShotId){
+      return `
+      <div class="shot-row" data-shot="${s.id}" style="display:block; padding:10px 0;">
+        <div class="row3" style="margin-bottom:8px;">
+          <div class="field" style="margin-bottom:0;">
+            <label>Orientation</label>
+            <select data-edit-orient="${s.id}">
+              ${ORIENT_CCW_ORDER.map(o => `<option value="${o}"${o===s.orientation?' selected':''}>${fmtDeg(o)}</option>`).join('')}
+            </select>
+          </div>
+          <div class="field" style="margin-bottom:0;">
+            <label>Distance (yd)</label>
+            <input type="number" inputmode="decimal" step="1" data-edit-distance="${s.id}" value="${s.distance != null ? s.distance : ''}">
+          </div>
+          <div class="field" style="margin-bottom:0;">
+            <label>Bow</label>
+            <input type="text" data-edit-bow="${s.id}" value="${escapeHtml(s.bow || '')}">
+          </div>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-primary btn-sm" data-save-shot="${s.id}" style="flex:1;">Save</button>
+          <button class="btn btn-ghost btn-sm" data-cancel-shot="${s.id}" style="flex:1;">Cancel</button>
+        </div>
+      </div>`;
+    }
+    return `
     <div class="shot-row" data-shot="${s.id}">
-      <span class="oa">${fmtDeg(s.orientation)} \u00b7 (${s.x.toFixed(2)}, ${s.y.toFixed(2)})</span>
-      <button class="rm" data-rmshot="${s.id}">remove</button>
+      <span class="oa">${fmtDeg(s.orientation)} · ${s.distance != null ? s.distance + 'yd' : '—'} · ${s.lrIn != null ? 'LR ' + s.lrIn.toFixed(2) + '" UD ' + s.udIn.toFixed(2) + '"' : '(' + s.x.toFixed(2) + ', ' + s.y.toFixed(2) + ')'}${s.bow ? ' · ' + escapeHtml(s.bow) : ''}</span>
+      <span>
+        <button class="rm" data-editshot="${s.id}">edit</button>
+        <button class="rm" data-rmshot="${s.id}">remove</button>
+      </span>
     </div>
-  `).join('');
+  `;}).join('');
 }
-
 shotListEl.addEventListener('click', (e) => {
-  const btn = e.target.closest('[data-rmshot]');
-  if (!btn) return;
-  const id = btn.getAttribute('data-rmshot');
-  const shots = loadShots().filter(s => s.id !== id);
-  saveShots(shots);
-  drawTarget();
-  renderShotList();
-  renderRecommendation();
-  render();
+  const rmBtn = e.target.closest('[data-rmshot]');
+  if (rmBtn){
+    const id = rmBtn.getAttribute('data-rmshot');
+    const shots = loadShots().filter(s => s.id !== id);
+    saveShots(shots);
+    if (editingShotId === id) editingShotId = null;
+    drawTarget();
+    renderShotList();
+    renderRecommendation();
+    render();
+    return;
+  }
+  const editBtn = e.target.closest('[data-editshot]');
+  if (editBtn){
+    editingShotId = editBtn.getAttribute('data-editshot');
+    renderShotList();
+    return;
+  }
+  const cancelShotBtn = e.target.closest('[data-cancel-shot]');
+  if (cancelShotBtn){
+    editingShotId = null;
+    renderShotList();
+    return;
+  }
+  const saveShotBtn = e.target.closest('[data-save-shot]');
+  if (saveShotBtn){
+    const id = saveShotBtn.getAttribute('data-save-shot');
+    const orientSel = shotListEl.querySelector(`[data-edit-orient="${id}"]`);
+    const distEl = shotListEl.querySelector(`[data-edit-distance="${id}"]`);
+    const bowEl = shotListEl.querySelector(`[data-edit-bow="${id}"]`);
+    const newOrientation = parseFloat(orientSel.value);
+    const newDistance = distEl.value ? parseFloat(distEl.value) : null;
+    const newBow = bowEl.value.trim();
+    const shots = loadShots().map(s => s.id === id
+      ? { ...s, orientation: newOrientation, distance: newDistance, bow: newBow }
+      : s);
+    saveShots(shots);
+    editingShotId = null;
+    drawTarget();
+    renderShotList();
+    renderRecommendation();
+    render();
+    showToast('Shot updated');
+  }
 });
-
 // ---- recommendation: honest, sample-size gated ----
 function renderRecommendation(){
   const shots = loadShots().filter(s => s.arrowId === activeArrowId);
   if (shots.length === 0){ recPanel.style.display = 'none'; return; }
-
   const byOrient = {};
   shots.forEach(s => {
     if (!byOrient[s.orientation]) byOrient[s.orientation] = [];
     byOrient[s.orientation].push(s);
   });
   const orientKeys = Object.keys(byOrient);
-
   const stats = orientKeys.map(k => {
     const arr = byOrient[k];
     const avgR = arr.reduce((sum,s)=> sum + Math.hypot(s.x,s.y), 0) / arr.length;
     return { orientation: parseFloat(k), count: arr.length, avgR };
   }).sort((a,b)=> a.avgR - b.avgR);
-
   recPanel.style.display = 'block';
-
   if (orientKeys.length < 2){
     recOrient.textContent = fmtDeg(stats[0].orientation) + ' (only orientation tested)';
     recConf.textContent = 'Log shots at a different orientation to compare.';
     recTable.innerHTML = '';
     return;
   }
-
   const best = stats[0];
-  let confidence, confColor;
-  if (best.count < 3){ confidence = 'Low confidence \u2014 too few shots at this orientation'; }
-  else if (best.count < 6){ confidence = 'Moderate confidence \u2014 keep logging to confirm'; }
-  else { confidence = 'Higher confidence \u2014 consistent across several shots'; }
-
+  let confidence;
+  if (best.count < 3){ confidence = 'Low confidence — too few shots at this orientation'; }
+  else if (best.count < 6){ confidence = 'Moderate confidence — keep logging to confirm'; }
+  else { confidence = 'Higher confidence — consistent across several shots'; }
   recOrient.textContent = fmtDeg(best.orientation);
   recConf.textContent = confidence;
   recTable.innerHTML = stats.map(s => `
     <div class="${s===best?'best':''}">
       <span>${fmtDeg(s.orientation)}</span>
-      <span>${s.count} shot${s.count===1?'':'s'} \u00b7 avg r ${s.avgR.toFixed(2)}</span>
+      <span>${s.count} shot${s.count===1?'':'s'} · avg r ${s.avgR.toFixed(2)}</span>
     </div>
   `).join('');
 }
+// ---------- export shots to CSV (matches Impact Data columns) ----------
+function csvEscape(v){
+  const s = (v === null || v === undefined) ? '' : String(v);
+  return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+}
+document.getElementById('export-btn').addEventListener('click', () => {
+  const arrows = loadArrows();
+  const shots = loadShots();
+  if (shots.length === 0){ showToast('No shots logged yet'); return; }
+  const rows = shots
+    .filter(s => s.lrIn !== undefined) // skip shots logged before distance/radius tracking existed
+    .slice().sort((a,b)=> a.createdAt.localeCompare(b.createdAt))
+    .map(s => {
+      const arrow = arrows.find(a => a.id === s.arrowId);
+      const dateStr = s.createdAt ? s.createdAt.slice(0,10) : '';
+      const lrSquares = Math.round((s.lrIn / 0.1875) * 100) / 100;
+      const udSquares = Math.round((s.udIn / 0.1875) * 100) / 100;
+      return [
+        arrow ? arrow.arrowId : s.arrowId,
+        s.orientation,
+        s.distance,
+        lrSquares,
+        udSquares,
+        s.bow || '',
+        dateStr
+      ];
+    });
+  const skipped = shots.length - rows.length;
+  const header = ['Arrow ID','Orientation (deg)','Distance (yd)','LR (3/16in sq)','UD (3/16in sq)','Bow','Date'];
+  const csv = [header, ...rows].map(r => r.map(csvEscape).join(',')).join('\r\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'arrow_tracker_shots_' + new Date().toISOString().slice(0,10) + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  showToast(skipped > 0
+    ? rows.length + ' shots exported (' + skipped + ' older shots skipped — no distance recorded)'
+    : rows.length + ' shots exported');
+});
+// ---------- full backup / restore (fixes: fleet had no recovery path) ----------
+const backupBtn = document.getElementById('backup-btn');
+const restoreBtn = document.getElementById('restore-btn');
+const restoreFile = document.getElementById('restore-file');
+backupBtn.addEventListener('click', () => {
+  const payload = {
+    exportedAt: new Date().toISOString(),
+    arrows: loadArrows(),
+    shots: loadShots(),
+    arrowIdList: loadArrowIdList(),
+    arrowGuidanceMap: loadArrowGuidanceMap(),
+    arrowWorkbookDataMap: loadArrowWorkbookDataMap(),
+    targetRadiusInches: loadTargetRadius(),
+    labData: loadLabData()
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'arrow_tracker_backup_' + new Date().toISOString().slice(0,10) + '.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  showToast('Backup exported — ' + payload.arrows.length + ' arrows, ' + payload.shots.length + ' shots');
+});
+restoreBtn.addEventListener('click', () => restoreFile.click());
+restoreFile.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    let data;
+    try{ data = JSON.parse(String(reader.result)); }
+    catch(err){ showToast('That file is not valid backup JSON'); restoreFile.value = ''; return; }
+    if (!Array.isArray(data.arrows) || !Array.isArray(data.shots)){
+      showToast('That file does not look like an Arrow Tracker backup');
+      restoreFile.value = '';
+      return;
+    }
+    const current = loadArrows();
+    const msg = current.length > 0
+      ? `Restore this backup? It will replace your current ${current.length} arrow(s) and their shots with ${data.arrows.length} arrow(s) and ${data.shots.length} shot(s) from the file. This cannot be undone.`
+      : `Restore ${data.arrows.length} arrow(s) and ${data.shots.length} shot(s) from this backup?`;
+    if (!window.confirm(msg)){ restoreFile.value = ''; return; }
+    saveArrows(data.arrows);
+    saveShots(data.shots);
+    if (Array.isArray(data.arrowIdList)) saveArrowIdList(data.arrowIdList);
+    if (data.arrowGuidanceMap && typeof data.arrowGuidanceMap === 'object') saveArrowGuidanceMap(data.arrowGuidanceMap);
+    if (data.arrowWorkbookDataMap && typeof data.arrowWorkbookDataMap === 'object') saveArrowWorkbookDataMap(data.arrowWorkbookDataMap);
+    if (Number.isFinite(data.targetRadiusInches) && data.targetRadiusInches > 0) saveTargetRadius(data.targetRadiusInches);
+    if (data.labData && typeof data.labData === 'object') saveLabData(data.labData);
+    renderArrowIdSelect();
+    renderLabIdSelect();
+    renderLabList();
+    cancelEditArrow();
+    render();
+    showToast('Backup restored');
+    restoreFile.value = '';
+  };
+  reader.onerror = () => { showToast('Could not read that file'); restoreFile.value = ''; };
+  reader.readAsText(file);
+});
+// ---------- Lab Data: storage ----------
+function loadLabData(){
+  try{
+    const raw = localStorage.getItem('labData');
+    return raw ? JSON.parse(raw) : {};
+  } catch(e){ console.error('Storage error', e); return {}; }
+}
+function saveLabData(map){
+  try{ localStorage.setItem('labData', JSON.stringify(map)); return true; }
+  catch(e){ console.error('Storage error', e); return false; }
+}
+function loadLabDraft(){
+  try{
+    const raw = localStorage.getItem('labSpineDraft');
+    return raw ? JSON.parse(raw) : null;
+  } catch(e){ return null; }
+}
+function saveLabDraft(){
+  try{
+    localStorage.setItem('labSpineDraft', JSON.stringify({
+      arrowId: labArrowId, baseline: labBaseline, spine: labSpine, index: labIndex
+    }));
+  } catch(e){ console.error('Storage error', e); }
+}
+function clearLabDraft(){
+  try{ localStorage.removeItem('labSpineDraft'); } catch(e){}
+}
 
+// ---------- Lab Data: spine wizard state ----------
+// Order matches the physical measurement procedure: 0deg baseline first (entered above,
+// not part of this array), then rotate 22.5deg counter-clockwise each step. Derived from
+// ORIENT_CCW_ORDER so the wizard, the position chips, and the shot log chips can never drift apart.
+const LAB_POSITIONS = ORIENT_CCW_ORDER.slice(1);
+let labArrowId = null;
+let labBaseline = null;
+let labSpine = {};      // angle (as string key) -> computed spine value
+let labIndex = 0;       // how many of LAB_POSITIONS have been saved so far
+let labReadings = [];   // readings added via "Measure again" for the position in progress
+let labDir = 'cw';
+let labRollBehavior = 'None';
+
+const labIdSelect = document.getElementById('lab-id-select');
+const labExistingHint = document.getElementById('lab-existing-hint');
+const labBaselineInput = document.getElementById('lab-baseline');
+const labStartBtn = document.getElementById('lab-start-btn');
+const labWizardPanel = document.getElementById('lab-wizard-panel');
+const labStepLabel = document.getElementById('lab-step-label');
+const labProgressTag = document.getElementById('lab-progress-tag');
+const labPositionChips = document.getElementById('lab-position-chips');
+const labReadingRows = document.getElementById('lab-reading-rows');
+const labAddReadingWrap = document.getElementById('lab-add-reading-wrap');
+const labDialSvg = document.getElementById('lab-dial-svg');
+const labRadarSvg = document.getElementById('lab-radar-svg');
+const labRadarCaption = document.getElementById('lab-radar-caption');
+const labDialCaption = document.getElementById('lab-dial-caption');
+const labDirChips = document.getElementById('lab-dir-chips');
+const labMagInput = document.getElementById('lab-mag');
+const labAddMeasureBtn = document.getElementById('lab-add-measure-btn');
+const labBackBtn = document.getElementById('lab-back-btn');
+const labNextBtn = document.getElementById('lab-next-btn');
+const labWizardHint = document.getElementById('lab-wizard-hint');
+const labDetailsPanel = document.getElementById('lab-details-panel');
+const labMassInput = document.getElementById('lab-mass');
+const labPointInput = document.getElementById('lab-point');
+const labFloInput = document.getElementById('lab-flo');
+const labHeavyAxisInput = document.getElementById('lab-heavy-axis');
+const labMassAsymInput = document.getElementById('lab-mass-asym');
+const labRollChips = document.getElementById('lab-roll-chips');
+const labAxisSummary = document.getElementById('lab-axis-summary');
+const labSaveBtn = document.getElementById('lab-save-btn');
+const labListEl = document.getElementById('lab-list');
+const labEmptyEl = document.getElementById('lab-empty-state');
+const labCountEl = document.getElementById('lab-count-tag');
+const labExportSpineBtn = document.getElementById('lab-export-spine-btn');
+const labExportMassBtn = document.getElementById('lab-export-mass-btn');
+
+function renderLabIdSelect(){
+  const list = loadArrowIdList();
+  const prev = labIdSelect.value;
+  labIdSelect.innerHTML = '<option value="">Select an arrow…</option>' +
+    list.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('');
+  if ([...labIdSelect.options].some(o => o.value === prev)) labIdSelect.value = prev;
+}
+renderLabIdSelect();
+
+labIdSelect.addEventListener('change', () => {
+  const id = labIdSelect.value;
+  labWizardPanel.style.display = 'none';
+  labDetailsPanel.style.display = 'none';
+  if (!id){
+    labExistingHint.textContent = '';
+    labBaselineInput.value = '';
+    return;
+  }
+  const data = loadLabData()[id];
+  if (data){
+    labExistingHint.textContent = 'Existing lab data found for this arrow' + (data.updatedAt ? ' (saved ' + data.updatedAt.slice(0,10) + ')' : '') + '. Starting the wizard will let you re-measure and overwrite it.';
+    labBaselineInput.value = data.spine && data.spine['0'] != null ? data.spine['0'] : '';
+    labMassInput.value = data.mass != null ? data.mass : '';
+    labPointInput.value = data.point != null ? data.point : '';
+    labFloInput.value = data.flo != null ? data.flo : '';
+    labHeavyAxisInput.value = data.heavyAxis != null ? data.heavyAxis : '';
+    labMassAsymInput.value = data.massAsymMag != null ? data.massAsymMag : '';
+    labRollBehavior = data.rollingBehavior || 'None';
+  } else {
+    labExistingHint.textContent = '';
+    labBaselineInput.value = '';
+    labMassInput.value = ''; labPointInput.value = ''; labFloInput.value = '';
+    labHeavyAxisInput.value = ''; labMassAsymInput.value = '';
+    labRollBehavior = 'None';
+  }
+  [...labRollChips.children].forEach(c => c.classList.toggle('active', c.getAttribute('data-roll') === labRollBehavior));
+});
+
+labRollChips.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-roll]');
+  if (!btn) return;
+  labRollBehavior = btn.getAttribute('data-roll');
+  [...labRollChips.children].forEach(c => c.classList.toggle('active', c === btn));
+});
+
+labDirChips.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-dir]');
+  if (!btn) return;
+  labDir = btn.getAttribute('data-dir');
+  [...labDirChips.children].forEach(c => c.classList.toggle('active', c === btn));
+  renderLabCalc();
+});
+labMagInput.addEventListener('input', renderLabCalc);
+
+// Clockwise = stiffer = subtract from baseline. Counter-clockwise = weaker = add to baseline.
+function signedReading(r){ return r.dir === 'ccw' ? Math.abs(r.mag) : -Math.abs(r.mag); }
+
+function renderLabReadingRows(){
+  if (!labReadings.length){ labReadingRows.innerHTML = ''; return; }
+  labReadingRows.innerHTML = '<div class="hint" style="margin-bottom:6px;">Readings for this position:</div>' +
+    labReadings.map((r,i) => `
+      <div class="shot-row" data-labreading="${i}">
+        <span class="oa">${r.dir === 'ccw' ? 'CCW' : 'CW'} ${r.mag.toFixed(3)}"</span>
+        <button class="rm" data-rm-labreading="${i}">remove</button>
+      </div>
+    `).join('');
+}
+labReadingRows.addEventListener('click', (e) => {
+  const rm = e.target.closest('[data-rm-labreading]');
+  if (!rm) return;
+  const idx = parseInt(rm.getAttribute('data-rm-labreading'), 10);
+  labReadings.splice(idx, 1);
+  renderLabReadingRows();
+  renderLabCalc();
+});
+function renderLabCalc(){
+  if (labIndex >= LAB_POSITIONS.length){ drawLabDial(); return; }
+  const angle = LAB_POSITIONS[labIndex];
+  const pending = parseFloat(labMagInput.value);
+  const all = labReadings.slice();
+  if (Number.isFinite(pending) && pending >= 0) all.push({dir: labDir, mag: pending});
+  if (!all.length || labBaseline == null){
+    const existing = labSpine[String(angle)];
+    labDialCaption.textContent = existing != null
+      ? 'Already recorded: ' + existing.toFixed(3) + '" at ' + angle + '°. Enter a new reading to overwrite, or Save & next to keep it.'
+      : 'Enter a dial reading to see the calculated spine.';
+    drawLabDial();
+    return;
+  }
+  const avgSigned = all.reduce((sum,r)=> sum + signedReading(r), 0) / all.length;
+  const value = labBaseline + avgSigned;
+  labDialCaption.textContent = (all.length > 1 ? 'Average of ' + all.length + ' readings — ' : '') +
+    'calculated spine at ' + angle + '°: ' + value.toFixed(3) + '"';
+  drawLabDial();
+}
+labAddMeasureBtn.addEventListener('click', () => {
+  const mag = parseFloat(labMagInput.value);
+  if (!Number.isFinite(mag) || mag < 0){ showToast('Enter a dial reading first'); return; }
+  labReadings.push({dir: labDir, mag});
+  labMagInput.value = '';
+  renderLabReadingRows();
+  renderLabCalc();
+});
+
+function computeWeakStiffAxis(spineObj){
+  const entries = Object.keys(spineObj).map(k => ({angle: parseFloat(k), val: spineObj[k]}))
+    .filter(e => Number.isFinite(e.val));
+  if (entries.length < 16) return null;
+  const weak = entries.reduce((a,b)=> b.val > a.val ? b : a);
+  const stiff = entries.reduce((a,b)=> b.val < a.val ? b : a);
+  return {weakAxis: weak.angle, weakVal: weak.val, stiffAxis: stiff.angle, stiffVal: stiff.val};
+}
+
+// Position chips mirror the shot-log orientation row: one compact wrapping row, same
+// 0, 337.5, 315... order. Each tile is two lines (angle + recorded value) so the sequence
+// is still readable at a glance without needing a tall list -- the dial below carries the
+// "how much did it vary" job visually. Tap any tile to jump straight to it. The 0deg tile
+// is a reminder, not a jump target -- the baseline is set in the field above, not here.
+function renderLabPositionChips(){
+  const currentAngle = labIndex < LAB_POSITIONS.length ? LAB_POSITIONS[labIndex] : null;
+  labPositionChips.innerHTML = ORIENT_CCW_ORDER.map(o => {
+    const val = labSpine[String(o)];
+    const isCurrent = o !== 0 && o === currentAngle;
+    const isBaseline = o === 0;
+    const cls = 'lab-pos-chip' + (isCurrent ? ' active' : '') + (isBaseline ? ' baseline' : '');
+    return `<button type="button" class="${cls}" data-labpos="${o}">
+      <span class="lpc-a">${fmtDeg(o)}</span>
+      <span class="lpc-v">${val != null ? val.toFixed(3) : '—'}</span>
+    </button>`;
+  }).join('');
+}
+labPositionChips.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-labpos]');
+  if (!btn) return;
+  const angle = parseFloat(btn.getAttribute('data-labpos'));
+  if (angle === 0){
+    showToast('0° is the baseline field above, not a wizard step');
+    return;
+  }
+  const idx = LAB_POSITIONS.indexOf(angle);
+  if (idx === -1) return;
+  labIndex = idx;
+  saveLabDraft();
+  renderLabStep();
+});
+
+// ---- dial indicator: mirrors the target face concept for spine readings ----
+// Needle points straight up at zero. Clockwise (stiffer) swings it right, counter-clockwise
+// (weaker) swings it left, proportional to magnitude. Repeat "Measure again" readings for
+// the CURRENT position show as small ticks (like repeat shots showing as dots); whatever
+// you're currently typing shows as the live needle (like the orange preview dot).
+const LAB_DIAL_CX = 130, LAB_DIAL_CY = 130, LAB_DIAL_R = 110;
+const LAB_DIAL_MAX_MAG = 0.05;   // inches of deflection at full-scale needle swing
+const LAB_DIAL_MAX_SWEEP = 125;  // degrees each side of straight-up
+const LAB_DIAL_STEP = 0.001;     // one tick per thousandth, matching the dial indicator itself
+function labDialAngle(dir, mag){
+  const clamped = Math.min(Math.abs(mag), LAB_DIAL_MAX_MAG);
+  const sweep = (clamped / LAB_DIAL_MAX_MAG) * LAB_DIAL_MAX_SWEEP;
+  return dir === 'ccw' ? -sweep : sweep;
+}
+function labDialPoint(angleDeg, radius){
+  const rad = (angleDeg - 90) * Math.PI / 180;
+  return { x: LAB_DIAL_CX + radius * Math.cos(rad), y: LAB_DIAL_CY + radius * Math.sin(rad) };
+}
+function labDialLine(a, len, color, width){
+  const p1 = labDialPoint(a, LAB_DIAL_R - len);
+  const p2 = labDialPoint(a, LAB_DIAL_R);
+  const line = document.createElementNS(svgNS,'line');
+  line.setAttribute('x1', p1.x); line.setAttribute('y1', p1.y);
+  line.setAttribute('x2', p2.x); line.setAttribute('y2', p2.y);
+  line.setAttribute('stroke', color); line.setAttribute('stroke-width', width);
+  labDialSvg.appendChild(line);
+}
+function drawLabDial(){
+  if (!labDialSvg) return;
+  labDialSvg.innerHTML = '';
+  const face = document.createElementNS(svgNS,'circle');
+  face.setAttribute('cx', LAB_DIAL_CX); face.setAttribute('cy', LAB_DIAL_CY); face.setAttribute('r', LAB_DIAL_R);
+  face.setAttribute('fill', '#1c1c19'); face.setAttribute('stroke', '#333329'); face.setAttribute('stroke-width', '2');
+  labDialSvg.appendChild(face);
+  // fine graduations every .001" across the full +/- range -- longer/brighter every .005" and .010"
+  const steps = Math.round(LAB_DIAL_MAX_MAG / LAB_DIAL_STEP); // 50
+  for (let k = 0; k <= steps; k++){
+    const mag = k * LAB_DIAL_STEP;
+    const sides = k === 0 ? ['cw'] : ['cw','ccw'];
+    sides.forEach(dir => {
+      const a = labDialAngle(dir, mag);
+      const isMajor = k % 10 === 0;
+      const isMid = k % 5 === 0;
+      const len = isMajor ? 16 : (isMid ? 10 : 5);
+      const color = isMajor ? '#8c897a' : '#333329';
+      const width = isMajor ? 2 : 1;
+      labDialLine(a, len, color, width);
+    });
+  }
+  // repeat "Measure again" readings for the current position -- like repeat shots as dots
+  labReadings.forEach(r => {
+    const a = labDialAngle(r.dir, r.mag);
+    const p = labDialPoint(a, LAB_DIAL_R - 20);
+    const dot = document.createElementNS(svgNS,'circle');
+    dot.setAttribute('cx', p.x); dot.setAttribute('cy', p.y); dot.setAttribute('r', 4);
+    dot.setAttribute('fill', '#2ecc7166'); dot.setAttribute('stroke', '#0a3d1f'); dot.setAttribute('stroke-width', '1');
+    labDialSvg.appendChild(dot);
+  });
+  // needle: always shows something, and reflects whichever field is authoritative right now --
+  // whatever's actively being typed, else the last saved reading for this position, else rest at zero.
+  const angle = labIndex < LAB_POSITIONS.length ? LAB_POSITIONS[labIndex] : null;
+  const savedVal = angle != null ? labSpine[String(angle)] : null;
+  const pending = parseFloat(labMagInput.value);
+  let needleDir = 'cw', needleMag = 0, needleColor = '#5a564a', needleWidth = 2;
+  if (Number.isFinite(pending) && pending >= 0){
+    needleDir = labDir; needleMag = pending; needleColor = '#c9822f'; needleWidth = 3;
+  } else if (savedVal != null && labBaseline != null){
+    const delta = savedVal - labBaseline;
+    needleDir = delta <= 0 ? 'cw' : 'ccw';
+    needleMag = Math.abs(delta);
+    needleColor = '#c9822f99'; needleWidth = 3;
+  } else if (labBaseline != null){
+    // Nothing typed yet and this position has never been recorded -- rest the needle at
+    // wherever the PREVIOUS position in the sequence left it, not back at zero. The real
+    // dial never re-zeros between rotations, so this is what you'd actually see on the gauge.
+    let prevVal = labBaseline;
+    if (labIndex > 0){
+      const prevAngle = LAB_POSITIONS[labIndex - 1];
+      const stored = labSpine[String(prevAngle)];
+      if (stored != null) prevVal = stored;
+    }
+    const delta = prevVal - labBaseline;
+    needleDir = delta <= 0 ? 'cw' : 'ccw';
+    needleMag = Math.abs(delta);
+    needleColor = '#5a564a'; needleWidth = 2;
+  }
+  const na = labDialAngle(needleDir, needleMag);
+  const tip = labDialPoint(na, LAB_DIAL_R - 22);
+  const needle = document.createElementNS(svgNS,'line');
+  needle.setAttribute('x1', LAB_DIAL_CX); needle.setAttribute('y1', LAB_DIAL_CY);
+  needle.setAttribute('x2', tip.x); needle.setAttribute('y2', tip.y);
+  needle.setAttribute('stroke', needleColor); needle.setAttribute('stroke-width', String(needleWidth)); needle.setAttribute('stroke-linecap', 'round');
+  labDialSvg.appendChild(needle);
+  const hub = document.createElementNS(svgNS,'circle');
+  hub.setAttribute('cx', LAB_DIAL_CX); hub.setAttribute('cy', LAB_DIAL_CY); hub.setAttribute('r', 5);
+  hub.setAttribute('fill', '#e8e6dd');
+  labDialSvg.appendChild(hub);
+}
+
+// ---- radar/polar chart: pattern of spine behavior across all 16 angles, same idea as
+// the target face showing pattern of shot impacts. Angles sit at their true geometric
+// position (0deg at top, clockwise) regardless of what order you measured them in. The
+// radial axis auto-scales to whatever's recorded so far (min/max), like the Sheets version.
+const LAB_RADAR_CX = 130, LAB_RADAR_CY = 130, LAB_RADAR_R = 100;
+function labRadarPoint(angleDeg, radius){
+  const rad = (angleDeg - 90) * Math.PI / 180;
+  return { x: LAB_RADAR_CX + radius * Math.cos(rad), y: LAB_RADAR_CY + radius * Math.sin(rad) };
+}
+// Catmull-Rom -> cubic Bezier conversion, so the connecting line curves smoothly through
+// every recorded point instead of a jagged polyline (standard 1/6-tension conversion).
+function catmullRomPath(pts, closed){
+  const n = pts.length;
+  if (n < 2) return '';
+  const get = (i) => {
+    if (closed) return pts[(i + n) % n];
+    if (i < 0) return pts[0];
+    if (i >= n) return pts[n - 1];
+    return pts[i];
+  };
+  let d = `M ${pts[0].x} ${pts[0].y}`;
+  const segCount = closed ? n : n - 1;
+  for (let i = 0; i < segCount; i++){
+    const p0 = get(i - 1), p1 = get(i), p2 = get(i + 1), p3 = get(i + 2);
+    const cp1x = p1.x + (p2.x - p0.x) / 6, cp1y = p1.y + (p2.y - p0.y) / 6;
+    const cp2x = p2.x - (p3.x - p1.x) / 6, cp2y = p2.y - (p3.y - p1.y) / 6;
+    d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`;
+  }
+  if (closed) d += ' Z';
+  return d;
+}
+// Groups the 16 angles into runs of consecutive recorded positions (wrap-aware, so a run
+// spanning the 337.5->0 seam isn't falsely split). If all 16 are in, it's a single closed
+// loop; otherwise each run is drawn as its own open smooth segment, gaps left unconnected.
+function buildLabRadarChains(){
+  const n = ORIENTATIONS.length;
+  const present = ORIENTATIONS.map(o => labSpine[String(o)] != null);
+  if (present.every(Boolean)){
+    return [{ closed: true, angles: ORIENTATIONS.slice() }];
+  }
+  const gapIdx = present.findIndex(p => !p);
+  if (gapIdx === -1) return [];
+  const order = [];
+  for (let k = 0; k < n; k++) order.push((gapIdx + 1 + k) % n);
+  const chains = [];
+  let cur = [];
+  order.forEach(idx => {
+    if (present[idx]){
+      cur.push(ORIENTATIONS[idx]);
+    } else if (cur.length){
+      chains.push({ closed: false, angles: cur });
+      cur = [];
+    }
+  });
+  if (cur.length) chains.push({ closed: false, angles: cur });
+  return chains;
+}
+function drawLabRadar(){
+  if (!labRadarSvg) return;
+  labRadarSvg.innerHTML = '';
+  [0.33, 0.66, 1.0].forEach(frac => {
+    const c = document.createElementNS(svgNS,'circle');
+    c.setAttribute('cx', LAB_RADAR_CX); c.setAttribute('cy', LAB_RADAR_CY); c.setAttribute('r', LAB_RADAR_R * frac);
+    c.setAttribute('fill', 'none'); c.setAttribute('stroke', '#333329'); c.setAttribute('stroke-width', '1');
+    labRadarSvg.appendChild(c);
+  });
+  ORIENTATIONS.forEach(o => {
+    const p = labRadarPoint(o, LAB_RADAR_R);
+    const line = document.createElementNS(svgNS,'line');
+    line.setAttribute('x1', LAB_RADAR_CX); line.setAttribute('y1', LAB_RADAR_CY);
+    line.setAttribute('x2', p.x); line.setAttribute('y2', p.y);
+    line.setAttribute('stroke', '#262620'); line.setAttribute('stroke-width', '1');
+    labRadarSvg.appendChild(line);
+  });
+  // highlight whichever angle the dial is currently on, tying the two charts together
+  const currentAngle = (typeof labIndex !== 'undefined' && labIndex < LAB_POSITIONS.length) ? LAB_POSITIONS[labIndex] : null;
+  if (currentAngle != null){
+    const p = labRadarPoint(currentAngle, LAB_RADAR_R);
+    const line = document.createElementNS(svgNS,'line');
+    line.setAttribute('x1', LAB_RADAR_CX); line.setAttribute('y1', LAB_RADAR_CY);
+    line.setAttribute('x2', p.x); line.setAttribute('y2', p.y);
+    line.setAttribute('stroke', '#c9822f88'); line.setAttribute('stroke-width', '2');
+    labRadarSvg.appendChild(line);
+  }
+  const recorded = ORIENTATIONS.map(o => ({angle:o, val: labSpine[String(o)]})).filter(e => e.val != null);
+  if (recorded.length < 2){
+    const hub = document.createElementNS(svgNS,'circle');
+    hub.setAttribute('cx', LAB_RADAR_CX); hub.setAttribute('cy', LAB_RADAR_CY); hub.setAttribute('r', 3);
+    hub.setAttribute('fill', '#8c897a');
+    labRadarSvg.appendChild(hub);
+    if (labRadarCaption) labRadarCaption.textContent = 'Record at least 2 positions to see the shape.';
+    return;
+  }
+  let min = Math.min(...recorded.map(e => e.val));
+  let max = Math.max(...recorded.map(e => e.val));
+  if (max === min){ min -= 0.005; max += 0.005; }
+  if (labRadarCaption){
+    labRadarCaption.textContent = 'Shown range ' + min.toFixed(3) + '"–' + max.toFixed(3) + '" (' + (max - min).toFixed(3) + '" spread across ' + recorded.length + ' of 16)';
+  }
+  const radiusFor = (val) => ((val - min) / (max - min)) * LAB_RADAR_R;
+  // connect recorded points with a smooth curve per contiguous run -- skips gaps, and the
+  // loop closes smoothly on its own once all 16 positions are filled in.
+  buildLabRadarChains().forEach(chain => {
+    const pts = chain.angles.map(a => labRadarPoint(a, radiusFor(labSpine[String(a)])));
+    const d = catmullRomPath(pts, chain.closed);
+    if (!d) return;
+    const path = document.createElementNS(svgNS,'path');
+    path.setAttribute('d', d);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', '#5aa9e6');
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('stroke-linejoin', 'round');
+    labRadarSvg.appendChild(path);
+  });
+  recorded.forEach(e => {
+    const p = labRadarPoint(e.angle, radiusFor(e.val));
+    const dot = document.createElementNS(svgNS,'circle');
+    dot.setAttribute('cx', p.x); dot.setAttribute('cy', p.y); dot.setAttribute('r', 3.5);
+    dot.setAttribute('fill', '#5aa9e6');
+    labRadarSvg.appendChild(dot);
+  });
+}
+
+function renderLabStep(){
+  if (labIndex >= LAB_POSITIONS.length){
+    labStepLabel.textContent = 'All 16 positions recorded';
+    labProgressTag.textContent = '16 / 16 recorded';
+    renderLabPositionChips();
+    labReadings = [];
+    labMagInput.value = '';
+    labReadingRows.innerHTML = '';
+    labDialCaption.textContent = 'Spine wizard complete — add mass and axis details below, then save.';
+    drawLabDial();
+    drawLabRadar();
+    labAddReadingWrap.style.display = 'none';
+    labAddMeasureBtn.style.display = 'none';
+    labBackBtn.style.display = 'inline-block';
+    labNextBtn.style.display = 'none';
+    labWizardHint.textContent = '';
+    showLabDetails();
+    return;
+  }
+  labAddReadingWrap.style.display = 'block';
+  labAddMeasureBtn.style.display = 'inline-block';
+  labBackBtn.style.display = 'inline-block';
+  labNextBtn.style.display = 'inline-block';
+  labDetailsPanel.style.display = 'none';
+  const angle = LAB_POSITIONS[labIndex];
+  labStepLabel.textContent = 'Position ' + (labIndex + 2) + ' of 16 — ' + angle + '°';
+  labProgressTag.textContent = (labIndex + 1) + ' / 16 recorded';
+  renderLabPositionChips();
+  labReadings = [];
+  labDir = 'cw';
+  [...labDirChips.children].forEach(c => c.classList.toggle('active', c.getAttribute('data-dir') === 'cw'));
+  labMagInput.value = '';
+  renderLabReadingRows();
+  renderLabCalc();
+  drawLabRadar();
+  labWizardHint.textContent = 'Rotate the shaft 22.5° further counter-clockwise from the last position, then read the dial.';
+}
+
+labStartBtn.addEventListener('click', () => {
+  const id = labIdSelect.value;
+  if (!id){ showToast('Select an Arrow ID first'); labIdSelect.focus(); return; }
+  const baseline = parseFloat(labBaselineInput.value);
+  if (!Number.isFinite(baseline) || baseline <= 0){ showToast('Enter the 0° baseline spine first'); labBaselineInput.focus(); return; }
+  const draft = loadLabDraft();
+  if (draft && draft.arrowId === id && draft.index < LAB_POSITIONS.length){
+    labArrowId = id;
+    labBaseline = draft.baseline;
+    labSpine = draft.spine || {};
+    labIndex = draft.index || 0;
+    showToast('Resuming wizard — ' + (labIndex + 1) + ' of 16 positions already recorded');
+  } else {
+    labArrowId = id;
+    labBaseline = baseline;
+    labSpine = { '0': baseline };
+    labIndex = 0;
+    saveLabDraft();
+  }
+  labWizardPanel.style.display = 'block';
+  labDetailsPanel.style.display = 'none';
+  renderLabStep();
+  labWizardPanel.scrollIntoView({behavior:'smooth', block:'start'});
+});
+
+labBackBtn.addEventListener('click', () => {
+  if (labIndex === 0){ showToast('Already at the first position after baseline'); return; }
+  labIndex -= 1;
+  saveLabDraft();
+  renderLabStep();
+});
+
+labNextBtn.addEventListener('click', () => {
+  const angle = LAB_POSITIONS[labIndex];
+  const pending = parseFloat(labMagInput.value);
+  const all = labReadings.slice();
+  if (Number.isFinite(pending) && pending >= 0) all.push({dir: labDir, mag: pending});
+  if (!all.length){
+    // No new reading entered -- if this position already has a saved value (e.g. you jumped
+    // here via the position chips just to check it), just move on without changing it.
+    if (labSpine[String(angle)] != null){
+      labIndex += 1;
+      saveLabDraft();
+      renderLabStep();
+      return;
+    }
+    showToast('Enter a dial reading before saving');
+    labMagInput.focus();
+    return;
+  }
+  const avgSigned = all.reduce((sum,r)=> sum + signedReading(r), 0) / all.length;
+  const value = Math.round((labBaseline + avgSigned) * 1000) / 1000;
+  labSpine[String(angle)] = value;
+  labIndex += 1;
+  saveLabDraft();
+  renderLabStep();
+});
+
+function showLabDetails(){
+  labDetailsPanel.style.display = 'block';
+  const axis = computeWeakStiffAxis(labSpine);
+  if (axis){
+    labAxisSummary.innerHTML = `
+      <div><span>Weak axis</span><span>${fmtDeg(axis.weakAxis)} · ${axis.weakVal.toFixed(3)}"</span></div>
+      <div><span>Stiff axis</span><span>${fmtDeg(axis.stiffAxis)} · ${axis.stiffVal.toFixed(3)}"</span></div>
+    `;
+  } else {
+    labAxisSummary.textContent = '—';
+  }
+}
+
+labSaveBtn.addEventListener('click', () => {
+  if (!labArrowId || Object.keys(labSpine).length < 16){
+    showToast('Complete all 16 spine positions first');
+    return;
+  }
+  const mass = labMassInput.value ? parseFloat(labMassInput.value) : null;
+  const point = labPointInput.value ? parseFloat(labPointInput.value) : null;
+  const flo = labFloInput.value ? parseFloat(labFloInput.value) : null;
+  const heavyAxis = labHeavyAxisInput.value ? parseFloat(labHeavyAxisInput.value) : null;
+  const massAsymMag = labMassAsymInput.value ? parseFloat(labMassAsymInput.value) : null;
+  const axis = computeWeakStiffAxis(labSpine);
+
+  const labMap = loadLabData();
+  labMap[labArrowId] = {
+    spine: labSpine,
+    mass, point, flo, heavyAxis, massAsymMag,
+    rollingBehavior: labRollBehavior,
+    weakAxis: axis ? axis.weakAxis : null,
+    stiffAxis: axis ? axis.stiffAxis : null,
+    updatedAt: new Date().toISOString()
+  };
+  saveLabData(labMap);
+
+  // Sync into the shared Fleet arrow record (Guidance tab) -- mass/point/baseline spine only.
+  // Guidance text is left untouched; it comes from the workbook import, not from here.
+  const arrows = loadArrows();
+  const idx = arrows.findIndex(a => a.arrowId === labArrowId);
+  if (idx === -1){
+    arrows.push({
+      id: 'a_' + Date.now(),
+      arrowId: labArrowId,
+      spine: labBaseline,
+      mass, point,
+      note: '',
+      createdAt: new Date().toISOString()
+    });
+  } else {
+    arrows[idx] = {
+      ...arrows[idx],
+      spine: labBaseline,
+      mass: mass != null ? mass : arrows[idx].mass,
+      point: point != null ? point : arrows[idx].point
+    };
+  }
+  saveArrows(arrows);
+
+  clearLabDraft();
+  labWizardPanel.style.display = 'none';
+  labDetailsPanel.style.display = 'none';
+  labIdSelect.value = '';
+  labExistingHint.textContent = '';
+  labBaselineInput.value = '';
+  labMassInput.value = ''; labPointInput.value = ''; labFloInput.value = '';
+  labHeavyAxisInput.value = ''; labMassAsymInput.value = '';
+  labArrowId = null; labBaseline = null; labSpine = {}; labIndex = 0;
+  render();
+  renderLabList();
+  showToast('Lab data saved — Fleet record updated');
+});
+
+function renderLabList(){
+  const map = loadLabData();
+  const ids = Object.keys(map);
+  labCountEl.textContent = ids.length + (ids.length === 1 ? ' arrow' : ' arrows');
+  if (!ids.length){
+    labListEl.style.display = 'none';
+    labEmptyEl.style.display = 'block';
+    return;
+  }
+  labListEl.style.display = 'block';
+  labEmptyEl.style.display = 'none';
+  labListEl.innerHTML = ids.map(id => {
+    const d = map[id];
+    return `
+    <div class="arrow-card">
+      <div class="top">
+        <div style="flex:1; min-width:0;">
+          <div class="id">${escapeHtml(id)}</div>
+          <div class="meta">weak ${d.weakAxis != null ? fmtDeg(d.weakAxis) : '—'} &nbsp;·&nbsp; stiff ${d.stiffAxis != null ? fmtDeg(d.stiffAxis) : '—'} &nbsp;·&nbsp; ${d.mass != null ? Number(d.mass).toFixed(1) + ' gr' : 'mass —'}</div>
+        </div>
+      </div>
+    </div>
+    `;
+  }).join('');
+}
+renderLabList();
+
+// ---------- Lab Data: CSV exports (Piece 6) ----------
+labExportSpineBtn.addEventListener('click', () => {
+  const map = loadLabData();
+  const rows = Object.keys(map)
+    .map(id => ({id, d: map[id]}))
+    .filter(({d}) => d.spine && Object.keys(d.spine).length >= 16)
+    .map(({id,d}) => {
+      const spineCols = ORIENTATIONS.map(o => d.spine[String(o)] != null ? d.spine[String(o)] : '');
+      return [id, ...spineCols, d.mass != null ? d.mass : '', d.point != null ? d.point : '', d.flo != null ? d.flo : ''];
+    });
+  if (!rows.length){ showToast('No complete spine data to export yet'); return; }
+  const header = ['Arrow ID', ...ORIENTATIONS.map(o => fmtDeg(o)), 'Mass (gr)', 'Point Weight (gr)', 'FLO Axis (deg)'];
+  const csv = [header, ...rows].map(r => r.map(csvEscape).join(',')).join('\r\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'arrow_tracker_spine_' + new Date().toISOString().slice(0,10) + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  showToast(rows.length + ' arrow(s) exported. The 16 spine columns paste into LSI Calculator B:Q; Mass, Point, and FLO paste separately into AS, AR, AP since those aren\'t next to B:Q.');
+});
+labExportMassBtn.addEventListener('click', () => {
+  const map = loadLabData();
+  const rows = Object.keys(map)
+    .map(id => ({id, d: map[id]}))
+    .filter(({d}) => d.heavyAxis != null || d.massAsymMag != null || (d.rollingBehavior && d.rollingBehavior !== 'None'))
+    .map(({id,d}) => [id, d.heavyAxis != null ? d.heavyAxis : '', d.massAsymMag != null ? d.massAsymMag : '', d.rollingBehavior || '']);
+  if (!rows.length){ showToast('No mass asymmetry data to export yet'); return; }
+  const header = ['Arrow ID', 'Heavy Axis Angle (deg)', 'Mass Asymmetry Magnitude (gf)', 'Rolling Settle Behavior'];
+  const csv = [header, ...rows].map(r => r.map(csvEscape).join(',')).join('\r\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'arrow_tracker_mass_asym_' + new Date().toISOString().slice(0,10) + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  showToast(rows.length + ' arrow(s) exported for Mass Asymmetry tab');
+});
+
+// ---------- tab navigation (Guidance / Lab Data) ----------
+const tabButtons = document.querySelectorAll('#tabbar .tab');
+const tabViews = {
+  guidance: document.getElementById('view-guidance'),
+  labdata: document.getElementById('view-labdata')
+};
+tabButtons.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const target = btn.getAttribute('data-tab');
+    tabButtons.forEach(b => b.classList.toggle('active', b === btn));
+    Object.keys(tabViews).forEach(key => {
+      tabViews[key].style.display = (key === target) ? 'block' : 'none';
+    });
+  });
+});
 render();
 </script>
 </body>
