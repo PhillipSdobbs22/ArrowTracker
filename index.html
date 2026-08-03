@@ -1400,19 +1400,25 @@ labIdSelect.addEventListener('change', () => {
     return;
   }
   const data = loadLabData()[id];
+  const fleetArrow = loadArrows().find(a => a.arrowId === id);
+  const wbData = loadArrowWorkbookDataMap()[id];
+  const pick = (labVal, fleetVal, wbVal) => labVal != null ? labVal : (fleetVal != null ? fleetVal : (wbVal != null ? wbVal : ''));
   if (data){
     labExistingHint.textContent = 'Existing lab data found for this arrow' + (data.updatedAt ? ' (saved ' + data.updatedAt.slice(0,10) + ')' : '') + '. Starting the wizard will let you re-measure and overwrite it.';
-    labBaselineInput.value = data.spine && data.spine['0'] != null ? data.spine['0'] : '';
-    labMassInput.value = data.mass != null ? data.mass : '';
-    labPointInput.value = data.point != null ? data.point : '';
+    labBaselineInput.value = pick(data.spine && data.spine['0'], fleetArrow && fleetArrow.spine, wbData && wbData.spine);
+    labMassInput.value = pick(data.mass, fleetArrow && fleetArrow.mass, wbData && wbData.mass);
+    labPointInput.value = pick(data.point, fleetArrow && fleetArrow.point, wbData && wbData.point);
     labFloInput.value = data.flo != null ? data.flo : '';
     labHeavyAxisInput.value = data.heavyAxis != null ? data.heavyAxis : '';
     labMassAsymInput.value = data.massAsymMag != null ? data.massAsymMag : '';
     labRollBehavior = data.rollingBehavior || 'None';
   } else {
-    labExistingHint.textContent = '';
-    labBaselineInput.value = '';
-    labMassInput.value = ''; labPointInput.value = ''; labFloInput.value = '';
+    const source = (fleetArrow && fleetArrow.spine != null) ? 'your Fleet record' : ((wbData && wbData.spine != null) ? 'the imported workbook' : null);
+    labExistingHint.textContent = source ? 'No completed spine wizard yet — baseline below is pre-filled from ' + source + '. Adjust it if your actual 0° measurement differs.' : '';
+    labBaselineInput.value = pick(null, fleetArrow && fleetArrow.spine, wbData && wbData.spine);
+    labMassInput.value = pick(null, fleetArrow && fleetArrow.mass, wbData && wbData.mass);
+    labPointInput.value = pick(null, fleetArrow && fleetArrow.point, wbData && wbData.point);
+    labFloInput.value = '';
     labHeavyAxisInput.value = ''; labMassAsymInput.value = '';
     labRollBehavior = 'None';
   }
