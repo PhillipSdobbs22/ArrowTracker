@@ -137,6 +137,20 @@
     font-family:"SF Mono", ui-monospace, monospace; cursor:pointer;
   }
   .chip.active{background:var(--accent); color:#1a1408; border-color:var(--accent);}
+  /* ---- axis-alignment rings on orientation chips (shot logger) ---- */
+  :root{
+    --axis-weak:#e8c93a; --axis-stiff:#f2f0e8; --axis-flo:#d1483a;
+    --axis-float:#4a90d9; --axis-euler:#8c897a;
+  }
+  .orient-chip-wrap{position:relative; display:inline-block;}
+  .axis-ring{position:absolute; border-radius:16px; pointer-events:none;}
+  .axis-ring.solid{border:2px solid var(--rc);}
+  .axis-ring.dashed{border:2px dashed var(--rc);}
+  .axis-legend{display:flex; flex-wrap:wrap; gap:10px; margin:-6px 0 10px;}
+  .axis-legend .li{display:flex; align-items:center; gap:5px; font-size:10.5px; color:var(--dim);
+    font-family:"SF Mono", ui-monospace, monospace;}
+  .axis-legend .sw{width:10px; height:10px; border-radius:3px; flex:none;}
+  .axis-legend .sw.dashedsw{background:transparent; border:1.5px dashed var(--axis-euler);}
   .lab-pos-chip{
     display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
     padding:8px 10px; min-width:60px; border-radius:12px; border:1px solid var(--line);
@@ -181,7 +195,7 @@
 </head>
 <body>
 <header>
-  <div class="eyebrow">Arrow Tracker · v2.1</div>
+  <div class="eyebrow">Arrow Tracker · v2.2</div>
   <h1>Fleet Log</h1>
   <p>Log each shaft's specs, then log shots by orientation to see what's actually working.</p>
 </header>
@@ -340,6 +354,17 @@
           <input id="lab-mass-asym" type="number" inputmode="decimal" step="0.1" placeholder="1.2">
         </div>
       </div>
+      <div class="row2">
+        <div class="field">
+          <label for="lab-float-axis">Float axis (deg) — bathtub test</label>
+          <input id="lab-float-axis" type="number" inputmode="decimal" step="0.1" placeholder="90.0">
+        </div>
+        <div class="field">
+          <label for="lab-euler-axis">EulerBuckle axis (deg) — clamp/press test</label>
+          <input id="lab-euler-axis" type="number" inputmode="decimal" step="0.1" placeholder="315.0">
+        </div>
+      </div>
+      <p class="hint">Float and EulerBuckle are separate candidate best-orientation methods (bathtub-float vs. clamp-buckle), kept apart from Weak/Stiff and FLO so they can be compared against each other and real shot data. Leave blank if not tested.</p>
       <div class="field">
         <label>Rolling settle behavior</label>
         <div class="chip-row" id="lab-roll-chips">
@@ -383,6 +408,13 @@
   <p class="sub" id="modal-sub"></p>
   <div class="field">
     <label>Orientation (deg)</label>
+    <div class="axis-legend" id="axis-legend" style="display:none;">
+      <span class="li"><span class="sw" style="background:var(--axis-weak)"></span>Weak</span>
+      <span class="li"><span class="sw" style="background:var(--axis-stiff)"></span>Stiff</span>
+      <span class="li"><span class="sw" style="background:var(--axis-flo)"></span>FLO</span>
+      <span class="li"><span class="sw" style="background:var(--axis-float)"></span>Float</span>
+      <span class="li"><span class="sw dashedsw"></span>EulerBuckle</span>
+    </div>
     <div class="chip-row" id="orient-chips"></div>
   </div>
   <div class="row2">
@@ -443,6 +475,15 @@
   <div class="shot-list" id="shot-list"></div>
 </div>
 <script>
+// ---------- rev.2-2 changelog (2026-08-04) ----------
+// - Lab Data: added Float Axis (bathtub-float test) and EulerBuckle Axis (clamp/press-buckle
+//   test) as two more candidate best-orientation methods, alongside existing Weak/Stiff (spine)
+//   and FLO. Manual-entry fields; also accepted via Arrow ID Export CSV import (cols 7-11,
+//   optional/backward-compatible).
+// - Shot logger: orientation chips now show a colored ring for each axis method that has a
+//   value near that chip's angle -- Weak=yellow, Stiff=white, FLO=red, Float=blue,
+//   EulerBuckle=dashed gray. Multiple agreeing methods stack as nested rings rather than
+//   merging. Legend appears above the chip row only when at least one axis is known.
 const listEl = document.getElementById('list');
 const emptyEl = document.getElementById('empty-state');
 const countEl = document.getElementById('count-tag');
@@ -624,8 +665,8 @@ function renderArrowIdSelect(){
     list.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('');
   if ([...idSelect.options].some(o => o.value === prev)) idSelect.value = prev;
   importHint.textContent = list.length
-    ? list.length + ' arrow ID' + (list.length === 1 ? '' : 's') + ' loaded from your last import, with guidance and starting spine/mass/point where available. Re-import any time the workbook\'s Arrow ID Export tab changes.'
-    : 'No arrow list imported yet. Export the workbook\'s "Arrow ID Export" tab as CSV (Arrow ID, Guidance, Priority Rank, Mean Spine, Mass, Point Weight), then tap "Import list" and pick that file.';
+    ? list.length + ' arrow ID' + (list.length === 1 ? '' : 's') + ' loaded from your last import, with guidance and starting spine/mass/point/axis data where available. Re-import any time the workbook\'s Arrow ID Export tab changes.'
+    : 'No arrow list imported yet. Export the workbook\'s "Arrow ID Export" tab as CSV (Arrow ID, Guidance, Priority Rank, Mean Spine, Mass, Point Weight, Weak Axis, Stiff Axis, FLO Axis, Float Axis, EulerBuckle Axis), then tap "Import list" and pick that file. The 5 axis columns are optional -- older exports still work.';
 }
 // Proper quote-aware CSV parser (RFC 4180 style) -- needed because guidance text
 // routinely contains commas, which a naive split(',') would misread.
@@ -674,7 +715,15 @@ function parseArrowIdCsv(text){
     const spine = cols.length > 3 ? num(cols[3]) : null;
     const mass = cols.length > 4 ? num(cols[4]) : null;
     const point = cols.length > 5 ? num(cols[5]) : null;
-    return { id, guidance, spine, mass, point };
+    // cols[6..10] are optional -- Weak Axis, Stiff Axis, FLO Axis, Float Axis, EulerBuckle
+    // Axis (deg), added by the workbook's Arrow ID Export update. Older exports without these
+    // columns still import fine; the axis fields just stay null and no chip rings are drawn.
+    const weakAxis = cols.length > 6 ? num(cols[6]) : null;
+    const stiffAxis = cols.length > 7 ? num(cols[7]) : null;
+    const floAxis = cols.length > 8 ? num(cols[8]) : null;
+    const floatAxis = cols.length > 9 ? num(cols[9]) : null;
+    const eulerBuckleAxis = cols.length > 10 ? num(cols[10]) : null;
+    return { id, guidance, spine, mass, point, weakAxis, stiffAxis, floAxis, floatAxis, eulerBuckleAxis };
   }).filter(r => r.id);
   // Drop a header row like "Arrow ID" (optionally with a "Guidance" second column) if present
   if (rows.length && /^arrow\s*id$/i.test(rows[0].id)) rows.shift();
@@ -703,8 +752,13 @@ importFile.addEventListener('change', (e) => {
     saveArrowGuidanceMap(guidanceMap);
     const workbookDataMap = loadArrowWorkbookDataMap();
     rows.forEach(r => {
-      if (r.spine != null || r.mass != null || r.point != null){
-        workbookDataMap[r.id] = { spine: r.spine, mass: r.mass, point: r.point };
+      if (r.spine != null || r.mass != null || r.point != null || r.weakAxis != null ||
+          r.stiffAxis != null || r.floAxis != null || r.floatAxis != null || r.eulerBuckleAxis != null){
+        workbookDataMap[r.id] = {
+          spine: r.spine, mass: r.mass, point: r.point,
+          weakAxis: r.weakAxis, stiffAxis: r.stiffAxis, floAxis: r.floAxis,
+          floatAxis: r.floatAxis, eulerBuckleAxis: r.eulerBuckleAxis
+        };
       }
     });
     saveArrowWorkbookDataMap(workbookDataMap);
@@ -927,6 +981,66 @@ function currentUD(){
   if (!Number.isFinite(mag)) return null;
   return udDirection === 'down' ? -Math.abs(mag) : Math.abs(mag);
 }
+// ---- axis-alignment chip rings: Weak/Stiff/FLO/Float/EulerBuckle candidate orientations ----
+// Priority per axis: this arrow's own Lab Data (measured here) > the value imported from the
+// workbook's Arrow ID Export (may be blank if that arrow hasn't been bench-tested for a given
+// method yet). Weak/Stiff come from the 16-position spine sweep either way -- Lab Data computes
+// them itself via computeWeakStiffAxis; the workbook import carries its own precomputed values
+// as a fallback for arrows not yet run through this app's wizard.
+function getArrowAxisSet(arrowIdStr){
+  const lab = loadLabData()[arrowIdStr];
+  const wb = loadArrowWorkbookDataMap()[arrowIdStr];
+  const pick = (a,b) => (a != null && Number.isFinite(a)) ? a : ((b != null && Number.isFinite(b)) ? b : null);
+  return {
+    weak: pick(lab && lab.weakAxis, wb && wb.weakAxis),
+    stiff: pick(lab && lab.stiffAxis, wb && wb.stiffAxis),
+    flo: pick(lab && lab.flo, wb && wb.floAxis),
+    float: pick(lab && lab.floatAxis, wb && wb.floatAxis),
+    euler: pick(lab && lab.eulerBuckleAxis, wb && wb.eulerBuckleAxis)
+  };
+}
+// Rounds a measured axis angle to the nearest 22.5deg orientation the fleet actually shoots at --
+// the chips only exist in 22.5deg steps, so this is display-only rounding, never mutates the
+// underlying measured value. Ties round up; 360 wraps back to 0.
+function nearestOrientStep(deg){
+  if (deg == null || !Number.isFinite(deg)) return null;
+  const d = ((deg % 360) + 360) % 360;
+  const step = Math.round(d / 22.5) * 22.5;
+  return step >= 360 ? 0 : step;
+}
+// Draws one outlined ring per axis method that has a value, stacked outward (each ring 3px
+// further out than the last) on whichever chip its rounded angle lands on -- so two or more
+// methods agreeing on an orientation stay individually visible rather than merging into one
+// blob. Order fixed so stacking is consistent chip-to-chip: weak, stiff, flo, float, euler.
+const AXIS_RING_DEFS = [
+  {key:'weak',  cssVar:'--axis-weak',  style:'solid'},
+  {key:'stiff', cssVar:'--axis-stiff', style:'solid'},
+  {key:'flo',   cssVar:'--axis-flo',   style:'solid'},
+  {key:'float', cssVar:'--axis-float', style:'solid'},
+  {key:'euler', cssVar:'--axis-euler', style:'dashed'}
+];
+function renderChipAxisRings(arrowIdStr){
+  const legend = document.getElementById('axis-legend');
+  orientChips.querySelectorAll('.axis-ring').forEach(r => r.remove());
+  if (!arrowIdStr){ if (legend) legend.style.display = 'none'; return; }
+  const axes = getArrowAxisSet(arrowIdStr);
+  let any = false;
+  AXIS_RING_DEFS.forEach(def => {
+    const step = nearestOrientStep(axes[def.key]);
+    if (step == null) return;
+    const wrap = orientChips.querySelector(`[data-wrap="${step}"]`);
+    if (!wrap) return;
+    any = true;
+    const depth = wrap.querySelectorAll('.axis-ring').length;
+    const ring = document.createElement('div');
+    ring.className = 'axis-ring ' + def.style;
+    ring.style.setProperty('--rc', `var(${def.cssVar})`);
+    const inset = -1 - depth * 3;
+    ring.style.inset = inset + 'px';
+    wrap.appendChild(ring);
+  });
+  if (legend) legend.style.display = any ? 'flex' : 'none';
+}
 function openShotLogger(arrowId){
   const arrows = loadArrows();
   const arrow = arrows.find(a => a.id === arrowId);
@@ -937,8 +1051,9 @@ function openShotLogger(arrowId){
   modalTitle.textContent = 'Log shot — ' + arrow.arrowId;
   modalSub.textContent = 'Pick the nock orientation and distance, tap the target to get close, then dial in the exact numbers.';
   orientChips.innerHTML = ORIENT_CCW_ORDER.map(o =>
-    `<button class="chip${o===0?' active':''}" data-o="${o}">${fmtDeg(o)}</button>`
+    `<span class="orient-chip-wrap" data-wrap="${o}"><button class="chip${o===0?' active':''}" data-o="${o}">${fmtDeg(o)}</button></span>`
   ).join('');
+  renderChipAxisRings(arrow.arrowId);
   distanceInput.value = '';
   bowInput.value = '';
   lrMagInput.value = '';
@@ -1408,6 +1523,8 @@ const labPointInput = document.getElementById('lab-point');
 const labFloInput = document.getElementById('lab-flo');
 const labHeavyAxisInput = document.getElementById('lab-heavy-axis');
 const labMassAsymInput = document.getElementById('lab-mass-asym');
+const labFloatAxisInput = document.getElementById('lab-float-axis');
+const labEulerAxisInput = document.getElementById('lab-euler-axis');
 const labRollChips = document.getElementById('lab-roll-chips');
 const labAxisSummary = document.getElementById('lab-axis-summary');
 const labSaveBtn = document.getElementById('lab-save-btn');
@@ -1518,9 +1635,11 @@ labIdSelect.addEventListener('change', () => {
     labBaselineInput.value = pickSpine(data.spine && data.spine['0'], fleetArrow && fleetArrow.spine, wbZeroDeg, wbData && wbData.spine);
     labMassInput.value = pickMass(data.mass, fleetArrow && fleetArrow.mass, wbData && wbData.mass);
     labPointInput.value = pick(data.point, fleetArrow && fleetArrow.point, wbData && wbData.point);
-    labFloInput.value = data.flo != null ? data.flo : '';
+    labFloInput.value = pick(data.flo, wbData && wbData.floAxis);
     labHeavyAxisInput.value = data.heavyAxis != null ? data.heavyAxis : '';
     labMassAsymInput.value = data.massAsymMag != null ? data.massAsymMag : '';
+    labFloatAxisInput.value = pick(data.floatAxis, wbData && wbData.floatAxis);
+    labEulerAxisInput.value = pick(data.eulerBuckleAxis, wbData && wbData.eulerBuckleAxis);
     labRollBehavior = data.rollingBehavior || 'None';
   } else {
     const source = (fleetArrow && fleetArrow.spine != null) ? 'your Fleet record'
@@ -1530,8 +1649,10 @@ labIdSelect.addEventListener('change', () => {
     labBaselineInput.value = pickSpine(null, fleetArrow && fleetArrow.spine, wbZeroDeg, wbData && wbData.spine);
     labMassInput.value = pickMass(null, fleetArrow && fleetArrow.mass, wbData && wbData.mass);
     labPointInput.value = pick(null, fleetArrow && fleetArrow.point, wbData && wbData.point);
-    labFloInput.value = '';
+    labFloInput.value = pick(null, wbData && wbData.floAxis);
     labHeavyAxisInput.value = ''; labMassAsymInput.value = '';
+    labFloatAxisInput.value = pick(null, wbData && wbData.floatAxis);
+    labEulerAxisInput.value = pick(null, wbData && wbData.eulerBuckleAxis);
     labRollBehavior = 'None';
   }
   [...labRollChips.children].forEach(c => c.classList.toggle('active', c.getAttribute('data-roll') === labRollBehavior));
@@ -1985,11 +2106,13 @@ labSaveBtn.addEventListener('click', () => {
   const flo = labFloInput.value ? parseFloat(labFloInput.value) : null;
   const heavyAxis = labHeavyAxisInput.value ? parseFloat(labHeavyAxisInput.value) : null;
   const massAsymMag = labMassAsymInput.value ? parseFloat(labMassAsymInput.value) : null;
+  const floatAxis = labFloatAxisInput.value ? parseFloat(labFloatAxisInput.value) : null;
+  const eulerBuckleAxis = labEulerAxisInput.value ? parseFloat(labEulerAxisInput.value) : null;
   const axis = computeWeakStiffAxis(labSpine);
   const labMap = loadLabData();
   labMap[labArrowId] = {
     spine: labSpine,
-    mass, point, flo, heavyAxis, massAsymMag,
+    mass, point, flo, heavyAxis, massAsymMag, floatAxis, eulerBuckleAxis,
     rollingBehavior: labRollBehavior,
     weakAxis: axis ? axis.weakAxis : null,
     stiffAxis: axis ? axis.stiffAxis : null,
@@ -2026,6 +2149,7 @@ labSaveBtn.addEventListener('click', () => {
   labBaselineInput.value = '';
   labMassInput.value = ''; labPointInput.value = ''; labFloInput.value = '';
   labHeavyAxisInput.value = ''; labMassAsymInput.value = '';
+  labFloatAxisInput.value = ''; labEulerAxisInput.value = '';
   labArrowId = null; labBaseline = null; labSpine = {}; labIndex = 0;
   render();
   renderLabList();
