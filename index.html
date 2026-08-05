@@ -105,6 +105,10 @@
     opacity:0; pointer-events:none; transition:opacity .2s ease;
   }
   .toast.show{opacity:1;}
+  .import-check{
+    color:var(--ok); font-weight:700; font-size:15px; margin-left:6px; vertical-align:middle;
+  }
+  .shot-dot{cursor:pointer;}
   .count-tag{
     font-size:11px; color:var(--dim); font-family:"SF Mono", ui-monospace, monospace;
   }
@@ -222,7 +226,7 @@
 </head>
 <body>
 <header>
-  <div class="eyebrow">Arrow Tracker · v2.4.4</div>
+  <div class="eyebrow">Arrow Tracker · v2.4.6</div>
   <h1>Fleet Log</h1>
   <p>Log each shaft's specs, then log shots by orientation to see what's actually working.</p>
 </header>
@@ -260,14 +264,15 @@
           <option value="__other__">Other (type manually)</option>
         </select>
       </div>
-      <button class="btn btn-ghost btn-sm" id="import-btn" type="button">Import list</button>
+      <button class="btn btn-ghost btn-sm" id="import-btn" type="button">Import Arrow ID</button>
+      <span id="import-check" class="import-check" style="display:none;" aria-label="Import successful">&#10003;</span>
       <input type="file" id="import-file" accept=".csv,text/csv" style="display:none;">
     </div>
     <div class="field" id="f-id-custom-wrap" style="display:none;">
       <label for="f-id-custom">Arrow ID (manual)</label>
       <input id="f-id-custom" type="text" placeholder="e.g. Arrow 7 CustomName" autocomplete="off">
     </div>
-    <p class="hint" id="import-hint">No arrow list imported yet. Export the workbook's "Arrow ID Export" tab as CSV (Arrow ID, Guidance, Priority Rank, Mean Spine, Mass, Point Weight), then tap "Import list" and pick that file. Guidance and starting Spine/Mass/Point fill in automatically as you browse arrows below.</p>
+    <p class="hint" id="import-hint">No arrow list imported yet. Export the workbook's "Arrow ID Export" tab as CSV (Arrow ID, Guidance, Priority Rank, Mean Spine, Mass, Point Weight), then tap "Import Arrow ID" and pick that file. Guidance and starting Spine/Mass/Point fill in automatically as you browse arrows below.</p>
     <div class="row3">
       <div class="field">
         <label for="f-spine">Spine (in)</label>
@@ -334,10 +339,11 @@
         </div>
       </div>
       <div class="field-row">
-        <button class="btn btn-ghost btn-sm" id="lab-import-btn" type="button">Import angle data</button>
+        <button class="btn btn-ghost btn-sm" id="lab-import-btn" type="button">Import Angle by Side</button>
+        <span id="lab-import-check" class="import-check" style="display:none;" aria-label="Import successful">&#10003;</span>
         <input type="file" id="lab-import-file" accept=".csv,text/csv" style="display:none;">
       </div>
-      <p class="hint" id="lab-import-hint">No per-angle spine data imported yet. Export the workbook's "Spine By Angle Export" tab as CSV (Arrow ID, 0°, 22.5°, 45°... 337.5°), then tap "Import angle data" and pick that file. This is your actual measured reading at each angle -- separate from the Guidance tab's Mean Spine, which is an average and isn't accurate for any single position.</p>
+      <p class="hint" id="lab-import-hint">No per-angle spine data imported yet. Export the workbook's "Spine By Angle Export" tab as CSV (Arrow ID, 0°, 22.5°, 45°... 337.5°), then tap "Import Angle by Side" and pick that file. This is your actual measured reading at each angle -- separate from the Guidance tab's Mean Spine, which is an average and isn't accurate for any single position.</p>
       <p class="hint" id="lab-existing-hint"></p>
       <div class="field">
         <label for="lab-baseline">0&deg; baseline spine (in)</label>
@@ -755,6 +761,7 @@ const idSelect = document.getElementById('f-id-select');
 const idCustomWrap = document.getElementById('f-id-custom-wrap');
 const idCustomInput = document.getElementById('f-id-custom');
 const importBtn = document.getElementById('import-btn');
+const importCheck = document.getElementById('import-check');
 const importFile = document.getElementById('import-file');
 const importHint = document.getElementById('import-hint');
 const addArrowTitle = document.getElementById('add-arrow-title');
@@ -774,7 +781,8 @@ function renderArrowIdSelect(){
   if ([...idSelect.options].some(o => o.value === prev)) idSelect.value = prev;
   importHint.textContent = list.length
     ? list.length + ' arrow ID' + (list.length === 1 ? '' : 's') + ' loaded from your last import, with guidance and starting spine/mass/point/axis data where available. Re-import any time the workbook\'s Arrow ID Export tab changes.'
-    : 'No arrow list imported yet. Export the workbook\'s "Arrow ID Export" tab as CSV (Arrow ID, Guidance, Priority Rank, Mean Spine, Mass, Point Weight, Weak Axis, Stiff Axis, FLO Axis, Float Axis, EulerBuckle Axis), then tap "Import list" and pick that file. The 5 axis columns are optional -- older exports still work.';
+    : 'No arrow list imported yet. Export the workbook\'s "Arrow ID Export" tab as CSV (Arrow ID, Guidance, Priority Rank, Mean Spine, Mass, Point Weight, Weak Axis, Stiff Axis, FLO Axis, Float Axis, EulerBuckle Axis), then tap "Import Arrow ID" and pick that file. The 5 axis columns are optional -- older exports still work.';
+  importCheck.style.display = list.length ? '' : 'none';
 }
 // Proper quote-aware CSV parser (RFC 4180 style) -- needed because guidance text
 // routinely contains commas, which a naive split(',') would misread.
@@ -1106,6 +1114,23 @@ function getArrowAxisSet(arrowIdStr){
     euler: pick(lab && lab.eulerBuckleAxis, wb && wb.eulerBuckleAxis)
   };
 }
+// Same as getArrowAxisSet, but Weak/Stiff are recomputed live from this arrow's saved 16-point
+// spine sweep (lab.spine, or the imported Spine By Angle Export as fallback) whenever a full
+// sweep is available -- same "live" rule renderLabPositionChipRings already uses inside the
+// wizard, extended here so the shot-log target and orientation chips agree with it too, even
+// for arrows whose weakAxis/stiffAxis fields were never separately saved or imported.
+function getArrowAxisSetLive(arrowIdStr){
+  const saved = getArrowAxisSet(arrowIdStr);
+  const spine = getArrowSpineByAngle(arrowIdStr);
+  const live = spine ? computeWeakStiffAxis(spine) : null;
+  return {
+    weak: live ? live.weakAxis : saved.weak,
+    stiff: live ? live.stiffAxis : saved.stiff,
+    flo: saved.flo,
+    float: saved.float,
+    euler: saved.euler
+  };
+}
 // Rounds a measured axis angle to the nearest 22.5deg orientation the fleet actually shoots at --
 // the chips only exist in 22.5deg steps, so this is display-only rounding, never mutates the
 // underlying measured value. Ties round up; 360 wraps back to 0.
@@ -1130,7 +1155,7 @@ function renderChipAxisRings(arrowIdStr){
   const legend = document.getElementById('axis-legend');
   orientChips.querySelectorAll('.axis-ring').forEach(r => r.remove());
   if (!arrowIdStr){ if (legend) legend.style.display = 'none'; return; }
-  const axes = getArrowAxisSet(arrowIdStr);
+  const axes = getArrowAxisSetLive(arrowIdStr);
   let any = false;
   AXIS_RING_DEFS.forEach(def => {
     const step = nearestOrientStep(axes[def.key]);
@@ -1347,26 +1372,34 @@ function closeModal(){
   renderLandingArrowSelect();
 }
 document.getElementById('ws-back-btn').addEventListener('click', closeModal);
-orientChips.addEventListener('click', (e) => {
-  const btn = e.target.closest('[data-o]');
-  if (!btn) return;
-  activeOrientation = parseFloat(btn.getAttribute('data-o'));
-  orientChips.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c === btn));
+// Single source of truth for "which orientation is selected" -- used by both the chip row
+// (click a chip) and the target face (click a dot), so the two stay in sync either direction.
+function selectOrientation(o){
+  activeOrientation = o;
+  orientChips.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', parseFloat(c.getAttribute('data-o')) === o));
   if (activeArrowId){
     const arrow = loadArrows().find(a => a.id === activeArrowId);
     if (arrow) drawShotRadar(arrow.arrowId, activeOrientation);
   }
+  drawTarget();
+}
+orientChips.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-o]');
+  if (!btn) return;
+  selectOrientation(parseFloat(btn.getAttribute('data-o')));
 });
 // ---- target SVG: tap-to-plot ----
 const svgNS = 'http://www.w3.org/2000/svg';
 const targetSvg = document.getElementById('target-svg');
 const SIZE = 260, CX = 130, CY = 130, R = 120;
+// Grayed-out target face -- rings are neutral gray/transparent shades only (no ring color
+// coding), so the colored impact dots (see plotExistingShots) are what carries information.
 const RINGS = [
-  {frac:1.00, fill:'#ffffff'},
-  {frac:0.875,fill:'#141412'},
-  {frac:0.75, fill:'#1e7fd1'},
-  {frac:0.625,fill:'#c0392b'},
-  {frac:0.375,fill:'#e8b923'}
+  {frac:1.00, fill:'rgba(255,255,255,0.07)'},
+  {frac:0.875,fill:'rgba(0,0,0,0.40)'},
+  {frac:0.75, fill:'rgba(255,255,255,0.11)'},
+  {frac:0.625,fill:'rgba(255,255,255,0.17)'},
+  {frac:0.375,fill:'rgba(255,255,255,0.24)'}
 ];
 function drawTarget(){
   targetSvg.innerHTML = '';
@@ -1492,19 +1525,79 @@ logShotBtn.addEventListener('click', () => {
   render();
   showToast('Shot logged — ' + fmtDeg(activeOrientation) + ' · ' + distance + 'yd · LR ' + lrSquares + ' UD ' + udSquares);
 });
+// Matches a shot's logged orientation back to every axis method (weak/stiff/flo/float/euler)
+// that arrow's own axis set rounds to that same orientation -- same rounding logic and
+// priority order as the chip rings (AXIS_RING_DEFS). Returns all matches (not just the
+// first) so a shot at an orientation where two+ methods agree (e.g. Weak and FLO both at
+// 0deg, same as the chip's stacked outline rings) can show more than one axis's color.
+function getShotAxisDefs(arrowIdStr, orientation){
+  const axes = getArrowAxisSetLive(arrowIdStr);
+  return AXIS_RING_DEFS.filter(def => nearestOrientStep(axes[def.key]) === orientation);
+}
 function plotExistingShots(){
   const shots = loadShots().filter(s => s.arrowId === activeArrowId);
+  // Shots are keyed by the internal record id (activeArrowId), but the axis lookup maps
+  // (Lab Data, workbook import, Spine By Angle) are keyed by the display Arrow ID string --
+  // same distinction drawShotRadar/renderChipAxisRings already resolve via arrow.arrowId.
+  const arrow = loadArrows().find(a => a.id === activeArrowId);
+  const arrowIdStr = arrow ? arrow.arrowId : null;
   shots.forEach(s => {
+    const axisDefs = arrowIdStr ? getShotAxisDefs(arrowIdStr, s.orientation) : [];
+    const primary = axisDefs[0] || null;
+    const secondary = axisDefs[1] || null;
+    const isActive = s.orientation === activeOrientation;
+    // Selected-orientation halo -- a ring in the app's accent color, behind the dot, only for
+    // shots matching the orientation chip currently picked above. Tapping this dot (or its
+    // halo) jumps the chip selection to this shot's orientation -- see click listener below.
+    if (isActive){
+      const halo = document.createElementNS(svgNS,'circle');
+      halo.setAttribute('cx', CX + s.x*R);
+      halo.setAttribute('cy', CY + s.y*R);
+      halo.setAttribute('r', 8.5);
+      halo.setAttribute('fill', 'none');
+      halo.setAttribute('stroke', '#c9822f');
+      halo.setAttribute('stroke-width', '2');
+      halo.setAttribute('class', 'shot-dot');
+      halo.setAttribute('data-orient', s.orientation);
+      targetSvg.appendChild(halo);
+    }
     const dot = document.createElementNS(svgNS,'circle');
     dot.setAttribute('cx', CX + s.x*R);
     dot.setAttribute('cy', CY + s.y*R);
     dot.setAttribute('r', 5);
-    dot.setAttribute('fill', s.orientation === activeOrientation ? '#2ecc71' : '#2ecc7166');
-    dot.setAttribute('stroke', '#0a3d1f');
-    dot.setAttribute('stroke-width', '1');
+    dot.setAttribute('class', 'shot-dot');
+    dot.setAttribute('data-orient', s.orientation);
+    if (primary){
+      dot.setAttribute('fill', `var(${primary.cssVar})`);
+      // A second agreeing axis method shows as this dot's outline in its color (dashed if
+      // that method is EulerBuckle) -- mirrors the chip rings stacking a second outline
+      // rather than merging colors. No second method -> plain dark outline as before.
+      const outlineDef = secondary || primary;
+      const outlineIsFill = !secondary;
+      dot.setAttribute('stroke', outlineIsFill ? '#141412' : `var(${outlineDef.cssVar})`);
+      dot.setAttribute('stroke-width', outlineDef.style === 'dashed' ? '1.75' : (outlineIsFill ? '1' : '1.5'));
+      if (outlineDef.style === 'dashed') dot.setAttribute('stroke-dasharray', '2,1.5');
+    } else {
+      // Axis not identified for this orientation -- plain black marker.
+      dot.setAttribute('fill', '#0d0d0b');
+      dot.setAttribute('stroke', '#e8e6dd88');
+      dot.setAttribute('stroke-width', '1');
+    }
+    // Non-active shots dim further than before (0.6 -> 0.4) now that the halo makes the
+    // active orientation's dots unmistakable rather than relying on opacity alone.
+    dot.setAttribute('opacity', isActive ? '1' : '0.4');
     targetSvg.appendChild(dot);
   });
 }
+// Tapping any shot dot (or its halo) selects that orientation, same as tapping its chip above
+// -- the reverse direction of the chip -> target-face highlight. Delegated on targetSvg so it
+// keeps working across every drawTarget() redraw without re-attaching per dot.
+targetSvg.addEventListener('click', (evt) => {
+  const hit = evt.target.closest('.shot-dot');
+  if (!hit) return;
+  evt.stopPropagation(); // don't also trigger the tap-to-aim handler below
+  selectOrientation(parseFloat(hit.getAttribute('data-orient')));
+}, true);
 function renderShotList(){
   const shots = loadShots().filter(s => s.arrowId === activeArrowId)
     .slice().sort((a,b)=> b.createdAt.localeCompare(a.createdAt));
@@ -1781,6 +1874,7 @@ let labDir = 'cw';
 let labRollBehavior = 'None';
 const labIdSelect = document.getElementById('lab-id-select');
 const labImportBtn = document.getElementById('lab-import-btn');
+const labImportCheck = document.getElementById('lab-import-check');
 const labImportFile = document.getElementById('lab-import-file');
 const labImportHint = document.getElementById('lab-import-hint');
 const labExistingHint = document.getElementById('lab-existing-hint');
@@ -1858,7 +1952,8 @@ function renderLabImportHint(){
   const count = Object.keys(map).length;
   labImportHint.textContent = count
     ? count + ' arrow' + (count === 1 ? '' : 's') + ' with real per-angle spine data loaded from your last import. Re-import any time the workbook\'s Spine By Angle Export tab changes.'
-    : 'No per-angle spine data imported yet. Export the workbook\'s "Spine By Angle Export" tab as CSV (Arrow ID, 0°, 22.5°, 45°... 337.5°), then tap "Import angle data" and pick that file. This is your actual measured reading at each angle -- separate from the Guidance tab\'s Mean Spine, which is an average and isn\'t accurate for any single position.';
+    : 'No per-angle spine data imported yet. Export the workbook\'s "Spine By Angle Export" tab as CSV (Arrow ID, 0°, 22.5°, 45°... 337.5°), then tap "Import Angle by Side" and pick that file. This is your actual measured reading at each angle -- separate from the Guidance tab\'s Mean Spine, which is an average and isn\'t accurate for any single position.';
+  labImportCheck.style.display = count ? '' : 'none';
 }
 labImportBtn.addEventListener('click', () => labImportFile.click());
 labImportFile.addEventListener('change', (e) => {
