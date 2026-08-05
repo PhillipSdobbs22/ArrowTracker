@@ -151,6 +151,30 @@
     font-family:"SF Mono", ui-monospace, monospace;}
   .axis-legend .sw{width:10px; height:10px; border-radius:3px; flex:none;}
   .axis-legend .sw.dashedsw{background:transparent; border:1.5px dashed var(--axis-euler);}
+  /* ---- workspace: single arrow-centric page, Bench Test / Log Shot segmented toggle ---- */
+  .segmented{display:flex; background:var(--panel-2); border:1px solid var(--line); border-radius:12px;
+    padding:3px; margin-top:14px;}
+  .segmented button{flex:1; background:transparent; border:none; border-radius:9px; padding:11px 0;
+    color:var(--dim); font-size:14px; font-weight:600; font-family:inherit; cursor:pointer;}
+  .segmented button.active{background:var(--accent); color:#1a1408;}
+  /* orientation chips reuse the same boxy shape as the Bench Test position chips, instead of
+     the oval pill style, now that both live on one page and should read as one design language */
+  #orient-chips .chip{padding:10px 8px; min-width:52px; border-radius:12px; text-align:center;}
+  /* ---- standalone range diagram: fixed bow, distance-scaled target (decorative, read-only) ---- */
+  .range-wrap{margin:14px 0 14px; padding:12px 14px 10px; background:var(--panel-2);
+    border:1px solid var(--line); border-radius:12px;}
+  .range-cap{font-size:10px; color:var(--dim); text-transform:uppercase; letter-spacing:.08em;
+    margin-bottom:8px; font-family:"SF Mono", ui-monospace, monospace;}
+  .range-stage{position:relative; height:128px;}
+  .range-bow-wrap{position:absolute; left:4px; top:50%; transform:translateY(-50%);}
+  #range-bow-svg{display:block;}
+  .range-track{position:absolute;}
+  .range-line{border-top:2px dashed var(--accent-dim); height:0;}
+  .range-dist{width:fit-content; margin:5px auto 0;
+    background:var(--bg); padding:1px 8px; border-radius:7px; border:1px solid var(--accent-dim);
+    color:var(--accent); font-size:11.5px; font-weight:600; font-family:"SF Mono", ui-monospace, monospace;
+    white-space:nowrap;}
+  .range-target-wrap{position:absolute; top:50%; transform:translateY(-50%);}
   .lab-pos-chip{
     display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px;
     padding:8px 10px; min-width:60px; border-radius:12px; border:1px solid var(--line);
@@ -162,6 +186,9 @@
   .lab-pos-chip.active{background:var(--accent); border-color:var(--accent);}
   .lab-pos-chip.active .lpc-a, .lab-pos-chip.active .lpc-v{color:#1a1408;}
   .lab-pos-chip.baseline{opacity:.75;}
+  .lab-pos-chip-wrap{position:relative; display:inline-block;}
+  .lab-pos-chip-wrap .axis-ring{border-radius:12px;}
+  .orient-chip-wrap .axis-ring{border-radius:12px;}
   .shot-list{margin-top:14px;}
   .shot-row{
     display:flex; justify-content:space-between; align-items:center;
@@ -195,17 +222,32 @@
 </head>
 <body>
 <header>
-  <div class="eyebrow">Arrow Tracker · v2.2</div>
+  <div class="eyebrow">Arrow Tracker · v2.4</div>
   <h1>Fleet Log</h1>
   <p>Log each shaft's specs, then log shots by orientation to see what's actually working.</p>
 </header>
 <main>
   <div class="tabbar" id="tabbar">
-    <button type="button" class="tab active" data-tab="guidance">Guidance</button>
-    <button type="button" class="tab" data-tab="labdata">Lab Data</button>
+    <button type="button" class="tab active" data-tab="landing">Arrows</button>
+    <button type="button" class="tab" data-tab="guidance">Fleet</button>
   </div>
-  <div id="view-guidance" class="view">
+  <div id="view-landing" class="view">
+    <div class="panel">
+      <h2>Pick an arrow</h2>
+      <div class="field">
+        <label for="landing-arrow-select">Arrow</label>
+        <select id="landing-arrow-select">
+          <option value="">Select an arrow…</option>
+        </select>
+      </div>
+      <p class="hint" id="landing-hint">No arrows yet -- import your workbook's Arrow ID Export list or add one under the Fleet tab.</p>
+    </div>
+  </div>
+  <div id="view-guidance" class="view" style="display:none;">
   <div class="panel">
+    <div class="field-row" style="margin-bottom:8px;">
+      <button class="btn btn-ghost btn-sm" id="fleet-to-landing-btn" type="button">&larr; Back to Arrows</button>
+    </div>
     <h2 style="display:flex; justify-content:space-between; align-items:center;">
       <span id="add-arrow-title">Add arrow</span>
       <button class="btn btn-ghost btn-sm" id="cancel-edit-btn" style="display:none;">Cancel edit</button>
@@ -267,10 +309,26 @@
     <p class="hint">Full backup saves every arrow (spine/mass/point/notes) and every shot to one file — the only way to recover your fleet if this browser's storage is ever cleared. Worth doing after any real logging session.</p>
   </div>
   </div>
-  <div id="view-labdata" class="view" style="display:none;">
+  <div id="view-workspace" class="view" style="display:none;">
+    <div class="panel" style="padding-bottom:14px;">
+      <button class="btn btn-ghost btn-sm" id="ws-back-btn" style="margin-bottom:12px;">&larr; Back to Arrows</button>
+      <h2 style="margin-bottom:10px;" id="ws-arrow-title">Arrow</h2>
+      <div class="field-row">
+        <div class="field">
+          <label for="ws-arrow-select">Switch arrow</label>
+          <select id="ws-arrow-select"></select>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="ws-import-btn" type="button">Import list</button>
+      </div>
+      <div class="segmented" id="ws-mode-toggle">
+        <button type="button" data-mode="bench">Bench Test</button>
+        <button type="button" class="active" data-mode="shot">Log Shot</button>
+      </div>
+    </div>
+    <div id="ws-bench" style="display:none;">
     <div class="panel">
       <h2>Lab Data — Spine Wizard</h2>
-      <div class="field-row">
+      <div class="field-row" style="display:none;">
         <div class="field">
           <label for="lab-id-select">Arrow ID</label>
           <select id="lab-id-select">
@@ -294,6 +352,13 @@
         <span id="lab-step-label">Position 2 of 16</span>
         <span class="count-tag" id="lab-progress-tag">1 / 16 recorded</span>
       </h2>
+      <div class="axis-legend" id="lab-axis-legend" style="display:none;">
+        <span class="li"><span class="sw" style="background:var(--axis-weak)"></span>Weak</span>
+        <span class="li"><span class="sw" style="background:var(--axis-stiff)"></span>Stiff</span>
+        <span class="li"><span class="sw" style="background:var(--axis-flo)"></span>FLO</span>
+        <span class="li"><span class="sw" style="background:var(--axis-float)"></span>Float</span>
+        <span class="li"><span class="sw dashedsw"></span>EulerBuckle</span>
+      </div>
       <div class="chip-row" id="lab-position-chips"></div>
       <div class="lab-visuals">
         <div class="target-wrap">
@@ -397,83 +462,122 @@
         <button class="btn btn-ghost btn-sm" id="lab-export-mass-btn" style="width:100%;">Export mass asymmetry (for Mass Asymmetry tab)</button>
       </div>
     </div>
+    </div>
+    <div id="ws-shot">
+    <div class="panel">
+      <h3 id="modal-title" style="margin:0 0 4px;">Log shot</h3>
+      <p class="sub" id="modal-sub"></p>
+      <div class="row2">
+        <div class="field">
+          <label for="f-distance">Distance (yd)</label>
+          <input id="f-distance" type="number" inputmode="decimal" step="1" placeholder="20">
+          <div class="chip-row" id="distance-preset-chips" style="margin-top:8px;">
+            <button type="button" class="chip" data-yd="20">20</button>
+            <button type="button" class="chip" data-yd="30">30</button>
+            <button type="button" class="chip" data-yd="40">40</button>
+            <button type="button" class="chip" data-yd="50">50</button>
+            <button type="button" class="chip" data-yd="60">60</button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="f-bow">Bow (optional)</label>
+          <input id="f-bow" type="text" placeholder="e.g. Genesis (NASP)" autocomplete="off">
+        </div>
+      </div>
+      <div class="range-wrap">
+        <div class="range-cap" id="range-cap">20 yd range</div>
+        <div class="range-stage">
+          <div class="range-bow-wrap" id="range-bow-wrap">
+            <svg id="range-bow-svg" width="60" height="66" viewBox="0 0 100 110" fill="none">
+              <!-- original bow + string + nocked arrow icon -->
+              <path d="M40 6 Q90 55 40 104" stroke="#c9822f" stroke-width="4" fill="none" stroke-linecap="round"/>
+              <line x1="40" y1="6" x2="40" y2="104" stroke="#8c897a" stroke-width="1.6"/>
+              <line x1="40" y1="55" x2="97" y2="55" stroke="#e8e6dd" stroke-width="2.4" stroke-linecap="round"/>
+              <path d="M97 55 L90 50 L90 60 Z" fill="#e8e6dd"/>
+              <path d="M40 55 L34 52 L34 58 Z" fill="#e8e6dd"/>
+            </svg>
+          </div>
+          <div class="range-track" id="range-track">
+            <div class="range-line"></div>
+            <div class="range-dist" id="range-dist">20 yd</div>
+          </div>
+          <div class="range-target-wrap" id="range-target-wrap">
+            <svg id="range-target-svg" width="72" height="72" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="58" fill="none" stroke="#f2f0e8" stroke-width="3"/>
+              <circle cx="60" cy="60" r="45" fill="#4a90d9"/>
+              <circle cx="60" cy="60" r="32" fill="#d1483a"/>
+              <circle cx="60" cy="60" r="17" fill="#e8c93a"/>
+              <circle cx="60" cy="60" r="1.5" fill="#5a5030"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Orientation (deg)</label>
+        <div class="axis-legend" id="axis-legend" style="display:none;">
+          <span class="li"><span class="sw" style="background:var(--axis-weak)"></span>Weak</span>
+          <span class="li"><span class="sw" style="background:var(--axis-stiff)"></span>Stiff</span>
+          <span class="li"><span class="sw" style="background:var(--axis-flo)"></span>FLO</span>
+          <span class="li"><span class="sw" style="background:var(--axis-float)"></span>Float</span>
+          <span class="li"><span class="sw dashedsw"></span>EulerBuckle</span>
+        </div>
+        <div class="chip-row" id="orient-chips"></div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>LR direction</label>
+          <div class="chip-row" id="lr-dir-chips">
+            <button type="button" class="chip" data-dir="left">&#9664; Left</button>
+            <button type="button" class="chip active" data-dir="right">Right &#9654;</button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="f-lr-mag">LR (3/16" squares)</label>
+          <input id="f-lr-mag" type="number" inputmode="numeric" step="1" min="0" placeholder="e.g. 10">
+        </div>
+      </div>
+      <div class="row2" style="margin-top:-10px;">
+        <div class="field">
+          <label>UD direction</label>
+          <div class="chip-row" id="ud-dir-chips">
+            <button type="button" class="chip active" data-dir="up">&#9650; Up</button>
+            <button type="button" class="chip" data-dir="down">&#9660; Down</button>
+          </div>
+        </div>
+        <div class="field">
+          <label for="f-ud-mag">UD (3/16" squares)</label>
+          <input id="f-ud-mag" type="number" inputmode="numeric" step="1" min="0" placeholder="e.g. 6">
+        </div>
+      </div>
+      <p class="hint" style="margin-top:-8px;">Distance from point of aim, in the same 3/16" squares you already use on the graph paper. Tap the direction, type the number — no minus sign needed.</p>
+      <div class="target-wrap" style="gap:14px; align-items:center;">
+        <div style="flex:1; max-width:170px;">
+          <svg id="shot-radar-svg" width="100%" height="170" viewBox="0 0 260 260"></svg>
+          <p class="radar-caption" style="text-align:center; font-size:11px; color:var(--dim); margin-top:2px;">This arrow's spine pattern</p>
+        </div>
+        <svg class="target" id="target-svg" width="190" height="190" viewBox="0 0 260 260" style="flex:none;"></svg>
+      </div>
+      <p class="target-hint">Tap the target to get close, then dial in the exact numbers above.</p>
+      <button class="btn btn-primary" id="log-shot-btn" style="margin-top:10px;">Log shot</button>
+      <div class="field-row" style="margin-top:16px; margin-bottom:14px;">
+        <div class="field">
+          <label for="f-radius">Target radius shown above (in)</label>
+          <input id="f-radius" type="number" inputmode="decimal" step="0.5" placeholder="6">
+        </div>
+      </div>
+      <p class="hint" style="margin-top:-8px; margin-bottom:14px;">The real-world radius this target graphic represents (e.g. scoring ring radius on your paper). Used to scale where your typed coordinates land on the visual, and to convert them to inches for export. Saved for next time.</p>
+      <div class="rec-panel" id="rec-panel" style="display:none;">
+        <div class="rec-label" style="font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--dim); font-family:'SF Mono',ui-monospace,monospace;">Recommended orientation</div>
+        <div class="rec-orient" id="rec-orient">—</div>
+        <div class="rec-conf" id="rec-conf">—</div>
+        <div class="rec-table" id="rec-table"></div>
+      </div>
+      <div class="shot-list" id="shot-list"></div>
+    </div>
+    </div>
   </div>
 </main>
 <div class="toast" id="toast"></div>
-<div class="modal-backdrop" id="modal-backdrop"></div>
-<div class="modal" id="modal">
-  <button class="close-modal" id="modal-close">✕</button>
-  <div class="modal-handle"></div>
-  <h3 id="modal-title">Log shot</h3>
-  <p class="sub" id="modal-sub"></p>
-  <div class="field">
-    <label>Orientation (deg)</label>
-    <div class="axis-legend" id="axis-legend" style="display:none;">
-      <span class="li"><span class="sw" style="background:var(--axis-weak)"></span>Weak</span>
-      <span class="li"><span class="sw" style="background:var(--axis-stiff)"></span>Stiff</span>
-      <span class="li"><span class="sw" style="background:var(--axis-flo)"></span>FLO</span>
-      <span class="li"><span class="sw" style="background:var(--axis-float)"></span>Float</span>
-      <span class="li"><span class="sw dashedsw"></span>EulerBuckle</span>
-    </div>
-    <div class="chip-row" id="orient-chips"></div>
-  </div>
-  <div class="row2">
-    <div class="field">
-      <label for="f-distance">Distance (yd)</label>
-      <input id="f-distance" type="number" inputmode="decimal" step="1" placeholder="20">
-    </div>
-    <div class="field">
-      <label for="f-bow">Bow (optional)</label>
-      <input id="f-bow" type="text" placeholder="e.g. Genesis (NASP)" autocomplete="off">
-    </div>
-  </div>
-  <div class="target-wrap">
-    <svg class="target" id="target-svg" width="260" height="260" viewBox="0 0 260 260"></svg>
-  </div>
-  <p class="target-hint">Tap the target to get close, then dial in the exact numbers below.</p>
-  <div class="row2">
-    <div class="field">
-      <label>LR direction</label>
-      <div class="chip-row" id="lr-dir-chips">
-        <button type="button" class="chip" data-dir="left">&#9664; Left</button>
-        <button type="button" class="chip active" data-dir="right">Right &#9654;</button>
-      </div>
-    </div>
-    <div class="field">
-      <label for="f-lr-mag">LR (3/16" squares)</label>
-      <input id="f-lr-mag" type="number" inputmode="numeric" step="1" min="0" placeholder="e.g. 10">
-    </div>
-  </div>
-  <div class="row2">
-    <div class="field">
-      <label>UD direction</label>
-      <div class="chip-row" id="ud-dir-chips">
-        <button type="button" class="chip active" data-dir="up">&#9650; Up</button>
-        <button type="button" class="chip" data-dir="down">&#9660; Down</button>
-      </div>
-    </div>
-    <div class="field">
-      <label for="f-ud-mag">UD (3/16" squares)</label>
-      <input id="f-ud-mag" type="number" inputmode="numeric" step="1" min="0" placeholder="e.g. 6">
-    </div>
-  </div>
-  <p class="hint" style="margin-top:-8px;">Distance from point of aim, in the same 3/16" squares you already use on the graph paper. Tap the direction, type the number — no minus sign needed.</p>
-  <button class="btn btn-primary" id="log-shot-btn" style="margin-top:10px;">Log shot</button>
-  <div class="field-row" style="margin-top:16px; margin-bottom:14px;">
-    <div class="field">
-      <label for="f-radius">Target radius shown above (in)</label>
-      <input id="f-radius" type="number" inputmode="decimal" step="0.5" placeholder="6">
-    </div>
-  </div>
-  <p class="hint" style="margin-top:-8px; margin-bottom:14px;">The real-world radius this target graphic represents (e.g. scoring ring radius on your paper). Used to scale where your typed coordinates land on the visual, and to convert them to inches for export. Saved for next time.</p>
-  <div class="rec-panel" id="rec-panel" style="display:none;">
-    <div class="rec-label" style="font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--dim); font-family:'SF Mono',ui-monospace,monospace;">Recommended orientation</div>
-    <div class="rec-orient" id="rec-orient">—</div>
-    <div class="rec-conf" id="rec-conf">—</div>
-    <div class="rec-table" id="rec-table"></div>
-  </div>
-  <div class="shot-list" id="shot-list"></div>
-</div>
 <script>
 // ---------- rev.2-2 changelog (2026-08-04) ----------
 // - Lab Data: added Float Axis (bathtub-float test) and EulerBuckle Axis (clamp/press-buckle
@@ -489,8 +593,12 @@ const emptyEl = document.getElementById('empty-state');
 const countEl = document.getElementById('count-tag');
 const toastEl = document.getElementById('toast');
 const ORIENTATIONS = Array.from({length:16}, (_,i)=> i*22.5); // canonical ascending order -- used only for CSV export alignment with the workbook's B:Q columns, never for on-screen ordering
-// Physical measurement/shot order: 0deg baseline, then 22.5deg counter-clockwise steps
-// (337.5, 315, 292.5, ...). This is what's shown on screen everywhere (shot log chips,
+// Physical measurement/shot order: 0deg baseline, then 22.5deg clockwise steps (dial fixed
+// at top, shaft rotated CW, eye at the nock sighting toward the field tip -- 12/3/6/9 o'clock
+// = 0/90/180/270deg). Each CW step brings the mark that's 22.5deg further back (in the CW
+// sense) under the dial, which is why the sequence below reads 337.5, 315, 292.5, ... -- this
+// was verified against the archer's actual bench procedure, not assumed.
+// This is what's shown on screen everywhere (shot log chips,
 // Lab Data wizard) so entry order always matches how the shaft is actually rotated --
 // storage still keys every value by its real angle, so export to the workbook is
 // unaffected regardless of the order things were entered on screen.
@@ -637,6 +745,7 @@ function render(){
       </div>
       <div class="actions">
         <button class="btn btn-ghost btn-sm" data-edit="${a.id}">Edit</button>
+        <button class="btn btn-ghost btn-sm" data-bench="${a.id}">Bench Test</button>
         <button class="btn btn-ghost btn-sm" data-log="${a.id}" style="flex:1;">Log shot · ${shotCount}</button>
       </div>
     </div>
@@ -928,8 +1037,7 @@ listEl.addEventListener('click', (e) => {
   }
 });
 // ---------- shot logger modal ----------
-const backdrop = document.getElementById('modal-backdrop');
-const modal = document.getElementById('modal');
+const workspaceView = document.getElementById('view-workspace');
 const modalTitle = document.getElementById('modal-title');
 const modalSub = document.getElementById('modal-sub');
 const orientChips = document.getElementById('orient-chips');
@@ -1041,6 +1149,153 @@ function renderChipAxisRings(arrowIdStr){
   });
   if (legend) legend.style.display = any ? 'flex' : 'none';
 }
+// ---- standalone range diagram: fixed bow, distance-scaled target (decorative only) ----
+// Purely visual -- reacts to the real Distance field but never sets any shot data itself.
+// That's the separate, real tap-to-aim target below (#target-svg), which sets LR/UD and is
+// otherwise untouched by any of this.
+const RANGE_TIER_SCALE = {20: 1.00, 30: 0.82, 40: 0.66, 50: 0.52, 60: 0.40};
+const RANGE_TIERS = [20, 30, 40, 50, 60];
+const RANGE_BOW_VIEWBOX_W = 100, RANGE_ARROW_TIP_X = 97;
+const RANGE_TARGET_VIEWBOX = 120;
+const RANGE_PANEL_SCALE = 0.6;
+const RANGE_REF_TARGET_SIZE = RANGE_TARGET_VIEWBOX * RANGE_PANEL_SCALE;
+const RANGE_MIN_GAP_PX = 10;
+const RANGE_RIGHT_EDGE_MARGIN_PX = 6;
+const rangeBowSvg = document.getElementById('range-bow-svg');
+const rangeStageEl = () => document.querySelector('.range-stage');
+const rangeTrackEl = document.getElementById('range-track');
+const rangeDistEl = document.getElementById('range-dist');
+const rangeCapEl = document.getElementById('range-cap');
+const rangeTargetWrap = document.getElementById('range-target-wrap');
+const rangeTargetSvg = document.getElementById('range-target-svg');
+let rangeTierLeftPx = {};
+
+function computeRangeTierPositions(){
+  const stage = rangeStageEl();
+  if (!stage) return;
+  const stageRect = stage.getBoundingClientRect();
+  const bowRect = rangeBowSvg.getBoundingClientRect();
+  const bowTipPx = (bowRect.left - stageRect.left) + (RANGE_ARROW_TIP_X / RANGE_BOW_VIEWBOX_W) * bowRect.width;
+  const panelWidth = stageRect.width;
+  const closestLeftPx = bowTipPx + RANGE_MIN_GAP_PX;
+  const farthestSize = RANGE_REF_TARGET_SIZE * RANGE_TIER_SCALE[60];
+  const farthestLeftPx = panelWidth - RANGE_RIGHT_EDGE_MARGIN_PX - farthestSize;
+  RANGE_TIERS.forEach((yd, i) => {
+    const t = i / (RANGE_TIERS.length - 1);
+    rangeTierLeftPx[yd] = closestLeftPx + (farthestLeftPx - closestLeftPx) * t;
+  });
+}
+function alignRangeLineAndLabel(){
+  const stage = rangeStageEl();
+  if (!stage) return;
+  const stageRect = stage.getBoundingClientRect();
+  const bowRect = rangeBowSvg.getBoundingClientRect();
+  const targetRect = rangeTargetWrap.getBoundingClientRect();
+  const bowTipPx = (bowRect.left - stageRect.left) + (RANGE_ARROW_TIP_X / RANGE_BOW_VIEWBOX_W) * bowRect.width;
+  const targetLeftPx = targetRect.left - stageRect.left;
+  const targetHalfHeight = targetRect.height / 2;
+  const LINE_TARGET_GAP_PX = 6; // stops short of the target's edge at every size, not its center --
+                                 // reaching center only looked right at 60yd because the target is
+                                 // small there; at 20yd (much bigger target) it visibly overlapped it
+  rangeTrackEl.style.left = bowTipPx + 'px';
+  rangeTrackEl.style.width = Math.max(0, (targetLeftPx - LINE_TARGET_GAP_PX) - bowTipPx) + 'px';
+  rangeTrackEl.style.top = 'calc(50% + ' + targetHalfHeight + 'px)';
+}
+// Snaps whatever's in the real Distance field to the nearest of the 5 tiers for the diagram's
+// scale/position only -- the field itself and the label keep the actual typed value.
+function nearestRangeTier(yd){
+  return RANGE_TIERS.reduce((a,b) => Math.abs(b-yd) < Math.abs(a-yd) ? b : a);
+}
+function updateRangeDiagram(){
+  if (!rangeBowSvg) return;
+  const raw = parseFloat(distanceInput.value);
+  const yd = Number.isFinite(raw) && raw > 0 ? raw : 20;
+  const tier = nearestRangeTier(yd);
+  const scale = RANGE_TIER_SCALE[tier];
+  const size = RANGE_REF_TARGET_SIZE * scale;
+  rangeTargetSvg.setAttribute('width', size);
+  rangeTargetSvg.setAttribute('height', size);
+  document.getElementById('range-target-wrap').style.left = rangeTierLeftPx[tier] + 'px';
+  const label = (Number.isInteger(yd) ? yd : yd.toFixed(1)) + ' yd';
+  rangeDistEl.textContent = label;
+  rangeCapEl.textContent = label + ' range';
+  alignRangeLineAndLabel();
+}
+function initRangeDiagram(){
+  computeRangeTierPositions();
+  updateRangeDiagram();
+}
+window.addEventListener('resize', () => { if (workspaceView.style.display !== 'none' && document.getElementById('ws-shot').style.display !== 'none') initRangeDiagram(); });
+// ---- Log Shot page radar: same 16-point-spine-pattern idea as the Bench Test radar, but for
+// whichever arrow is active here, using its saved/persisted data rather than a live wizard
+// session. Rotates so the currently-selected Orientation chip sits at 12 o'clock -- a rigid
+// rotation of the same shape, never a redraw of the underlying values, so it's always
+// verifiable against the degree labels ringing the outside.
+const SHOT_RADAR_CX = 130, SHOT_RADAR_CY = 130, SHOT_RADAR_R = 100;
+function shotRadarPoint(angleDeg, radius, rotateToTop){
+  const rad = (angleDeg - (rotateToTop || 0) - 90) * Math.PI / 180;
+  return { x: SHOT_RADAR_CX + radius * Math.cos(rad), y: SHOT_RADAR_CY + radius * Math.sin(rad) };
+}
+function getArrowSpineByAngle(arrowIdStr){
+  const lab = loadLabData()[arrowIdStr];
+  if (lab && lab.spine) return lab.spine;
+  const wb = loadArrowSpineByAngleMap()[arrowIdStr];
+  return wb || null;
+}
+function drawShotRadar(arrowIdStr, rotateToTop){
+  const svg = document.getElementById('shot-radar-svg');
+  if (!svg) return;
+  svg.innerHTML = '';
+  [0.33, 0.66, 1.0].forEach(frac => {
+    const c = document.createElementNS(svgNS,'circle');
+    c.setAttribute('cx', SHOT_RADAR_CX); c.setAttribute('cy', SHOT_RADAR_CY); c.setAttribute('r', SHOT_RADAR_R * frac);
+    c.setAttribute('fill', 'none'); c.setAttribute('stroke', '#333329'); c.setAttribute('stroke-width', '1');
+    svg.appendChild(c);
+  });
+  const spine = getArrowSpineByAngle(arrowIdStr);
+  const recorded = spine ? ORIENTATIONS.map(o => ({angle:o, val: spine[String(o)]})).filter(e => e.val != null) : [];
+  ORIENTATIONS.forEach(o => {
+    const isSel = o === rotateToTop;
+    const p = shotRadarPoint(o, SHOT_RADAR_R + 6, rotateToTop);
+    const line = document.createElementNS(svgNS,'line');
+    line.setAttribute('x1', SHOT_RADAR_CX); line.setAttribute('y1', SHOT_RADAR_CY);
+    line.setAttribute('x2', p.x); line.setAttribute('y2', p.y);
+    line.setAttribute('stroke', isSel ? '#c9822f' : '#262620'); line.setAttribute('stroke-width', isSel ? '2' : '1');
+    svg.appendChild(line);
+    const lp = shotRadarPoint(o, SHOT_RADAR_R + 16, rotateToTop);
+    const label = document.createElementNS(svgNS,'text');
+    label.setAttribute('x', lp.x); label.setAttribute('y', lp.y);
+    label.setAttribute('font-size', '9'); label.setAttribute('fill', '#8c897a');
+    label.setAttribute('text-anchor', 'middle'); label.setAttribute('dominant-baseline', 'middle');
+    label.textContent = fmtDeg(o);
+    svg.appendChild(label);
+  });
+  if (recorded.length < 2){
+    const hub = document.createElementNS(svgNS,'circle');
+    hub.setAttribute('cx', SHOT_RADAR_CX); hub.setAttribute('cy', SHOT_RADAR_CY); hub.setAttribute('r', 3);
+    hub.setAttribute('fill', '#8c897a');
+    svg.appendChild(hub);
+    return;
+  }
+  let min = Math.min(...recorded.map(e => e.val));
+  let max = Math.max(...recorded.map(e => e.val));
+  if (max === min){ min -= 0.005; max += 0.005; }
+  const radiusFor = (val) => 20 + ((val - min) / (max - min)) * (SHOT_RADAR_R - 20);
+  if (recorded.length === ORIENTATIONS.length){
+    const poly = ORIENTATIONS.map(o => { const p = shotRadarPoint(o, radiusFor(spine[String(o)]), rotateToTop); return p.x + ',' + p.y; }).join(' ');
+    const polygon = document.createElementNS(svgNS,'polygon');
+    polygon.setAttribute('points', poly);
+    polygon.setAttribute('fill', '#4a90d980'); polygon.setAttribute('stroke', '#4a90d9'); polygon.setAttribute('stroke-width', '2');
+    svg.appendChild(polygon);
+  }
+  recorded.forEach(e => {
+    const p = shotRadarPoint(e.angle, radiusFor(e.val), rotateToTop);
+    const dot = document.createElementNS(svgNS,'circle');
+    dot.setAttribute('cx', p.x); dot.setAttribute('cy', p.y); dot.setAttribute('r', 3);
+    dot.setAttribute('fill', '#e8e6dd');
+    svg.appendChild(dot);
+  });
+}
 function openShotLogger(arrowId){
   const arrows = loadArrows();
   const arrow = arrows.find(a => a.id === arrowId);
@@ -1055,6 +1310,7 @@ function openShotLogger(arrowId){
   ).join('');
   renderChipAxisRings(arrow.arrowId);
   distanceInput.value = '';
+  distancePresetChips.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
   bowInput.value = '';
   lrMagInput.value = '';
   udMagInput.value = '';
@@ -1066,22 +1322,41 @@ function openShotLogger(arrowId){
   drawTarget();
   renderShotList();
   renderRecommendation();
-  backdrop.classList.add('show');
-  modal.classList.add('show');
+  drawShotRadar(arrow.arrowId, 0);
+  openWorkspace(arrowId, 'shot');
+  initRangeDiagram();
 }
+const distancePresetChips = document.getElementById('distance-preset-chips');
+distanceInput.addEventListener('input', () => {
+  const v = parseFloat(distanceInput.value);
+  distancePresetChips.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', Number(c.dataset.yd) === v));
+  if (workspaceView.style.display !== 'none') updateRangeDiagram();
+});
+distancePresetChips.addEventListener('click', (e) => {
+  const chip = e.target.closest('[data-yd]');
+  if (!chip) return;
+  distanceInput.value = chip.dataset.yd;
+  distancePresetChips.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c === chip));
+  if (workspaceView.style.display !== 'none') updateRangeDiagram();
+});
 function closeModal(){
-  backdrop.classList.remove('show');
-  modal.classList.remove('show');
   activeArrowId = null;
   editingShotId = null;
+  workspaceView.style.display = 'none';
+  tabButtons.forEach(b => b.classList.toggle('active', b.getAttribute('data-tab') === 'landing'));
+  Object.keys(tabViews).forEach(key => { tabViews[key].style.display = (key === 'landing') ? 'block' : 'none'; });
+  renderLandingArrowSelect();
 }
-document.getElementById('modal-close').addEventListener('click', closeModal);
-backdrop.addEventListener('click', closeModal);
+document.getElementById('ws-back-btn').addEventListener('click', closeModal);
 orientChips.addEventListener('click', (e) => {
   const btn = e.target.closest('[data-o]');
   if (!btn) return;
   activeOrientation = parseFloat(btn.getAttribute('data-o'));
-  [...orientChips.children].forEach(c => c.classList.toggle('active', c === btn));
+  orientChips.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c === btn));
+  if (activeArrowId){
+    const arrow = loadArrows().find(a => a.id === activeArrowId);
+    if (arrow) drawShotRadar(arrow.arrowId, activeOrientation);
+  }
 });
 // ---- target SVG: tap-to-plot ----
 const svgNS = 'http://www.w3.org/2000/svg';
@@ -1103,7 +1378,17 @@ function drawTarget(){
     c.setAttribute('stroke', '#00000022');
     targetSvg.appendChild(c);
   });
-  // crosshair
+  // crosshair -- perpendicular lines spanning the target, plus the small center dot
+  const vLine = document.createElementNS(svgNS,'line');
+  vLine.setAttribute('x1',CX); vLine.setAttribute('y1',CY-R-4);
+  vLine.setAttribute('x2',CX); vLine.setAttribute('y2',CY+R+4);
+  vLine.setAttribute('stroke','#00000055'); vLine.setAttribute('stroke-width','1');
+  targetSvg.appendChild(vLine);
+  const hLine = document.createElementNS(svgNS,'line');
+  hLine.setAttribute('x1',CX-R-4); hLine.setAttribute('y1',CY);
+  hLine.setAttribute('x2',CX+R+4); hLine.setAttribute('y2',CY);
+  hLine.setAttribute('stroke','#00000055'); hLine.setAttribute('stroke-width','1');
+  targetSvg.appendChild(hLine);
   const cross = document.createElementNS(svgNS,'circle');
   cross.setAttribute('cx',CX); cross.setAttribute('cy',CY); cross.setAttribute('r',2);
   cross.setAttribute('fill','#00000055');
@@ -1484,7 +1769,8 @@ function clearLabDraft(){
 }
 // ---------- Lab Data: spine wizard state ----------
 // Order matches the physical measurement procedure: 0deg baseline first (entered above,
-// not part of this array), then rotate 22.5deg counter-clockwise each step. Derived from
+// not part of this array), then rotate 22.5deg clockwise each step (dial fixed at top,
+// shaft rotated CW). Derived from
 // ORIENT_CCW_ORDER so the wizard, the position chips, and the shot log chips can never drift apart.
 const LAB_POSITIONS = ORIENT_CCW_ORDER.slice(1);
 let labArrowId = null;
@@ -1739,11 +2025,47 @@ function renderLabPositionChips(){
     const isCurrent = o !== 0 && o === currentAngle;
     const isBaseline = o === 0;
     const cls = 'lab-pos-chip' + (isCurrent ? ' active' : '') + (isBaseline ? ' baseline' : '');
-    return `<button type="button" class="${cls}" data-labpos="${o}">
+    return `<span class="lab-pos-chip-wrap" data-wrap="${o}"><button type="button" class="${cls}" data-labpos="${o}">
       <span class="lpc-a">${fmtDeg(o)}</span>
       <span class="lpc-v">${val != null ? val.toFixed(3) : '—'}</span>
-    </button>`;
+    </button></span>`;
   }).join('');
+  renderLabPositionChipRings();
+}
+// Weak/Stiff are computed LIVE from whatever's currently in labSpine -- so if all 16 are
+// already seeded (from a workbook import, like the 6 arrows here) or filled in this session,
+// the rings appear immediately, before the wizard is formally saved. FLO/Float/EulerBuckle
+// come from getArrowAxisSet (saved Lab Data or workbook import), same source the shot-log
+// chips use, since those are independent measurements that don't depend on this session's
+// in-progress spine sweep.
+function renderLabPositionChipRings(){
+  const legend = document.getElementById('lab-axis-legend');
+  labPositionChips.querySelectorAll('.axis-ring').forEach(r => r.remove());
+  if (!labArrowId){ if (legend) legend.style.display = 'none'; return; }
+  const saved = getArrowAxisSet(labArrowId);
+  const live = computeWeakStiffAxis(labSpine);
+  const axes = {
+    weak: live ? live.weakAxis : saved.weak,
+    stiff: live ? live.stiffAxis : saved.stiff,
+    flo: saved.flo,
+    float: saved.float,
+    euler: saved.euler
+  };
+  let any = false;
+  AXIS_RING_DEFS.forEach(def => {
+    const step = nearestOrientStep(axes[def.key]);
+    if (step == null) return;
+    const wrap = labPositionChips.querySelector(`[data-wrap="${step}"]`);
+    if (!wrap) return;
+    any = true;
+    const depth = wrap.querySelectorAll('.axis-ring').length;
+    const ring = document.createElement('div');
+    ring.className = 'axis-ring ' + def.style;
+    ring.style.setProperty('--rc', `var(${def.cssVar})`);
+    ring.style.inset = (-1 - depth * 3) + 'px';
+    wrap.appendChild(ring);
+  });
+  if (legend) legend.style.display = any ? 'flex' : 'none';
 }
 labPositionChips.addEventListener('click', (e) => {
   const btn = e.target.closest('[data-labpos]');
@@ -2014,7 +2336,7 @@ function renderLabStep(){
   renderLabReadingRows();
   renderLabCalc();
   drawLabRadar();
-  labWizardHint.textContent = 'Rotate the shaft 22.5° further counter-clockwise from the last position, then read the dial.';
+  labWizardHint.textContent = 'Rotate the shaft 22.5° further clockwise from the last position, then read the dial.';
 }
 labStartBtn.addEventListener('click', () => {
   const id = labIdSelect.value;
@@ -2225,11 +2547,11 @@ labExportMassBtn.addEventListener('click', () => {
   URL.revokeObjectURL(url);
   showToast(rows.length + ' arrow(s) exported for Mass Asymmetry tab');
 });
-// ---------- tab navigation (Guidance / Lab Data) ----------
+// ---------- tab navigation (Arrows / Fleet) ----------
 const tabButtons = document.querySelectorAll('#tabbar .tab');
 const tabViews = {
-  guidance: document.getElementById('view-guidance'),
-  labdata: document.getElementById('view-labdata')
+  landing: document.getElementById('view-landing'),
+  guidance: document.getElementById('view-guidance')
 };
 tabButtons.forEach(btn => {
   btn.addEventListener('click', () => {
@@ -2238,7 +2560,141 @@ tabButtons.forEach(btn => {
     Object.keys(tabViews).forEach(key => {
       tabViews[key].style.display = (key === target) ? 'block' : 'none';
     });
+    workspaceView.style.display = 'none';
+    if (target === 'landing') renderLandingArrowSelect();
   });
+});
+document.getElementById('fleet-to-landing-btn').addEventListener('click', () => {
+  tabButtons.forEach(b => b.classList.toggle('active', b.getAttribute('data-tab') === 'landing'));
+  Object.keys(tabViews).forEach(key => { tabViews[key].style.display = (key === 'landing') ? 'block' : 'none'; });
+  renderLandingArrowSelect();
+});
+// The landing dropdown is sorted exactly as the workbook's Arrow ID Export CSV was last
+// imported (loadArrowIdList preserves that row order untouched -- no re-sorting happens
+// anywhere in the import pipeline), with any Fleet-only arrows that were never imported
+// appended at the end so nothing the archer has already entered gets hidden.
+const landingArrowSelect = document.getElementById('landing-arrow-select');
+const landingHint = document.getElementById('landing-hint');
+function renderLandingArrowSelect(){
+  const imported = loadArrowIdList();
+  const fleetNames = loadArrows().map(a => a.arrowId);
+  const extras = fleetNames.filter(name => !imported.includes(name));
+  const combined = [...imported, ...extras];
+  landingArrowSelect.innerHTML = '<option value="">Select an arrow…</option>' +
+    combined.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('');
+  landingHint.textContent = combined.length
+    ? combined.length + ' arrow' + (combined.length === 1 ? '' : 's') + ', in the order from your last workbook import. Re-import under the Fleet tab any time the workbook changes.'
+    : "No arrows yet -- import your workbook's Arrow ID Export list or add one under the Fleet tab.";
+}
+landingArrowSelect.addEventListener('change', () => {
+  const realArrowId = landingArrowSelect.value;
+  if (!realArrowId) return;
+  const arrows = loadArrows();
+  let arrow = arrows.find(a => a.arrowId === realArrowId);
+  if (!arrow){
+    const wb = loadArrowWorkbookDataMap()[realArrowId];
+    arrow = { id: 'a_' + Date.now(), arrowId: realArrowId, spine: wb && wb.spine, mass: wb && wb.mass, point: wb && wb.point, note: '', createdAt: new Date().toISOString() };
+    arrows.push(arrow);
+    saveArrows(arrows);
+  }
+  openShotLogger(arrow.id); // Log Shot is the default landing mode, matching the locked v2.3 concept
+});
+// First-load routing: land on the Arrows picker if there's anything to pick from; otherwise
+// fall back to Fleet, since a brand-new install has no arrows yet and needs that entry point.
+renderLandingArrowSelect();
+if (loadArrowIdList().length === 0 && loadArrows().length === 0){
+  tabButtons.forEach(b => b.classList.toggle('active', b.getAttribute('data-tab') === 'guidance'));
+  tabViews.landing.style.display = 'none';
+  tabViews.guidance.style.display = 'block';
+}
+
+// ---------- Arrow Workspace: single arrow-centric page, Bench Test / Log Shot toggle ----------
+const wsArrowSelect = document.getElementById('ws-arrow-select');
+const wsArrowTitle = document.getElementById('ws-arrow-title');
+const wsModeToggle = document.getElementById('ws-mode-toggle');
+const wsBench = document.getElementById('ws-bench');
+const wsShot = document.getElementById('ws-shot');
+const wsImportBtn = document.getElementById('ws-import-btn');
+
+function renderWsArrowSelect(selectedId){
+  const list = loadArrowIdList();
+  wsArrowSelect.innerHTML = list.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('');
+  if (selectedId && [...wsArrowSelect.options].some(o => o.value === selectedId)) wsArrowSelect.value = selectedId;
+}
+// Opens the single-page workspace for one arrow, in either mode. Reuses the exact same
+// per-mode setup functions the old modal and old Lab Data tab already had (openShotLogger's
+// internals, labIdSelect's change handler) -- this function's only new job is switching which
+// mode is visible and keeping the workspace-level arrow picker in sync with both.
+function openWorkspace(arrowIdStr, mode){
+  const arrows = loadArrows();
+  const arrow = arrows.find(a => a.arrowId === arrowIdStr) || arrows.find(a => a.id === arrowIdStr);
+  const realArrowId = arrow ? arrow.arrowId : arrowIdStr;
+  wsArrowTitle.textContent = realArrowId;
+  renderWsArrowSelect(realArrowId);
+  document.getElementById('view-guidance').style.display = 'none';
+  document.getElementById('view-landing').style.display = 'none';
+  workspaceView.style.display = 'block';
+  [...wsModeToggle.children].forEach(c => c.classList.toggle('active', c.dataset.mode === mode));
+  wsBench.style.display = (mode === 'bench') ? 'block' : 'none';
+  wsShot.style.display = (mode === 'shot') ? 'block' : 'none';
+  // keep the (now-hidden) Lab Data arrow select in sync so its existing change handler
+  // populates the Bench Test panel correctly regardless of which mode is currently visible
+  if (labIdSelect.value !== realArrowId){
+    labIdSelect.value = realArrowId;
+    labIdSelect.dispatchEvent(new Event('change'));
+  }
+}
+wsModeToggle.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-mode]');
+  if (!btn) return;
+  const mode = btn.dataset.mode;
+  [...wsModeToggle.children].forEach(c => c.classList.toggle('active', c === btn));
+  wsBench.style.display = (mode === 'bench') ? 'block' : 'none';
+  wsShot.style.display = (mode === 'shot') ? 'block' : 'none';
+  if (mode === 'shot'){
+    const realArrowId = wsArrowSelect.value;
+    const arrow = loadArrows().find(a => a.arrowId === realArrowId);
+    // if this arrow's shot fields were never populated (e.g. arrived via Bench Test first
+    // and never opened Log Shot for it), run the same setup the modal used to run on open --
+    // otherwise activeArrowId stays null and tap-to-aim/orientation silently do nothing
+    if (arrow && activeArrowId !== arrow.id){
+      openShotLogger(arrow.id);
+    } else {
+      initRangeDiagram();
+    }
+  }
+});
+wsArrowSelect.addEventListener('change', () => {
+  const realArrowId = wsArrowSelect.value;
+  const arrows = loadArrows();
+  let arrow = arrows.find(a => a.arrowId === realArrowId);
+  if (!arrow){
+    // not yet a Fleet record (e.g. only in the imported list) -- create a minimal one so the
+    // rest of the app (which keys everything off a Fleet arrow.id) has something to attach to
+    const wb = loadArrowWorkbookDataMap()[realArrowId];
+    arrow = { id: 'a_' + Date.now(), arrowId: realArrowId, spine: wb && wb.spine, mass: wb && wb.mass, point: wb && wb.point, note: '', createdAt: new Date().toISOString() };
+    arrows.push(arrow);
+    saveArrows(arrows);
+  }
+  const currentMode = wsModeToggle.querySelector('.active').dataset.mode;
+  wsArrowTitle.textContent = realArrowId;
+  if (currentMode === 'shot'){
+    openShotLogger(arrow.id);
+  } else {
+    labIdSelect.value = realArrowId;
+    labIdSelect.dispatchEvent(new Event('change'));
+  }
+});
+wsImportBtn.addEventListener('click', () => importFile.click());
+document.getElementById('list').addEventListener('click', (e) => {
+  const benchBtn = e.target.closest('[data-bench]');
+  if (!benchBtn) return;
+  const arrows = loadArrows();
+  const arrow = arrows.find(a => a.id === benchBtn.getAttribute('data-bench'));
+  if (!arrow) return;
+  labIdSelect.value = arrow.arrowId;
+  labIdSelect.dispatchEvent(new Event('change'));
+  openWorkspace(arrow.arrowId, 'bench');
 });
 render();
 </script>
