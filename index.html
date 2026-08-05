@@ -222,7 +222,7 @@
 </head>
 <body>
 <header>
-  <div class="eyebrow">Arrow Tracker · v2.4.2</div>
+  <div class="eyebrow">Arrow Tracker · v2.4.4</div>
   <h1>Fleet Log</h1>
   <p>Log each shaft's specs, then log shots by orientation to see what's actually working.</p>
 </header>
@@ -318,8 +318,8 @@
         <select id="ws-arrow-select"></select>
       </div>
       <div class="segmented" id="ws-mode-toggle">
-        <button type="button" data-mode="bench">Bench Test</button>
         <button type="button" class="active" data-mode="shot">Log Shot</button>
+        <button type="button" data-mode="bench">Bench Test</button>
       </div>
     </div>
     <div id="ws-bench" style="display:none;">
@@ -332,6 +332,8 @@
             <option value="">Select an arrow…</option>
           </select>
         </div>
+      </div>
+      <div class="field-row">
         <button class="btn btn-ghost btn-sm" id="lab-import-btn" type="button">Import angle data</button>
         <input type="file" id="lab-import-file" accept=".csv,text/csv" style="display:none;">
       </div>
