@@ -127,6 +127,20 @@
   }
   .modal.show{transform:translateY(0);}
   .modal-handle{width:36px; height:4px; background:var(--line); border-radius:2px; margin:0 auto 14px;}
+  /* v2.4.15: custom confirm dialog -- replaces window.confirm(), which silently fails to show
+     any dialog at all in an iOS home-screen (standalone) web app, unlike Chrome/Safari tabs. */
+  .confirm-backdrop{
+    position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:60;
+    display:none; align-items:center; justify-content:center; padding:20px;
+  }
+  .confirm-backdrop.show{display:flex;}
+  .confirm-card{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    padding:18px; max-width:340px; width:100%;
+  }
+  .confirm-msg{margin:0 0 16px; font-size:14px; line-height:1.45; color:var(--text);}
+  .confirm-actions{display:flex; gap:10px;}
+  .confirm-actions button{flex:1;}
   .modal h3{margin:0 0 2px; font-size:17px;}
   .modal .sub{font-size:12.5px; color:var(--dim); margin:0 0 14px;}
   .target-wrap{display:flex; justify-content:center; margin:10px 0 16px;}
@@ -143,7 +157,7 @@
   .chip.active{background:var(--accent); color:#1a1408; border-color:var(--accent);}
   /* ---- axis-alignment rings on orientation chips (shot logger) ---- */
   :root{
-    --axis-weak:#e8c93a; --axis-stiff:#f2f0e8; --axis-flo:#d1483a;
+    --axis-weak:#e8c93a; --axis-stiff:#f2f0e8; --axis-flo:#d1487e;
     --axis-float:#4a90d9; --axis-euler:#8c897a;
   }
   .orient-chip-wrap{position:relative; display:inline-block;}
@@ -214,11 +228,12 @@
     background:var(--panel-2); border:1px solid var(--line); border-radius:10px;
     padding:12px 14px; margin-top:14px;
   }
-  .rec-panel .rec-orient{font-size:19px; font-weight:700; color:var(--accent);}
+  .rec-panel .rec-orient{font-size:19px; font-weight:700; color:var(--ok);}
   .rec-panel .rec-conf{font-size:12px; color:var(--dim); margin-top:3px;}
   .rec-panel .rec-table{margin-top:10px; font-size:12px; font-family:"SF Mono",ui-monospace,monospace;}
   .rec-panel .rec-table div{display:flex; justify-content:space-between; padding:3px 0; color:var(--dim);}
   .rec-panel .rec-table div.best{color:var(--text);}
+  .rec-panel .rec-table div.worst{color:var(--danger);}
   .close-modal{
     position:absolute; top:14px; right:16px; background:var(--panel-2);
     border:1px solid var(--line); color:var(--dim); width:30px; height:30px;
@@ -234,16 +249,16 @@
 </head>
 <body>
 <header>
-  <div class="eyebrow">Arrow Tracker · v2.4.11</div>
-  <h1>Fleet Log</h1>
+  <div class="eyebrow">Arrow Tracker · v2.4.24</div>
+  <h1>ArrowSpace</h1>
   <p>Log each shaft's specs, then log shots by orientation to see what's actually working.</p>
 </header>
 <main>
   <div class="tabbar" id="tabbar">
-    <button type="button" class="tab active" data-tab="landing">Arrows</button>
-    <button type="button" class="tab" data-tab="guidance">Fleet</button>
+    <button type="button" class="tab active" data-tab="guidance">Vault</button>
+    <button type="button" class="tab" data-tab="landing">Sessions</button>
   </div>
-  <div id="view-landing" class="view">
+  <div id="view-landing" class="view" style="display:none;">
     <div class="panel">
       <div class="field">
         <label for="landing-arrow-select">Arrow</label>
@@ -251,13 +266,13 @@
           <option value="">Select an arrow…</option>
         </select>
       </div>
-      <p class="hint" id="landing-hint">No arrows yet -- import your workbook's Arrow ID Export list or add one under the Fleet tab.</p>
+      <p class="hint" id="landing-hint">No arrows yet -- import your workbook's Arrow ID Export list or add one under the Vault tab.</p>
     </div>
   </div>
-  <div id="view-guidance" class="view" style="display:none;">
+  <div id="view-guidance" class="view">
   <div class="panel">
     <div class="field-row" style="margin-bottom:8px;">
-      <button class="btn btn-ghost btn-sm" id="fleet-to-landing-btn" type="button">&larr; Back to Arrows</button>
+      <button class="btn btn-ghost btn-sm" id="fleet-to-landing-btn" type="button">&larr; Back to Sessions</button>
     </div>
     <h2 style="display:flex; justify-content:space-between; align-items:center;">
       <span id="add-arrow-title">Add arrow</span>
@@ -323,15 +338,15 @@
   </div>
   <div id="view-workspace" class="view" style="display:none;">
     <div class="panel" style="padding-bottom:14px;">
-      <button class="btn btn-ghost btn-sm" id="ws-back-btn" style="margin-bottom:12px;">&larr; Back to Arrows</button>
+      <button class="btn btn-ghost btn-sm" id="ws-back-btn" style="margin-bottom:12px;">&larr; Back to Sessions</button>
       <h2 style="margin-bottom:10px;" id="ws-arrow-title">Arrow</h2>
       <div class="field">
         <label for="ws-arrow-select">Switch arrow</label>
         <select id="ws-arrow-select"></select>
       </div>
       <div class="segmented" id="ws-mode-toggle">
-        <button type="button" class="active" data-mode="shot">Log Shot</button>
-        <button type="button" data-mode="bench">Bench Test</button>
+        <button type="button" class="active" data-mode="bench">Bench Test</button>
+        <button type="button" data-mode="shot">Log Shot</button>
       </div>
     </div>
     <div id="ws-bench" style="display:none;">
@@ -536,16 +551,20 @@
           </div>
           <div class="shaft-wrap" id="shaft-wrap" title="Nock/fletch orientation, viewed from behind the arrow">
             <svg id="shaft-svg" width="34" height="46" viewBox="0 0 100 130">
-              <!-- yellow top fletch (blade), pointed away from viewer -->
-              <path d="M50 2 L60 46 L50 40 L40 46 Z" fill="#e8c93a"/>
-              <!-- shaft cross-section: black ring + gray nock groove -->
+              <!-- light-gray top fletch (index vane), pointed away from viewer -->
+              <path d="M50 2 L60 46 L50 40 L40 46 Z" fill="#c9c6ba"/>
+              <!-- two dark-gray lower fletches, 120deg apart from the top one -- base points reach
+                   past the outer circle's edge (below) so the circle's outline crosses over them,
+                   same as it already does for the top vane -->
+              <path d="M32.4 76.5 L2 122 L8 126 L39.3 83.1 Z" fill="#4a4a44"/>
+              <path d="M67.6 76.5 L98 122 L92 126 L60.7 83.1 Z" fill="#4a4a44"/>
+              <!-- shaft cross-section: black outer wall + light-gray hollow bore + gray nock groove,
+                   drawn last so the outer wall visibly crosses over all three vane bases -->
               <circle cx="50" cy="65" r="26" fill="none" stroke="#1a1a17" stroke-width="4.5"/>
+              <circle cx="50" cy="65" r="13" fill="none" stroke="#c9c6ba" stroke-width="2"/>
               <rect x="45.5" y="40" width="9" height="50" fill="#8c897a"/>
               <rect x="45.5" y="40" width="2" height="50" fill="#1a1a17"/>
               <rect x="52.5" y="40" width="2" height="50" fill="#1a1a17"/>
-              <!-- two lower fletches, 120deg apart from the top one -->
-              <path d="M27 80 L2 122 L8 126 L34 92 Z" fill="#c9463a"/>
-              <path d="M73 80 L98 122 L92 126 L66 92 Z" fill="#c9463a"/>
             </svg>
           </div>
           <div class="chip-row" id="orient-chip-solo"></div>
@@ -596,9 +615,18 @@
       </div>
       <p class="hint" style="margin-top:-8px; margin-bottom:14px;">The real-world radius this target graphic represents (e.g. scoring ring radius on your paper). Used to scale where your typed coordinates land on the visual, and to convert them to inches for export. Saved for next time.</p>
       <div class="rec-panel" id="rec-panel" style="display:none;">
-        <div class="rec-label" style="font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--dim); font-family:'SF Mono',ui-monospace,monospace;">Recommended orientation</div>
-        <div class="rec-orient" id="rec-orient">—</div>
-        <div class="rec-conf" id="rec-conf">—</div>
+        <div style="display:flex; gap:16px;">
+          <div style="flex:1;">
+            <div class="rec-label" style="font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--ok); font-family:'SF Mono',ui-monospace,monospace;">Recommended orientation</div>
+            <div class="rec-orient" id="rec-orient">—</div>
+            <div class="rec-conf" id="rec-conf">—</div>
+          </div>
+          <div style="flex:1;" id="rec-worst-wrap">
+            <div class="rec-label" style="font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--danger); font-family:'SF Mono',ui-monospace,monospace;">Worst orientation</div>
+            <div class="rec-orient" id="rec-worst-orient" style="color:var(--danger);">—</div>
+            <div class="rec-conf" id="rec-worst-conf">—</div>
+          </div>
+        </div>
         <div class="rec-table" id="rec-table"></div>
       </div>
       <div class="shot-list" id="shot-list"></div>
@@ -607,6 +635,15 @@
   </div>
 </main>
 <div class="toast" id="toast"></div>
+<div class="confirm-backdrop" id="confirm-backdrop">
+  <div class="confirm-card">
+    <p class="confirm-msg" id="confirm-msg">—</p>
+    <div class="confirm-actions">
+      <button type="button" class="btn btn-ghost" id="confirm-cancel-btn">Cancel</button>
+      <button type="button" class="btn" id="confirm-ok-btn" style="background:var(--danger); color:#f2f0e8;">Delete</button>
+    </div>
+  </div>
+</div>
 <script>
 // ---------- rev.2-2 changelog (2026-08-04) ----------
 // - Lab Data: added Float Axis (bathtub-float test) and EulerBuckle Axis (clamp/press-buckle
@@ -614,7 +651,7 @@
 //   and FLO. Manual-entry fields; also accepted via Arrow ID Export CSV import (cols 7-11,
 //   optional/backward-compatible).
 // - Shot logger: orientation chips now show a colored ring for each axis method that has a
-//   value near that chip's angle -- Weak=yellow, Stiff=white, FLO=red, Float=blue,
+//   value near that chip's angle -- Weak=yellow, Stiff=white, FLO=pink, Float=blue,
 //   EulerBuckle=dashed gray. Multiple agreeing methods stack as nested rings rather than
 //   merging. Legend appears above the chip row only when at least one axis is known.
 const listEl = document.getElementById('list');
@@ -639,6 +676,28 @@ function showToast(msg){
   toastEl.classList.add('show');
   setTimeout(()=> toastEl.classList.remove('show'), 1600);
 }
+// v2.4.15: custom confirm dialog. window.confirm() silently does nothing in an iOS home-screen
+// (standalone) web app -- no popup appears at all, so any code gated behind it (delete arrow,
+// restore backup) looked broken there even though it worked fine in a normal browser tab.
+// Returns a Promise<boolean> so call sites just add .then(ok => { if (!ok) return; ... }).
+const confirmBackdrop = document.getElementById('confirm-backdrop');
+const confirmMsgEl = document.getElementById('confirm-msg');
+const confirmOkBtn = document.getElementById('confirm-ok-btn');
+const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
+let confirmResolve = null;
+function showConfirm(message, okLabel){
+  confirmMsgEl.textContent = message;
+  confirmOkBtn.textContent = okLabel || 'OK';
+  confirmBackdrop.classList.add('show');
+  return new Promise((resolve) => { confirmResolve = resolve; });
+}
+function closeConfirm(result){
+  confirmBackdrop.classList.remove('show');
+  if (confirmResolve){ const r = confirmResolve; confirmResolve = null; r(result); }
+}
+confirmOkBtn.addEventListener('click', () => closeConfirm(true));
+confirmCancelBtn.addEventListener('click', () => closeConfirm(false));
+confirmBackdrop.addEventListener('click', (e) => { if (e.target === confirmBackdrop) closeConfirm(false); });
 function escapeHtml(s){
   return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
@@ -1047,14 +1106,16 @@ listEl.addEventListener('click', (e) => {
     const msg = shotCount > 0
       ? `Delete ${label}? This will also delete its ${shotCount} logged shot${shotCount === 1 ? '' : 's'}. This cannot be undone.`
       : `Delete ${label}? This cannot be undone.`;
-    if (!window.confirm(msg)) return;
-    let arrows = loadArrows().filter(a => a.id !== id);
-    saveArrows(arrows);
-    let shots = loadShots().filter(s => s.arrowId !== id);
-    saveShots(shots);
-    if (editingArrowId === id) cancelEditArrow();
-    render();
-    showToast('Arrow removed');
+    showConfirm(msg, 'Delete').then((ok) => {
+      if (!ok) return;
+      let arrows = loadArrows().filter(a => a.id !== id);
+      saveArrows(arrows);
+      let shots = loadShots().filter(s => s.arrowId !== id);
+      saveShots(shots);
+      if (editingArrowId === id) cancelEditArrow();
+      render();
+      showToast('Arrow removed');
+    });
     return;
   }
   const editBtn = e.target.closest('[data-edit]');
@@ -1077,8 +1138,24 @@ const recPanel = document.getElementById('rec-panel');
 const recOrient = document.getElementById('rec-orient');
 const recConf = document.getElementById('rec-conf');
 const recTable = document.getElementById('rec-table');
+const recWorstWrap = document.getElementById('rec-worst-wrap');
+const recWorstOrient = document.getElementById('rec-worst-orient');
+const recWorstConf = document.getElementById('rec-worst-conf');
 let activeArrowId = null;
 let activeOrientation = 0;
+// v2.4.24: shaft rotation is tracked as an unwrapped (not mod-360) degree value so consecutive
+// chip clicks always spin the shortest way -- e.g. 0deg -> 337.5deg goes -22.5 (CCW), not the
+// long way around at +337.5 (CW), which is what a plain rotate(targetDeg) would do since CSS
+// transitions always interpolate straight from the current value to the new one.
+let shaftRotationDeg = 0;
+function setShaftRotation(targetDeg){
+  const shaftSvg = document.getElementById('shaft-svg');
+  if (!shaftSvg) return;
+  const current360 = ((shaftRotationDeg % 360) + 360) % 360;
+  const delta = ((targetDeg - current360 + 540) % 360) - 180; // shortest signed delta, (-180,180]
+  shaftRotationDeg += delta;
+  shaftSvg.style.transform = `rotate(${shaftRotationDeg}deg)`;
+}
 const distanceInput = document.getElementById('f-distance');
 const bowInput = document.getElementById('f-bow');
 const radiusInput = document.getElementById('f-radius');
@@ -1300,8 +1377,7 @@ function drawShotRadar(arrowIdStr, rotateToTop){
   // the two use two different angle variables below instead of sharing rotateToTop directly.
   const shaftAngle = rotateToTop || 0;
   const radarTop = (360 - shaftAngle) % 360;
-  const shaftSvg = document.getElementById('shaft-svg');
-  if (shaftSvg) shaftSvg.style.transform = `rotate(${shaftAngle}deg)`;
+  setShaftRotation(shaftAngle);
   const svg = document.getElementById('shot-radar-svg');
   if (!svg) return;
   svg.innerHTML = '';
@@ -1372,8 +1448,9 @@ function openShotLogger(arrowId){
   // to the legend so it doesn't sit alone on its own row -- purely a DOM move, so it stays the
   // same element with the same data-o/data-wrap, no reordering of ORIENT_CCW_ORDER itself.
   const orientSoloEl = document.getElementById('orient-chip-solo');
-  if (orientSoloEl && orientChips.lastElementChild){
-    orientSoloEl.appendChild(orientChips.lastElementChild);
+  if (orientSoloEl){
+    orientSoloEl.innerHTML = ''; // v2.4.14: clear stale chip(s) from any prior openShotLogger() call
+    if (orientChips.lastElementChild) orientSoloEl.appendChild(orientChips.lastElementChild);
   }
   renderChipAxisRings(arrow.arrowId);
   distanceInput.value = '';
@@ -1757,17 +1834,26 @@ function renderRecommendation(){
     recOrient.textContent = fmtDeg(stats[0].orientation) + ' (only orientation tested)';
     recConf.textContent = 'Log shots at a different orientation to compare.';
     recTable.innerHTML = '';
+    recWorstWrap.style.display = 'none';
     return;
   }
+  recWorstWrap.style.display = '';
   const best = stats[0];
+  const worst = stats[stats.length - 1];
   let confidence;
   if (best.count < 3){ confidence = 'Low confidence — too few shots at this orientation'; }
   else if (best.count < 6){ confidence = 'Moderate confidence — keep logging to confirm'; }
   else { confidence = 'Higher confidence — consistent across several shots'; }
+  let worstConfidence;
+  if (worst.count < 3){ worstConfidence = 'Low confidence — too few shots at this orientation'; }
+  else if (worst.count < 6){ worstConfidence = 'Moderate confidence — keep logging to confirm'; }
+  else { worstConfidence = 'Higher confidence — consistent across several shots'; }
   recOrient.textContent = fmtDeg(best.orientation);
   recConf.textContent = confidence;
+  recWorstOrient.textContent = fmtDeg(worst.orientation);
+  recWorstConf.textContent = worst.orientation === best.orientation ? 'Same as recommended (only one orientation tested)' : worstConfidence;
   recTable.innerHTML = stats.map(s => `
-    <div class="${s===best?'best':''}">
+    <div class="${s===best?'best':''}${s===worst?' worst':''}">
       <span>${fmtDeg(s.orientation)}</span>
       <span>${s.count} shot${s.count===1?'':'s'} · avg r ${s.avgR.toFixed(2)}</span>
     </div>
@@ -1861,23 +1947,25 @@ restoreFile.addEventListener('change', (e) => {
     const msg = current.length > 0
       ? `Restore this backup? It will replace your current ${current.length} arrow(s) and their shots with ${data.arrows.length} arrow(s) and ${data.shots.length} shot(s) from the file. This cannot be undone.`
       : `Restore ${data.arrows.length} arrow(s) and ${data.shots.length} shot(s) from this backup?`;
-    if (!window.confirm(msg)){ restoreFile.value = ''; return; }
-    saveArrows(data.arrows);
-    saveShots(data.shots);
-    if (Array.isArray(data.arrowIdList)) saveArrowIdList(data.arrowIdList);
-    if (data.arrowGuidanceMap && typeof data.arrowGuidanceMap === 'object') saveArrowGuidanceMap(data.arrowGuidanceMap);
-    if (data.arrowWorkbookDataMap && typeof data.arrowWorkbookDataMap === 'object') saveArrowWorkbookDataMap(data.arrowWorkbookDataMap);
-    if (data.arrowSpineByAngleMap && typeof data.arrowSpineByAngleMap === 'object') saveArrowSpineByAngleMap(data.arrowSpineByAngleMap);
-    if (Number.isFinite(data.targetRadiusInches) && data.targetRadiusInches > 0) saveTargetRadius(data.targetRadiusInches);
-    if (data.labData && typeof data.labData === 'object') saveLabData(data.labData);
-    renderArrowIdSelect();
-    renderLabIdSelect();
-    renderLabImportHint();
-    renderLabList();
-    cancelEditArrow();
-    render();
-    showToast('Backup restored');
-    restoreFile.value = '';
+    showConfirm(msg, 'Restore').then((ok) => {
+      if (!ok){ restoreFile.value = ''; return; }
+      saveArrows(data.arrows);
+      saveShots(data.shots);
+      if (Array.isArray(data.arrowIdList)) saveArrowIdList(data.arrowIdList);
+      if (data.arrowGuidanceMap && typeof data.arrowGuidanceMap === 'object') saveArrowGuidanceMap(data.arrowGuidanceMap);
+      if (data.arrowWorkbookDataMap && typeof data.arrowWorkbookDataMap === 'object') saveArrowWorkbookDataMap(data.arrowWorkbookDataMap);
+      if (data.arrowSpineByAngleMap && typeof data.arrowSpineByAngleMap === 'object') saveArrowSpineByAngleMap(data.arrowSpineByAngleMap);
+      if (Number.isFinite(data.targetRadiusInches) && data.targetRadiusInches > 0) saveTargetRadius(data.targetRadiusInches);
+      if (data.labData && typeof data.labData === 'object') saveLabData(data.labData);
+      renderArrowIdSelect();
+      renderLabIdSelect();
+      renderLabImportHint();
+      renderLabList();
+      cancelEditArrow();
+      render();
+      showToast('Backup restored');
+      restoreFile.value = '';
+    });
   };
   reader.onerror = () => { showToast('Could not read that file'); restoreFile.value = ''; };
   reader.readAsText(file);
@@ -1919,6 +2007,11 @@ let labArrowId = null;
 let labBaseline = null;
 let labSpine = {};      // angle (as string key) -> computed spine value
 let labIndex = 0;       // how many of LAB_POSITIONS have been saved so far
+// v2.4.22: purely visual override for the radar's solid highlight line -- lets tapping the
+// 0deg chip move the highlight there for reference, WITHOUT touching labIndex/wizard progress
+// (0deg is never a real wizard step). Cleared at the top of renderLabStep so every normal
+// advance/back/real-chip-click flow reverts to the standard labIndex-based highlight.
+let labHighlightOverride = null;
 let labReadings = [];   // readings added via "Measure again" for the position in progress
 let labDir = 'cw';
 let labRollBehavior = 'None';
@@ -2217,8 +2310,11 @@ labPositionChips.addEventListener('click', (e) => {
   const angle = parseFloat(btn.getAttribute('data-labpos'));
   if (angle === 0){
     showToast('0° is the baseline field above, not a wizard step');
+    labHighlightOverride = 0;
+    drawLabRadar();
     return;
   }
+  labHighlightOverride = null;
   const idx = LAB_POSITIONS.indexOf(angle);
   if (idx === -1) return;
   labIndex = idx;
@@ -2274,6 +2370,15 @@ function drawLabDial(){
       labDialLine(a, len, color, width);
     });
   }
+  // v2.4.22: scale label so the tick spacing isn't ambiguous -- placed straight down from
+  // center, the one spot the needle can never sweep into (max swing is 125deg each side of
+  // straight-up, leaving a clear ~110deg dead zone centered at the bottom).
+  const scaleLabel = document.createElementNS(svgNS,'text');
+  scaleLabel.setAttribute('x', LAB_DIAL_CX); scaleLabel.setAttribute('y', LAB_DIAL_CY + 62);
+  scaleLabel.setAttribute('font-size', '9'); scaleLabel.setAttribute('fill', '#8c897a');
+  scaleLabel.setAttribute('text-anchor', 'middle');
+  scaleLabel.textContent = '.001"';
+  labDialSvg.appendChild(scaleLabel);
   // repeat "Measure again" readings for the current position -- like repeat shots as dots
   labReadings.forEach(r => {
     const a = labDialAngle(r.dir, r.mag);
@@ -2396,9 +2501,30 @@ function drawLabRadar(){
     line.setAttribute('x2', p.x); line.setAttribute('y2', p.y);
     line.setAttribute('stroke', '#262620'); line.setAttribute('stroke-width', '1');
     labRadarSvg.appendChild(line);
+    // v2.4.20: perimeter degree label, same placement/style as the Log Shot radar --
+    // plus, if this angle has been recorded yet, the measured spine value right below it
+    const lp = labRadarPoint(o, LAB_RADAR_R + 16);
+    const label = document.createElementNS(svgNS,'text');
+    label.setAttribute('x', lp.x); label.setAttribute('y', lp.y);
+    label.setAttribute('font-size', '9'); label.setAttribute('fill', '#8c897a');
+    label.setAttribute('text-anchor', 'middle'); label.setAttribute('dominant-baseline', 'middle');
+    label.textContent = fmtDeg(o);
+    labRadarSvg.appendChild(label);
+    const valAtAngle = labSpine[String(o)];
+    if (valAtAngle != null){
+      const vp = labRadarPoint(o, LAB_RADAR_R + 27);
+      const valLabel = document.createElementNS(svgNS,'text');
+      valLabel.setAttribute('x', vp.x); valLabel.setAttribute('y', vp.y);
+      valLabel.setAttribute('font-size', '8'); valLabel.setAttribute('fill', '#5aa9e6');
+      valLabel.setAttribute('text-anchor', 'middle'); valLabel.setAttribute('dominant-baseline', 'middle');
+      valLabel.textContent = valAtAngle.toFixed(3);
+      labRadarSvg.appendChild(valLabel);
+    }
   });
   // highlight whichever angle the dial is currently on, tying the two charts together
-  const currentAngle = (typeof labIndex !== 'undefined' && labIndex < LAB_POSITIONS.length) ? LAB_POSITIONS[labIndex] : null;
+  const currentAngle = labHighlightOverride != null
+    ? labHighlightOverride
+    : ((typeof labIndex !== 'undefined' && labIndex < LAB_POSITIONS.length) ? LAB_POSITIONS[labIndex] : null);
   if (currentAngle != null){
     const p = labRadarPoint(currentAngle, LAB_RADAR_R);
     const line = document.createElementNS(svgNS,'line');
@@ -2406,6 +2532,18 @@ function drawLabRadar(){
     line.setAttribute('x2', p.x); line.setAttribute('y2', p.y);
     line.setAttribute('stroke', '#c9822f88'); line.setAttribute('stroke-width', '2');
     labRadarSvg.appendChild(line);
+  }
+  // v2.4.21: purely visual reference for the 0deg baseline -- dashed and dimmer than the solid
+  // orange "current step" line above, since 0deg is never a selectable wizard step (it's set
+  // via the baseline field, not the position chips) and this must never be mistaken for one.
+  if (labBaseline != null){
+    const bp = labRadarPoint(0, LAB_RADAR_R);
+    const baseLine = document.createElementNS(svgNS,'line');
+    baseLine.setAttribute('x1', LAB_RADAR_CX); baseLine.setAttribute('y1', LAB_RADAR_CY);
+    baseLine.setAttribute('x2', bp.x); baseLine.setAttribute('y2', bp.y);
+    baseLine.setAttribute('stroke', '#8c897a'); baseLine.setAttribute('stroke-width', '1.5');
+    baseLine.setAttribute('stroke-dasharray', '3,3');
+    labRadarSvg.appendChild(baseLine);
   }
   const recorded = ORIENTATIONS.map(o => ({angle:o, val: labSpine[String(o)]})).filter(e => e.val != null);
   if (recorded.length < 2){
@@ -2446,6 +2584,7 @@ function drawLabRadar(){
   });
 }
 function renderLabStep(){
+  labHighlightOverride = null; // v2.4.22: any normal step render clears the 0deg preview override
   if (labIndex >= LAB_POSITIONS.length){
     labStepLabel.textContent = 'All 16 positions recorded';
     labProgressTag.textContent = '16 / 16 recorded';
@@ -2691,7 +2830,7 @@ labExportMassBtn.addEventListener('click', () => {
   URL.revokeObjectURL(url);
   showToast(rows.length + ' arrow(s) exported for Mass Asymmetry tab');
 });
-// ---------- tab navigation (Arrows / Fleet) ----------
+// ---------- tab navigation (Sessions / Vault) ----------
 const tabButtons = document.querySelectorAll('#tabbar .tab');
 const tabViews = {
   landing: document.getElementById('view-landing'),
@@ -2727,8 +2866,8 @@ function renderLandingArrowSelect(){
   landingArrowSelect.innerHTML = '<option value="">Select an arrow…</option>' +
     combined.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('');
   landingHint.textContent = combined.length
-    ? combined.length + ' arrow' + (combined.length === 1 ? '' : 's') + ', in the order from your last workbook import. Re-import under the Fleet tab any time the workbook changes.'
-    : "No arrows yet -- import your workbook's Arrow ID Export list or add one under the Fleet tab.";
+    ? combined.length + ' arrow' + (combined.length === 1 ? '' : 's') + ', in the order from your last workbook import. Re-import under the Vault tab any time the workbook changes.'
+    : "No arrows yet -- import your workbook's Arrow ID Export list or add one under the Vault tab.";
 }
 landingArrowSelect.addEventListener('change', () => {
   const realArrowId = landingArrowSelect.value;
@@ -2741,16 +2880,16 @@ landingArrowSelect.addEventListener('change', () => {
     arrows.push(arrow);
     saveArrows(arrows);
   }
-  openShotLogger(arrow.id); // Log Shot is the default landing mode, matching the locked v2.3 concept
+  labIdSelect.value = arrow.arrowId;
+  labIdSelect.dispatchEvent(new Event('change'));
+  openWorkspace(arrow.arrowId, 'bench'); // v2.4.19: Bench Test is now the default landing mode
 });
-// First-load routing: land on the Arrows picker if there's anything to pick from; otherwise
-// fall back to Fleet, since a brand-new install has no arrows yet and needs that entry point.
+// First-load routing: Vault opens by default per the app's tab order (v2.4.13).
+// NOTE: this replaces an earlier adaptive rule that defaulted to the Sessions/arrow-picker
+// tab whenever the fleet already had arrows in it, only falling back to Fleet/Vault for a
+// brand-new empty install. That adaptive behavior is gone now -- Vault is always first,
+// even for returning users who just want to jump straight into picking an arrow.
 renderLandingArrowSelect();
-if (loadArrowIdList().length === 0 && loadArrows().length === 0){
-  tabButtons.forEach(b => b.classList.toggle('active', b.getAttribute('data-tab') === 'guidance'));
-  tabViews.landing.style.display = 'none';
-  tabViews.guidance.style.display = 'block';
-}
 
 // ---------- Arrow Workspace: single arrow-centric page, Bench Test / Log Shot toggle ----------
 const wsArrowSelect = document.getElementById('ws-arrow-select');
