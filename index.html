@@ -164,12 +164,18 @@
   /* orientation chips reuse the same boxy shape as the Bench Test position chips, instead of
      the oval pill style, now that both live on one page and should read as one design language */
   #orient-chips .chip{padding:10px 8px; min-width:52px; border-radius:12px; text-align:center;}
+  /* v2.4.8: legend + trailing (22.5deg) chip share one row above the main grid, right-aligned
+     over the 270deg column so there's no reserved blank row for a single chip */
+  .chip-row-solo{display:flex; justify-content:flex-end; align-items:center; gap:10px; margin-bottom:8px;}
+  .chip-row-solo .axis-legend{flex:1; min-width:0; margin:0;}
+  .chip-row-solo #orient-chip-solo{flex:none; margin-bottom:0;}
+  #orient-chip-solo .chip{padding:10px 8px; min-width:52px; border-radius:12px; text-align:center;}
   /* ---- standalone range diagram: fixed bow, distance-scaled target (decorative, read-only) ---- */
   .range-wrap{margin:14px 0 14px; padding:12px 14px 10px; background:var(--panel-2);
     border:1px solid var(--line); border-radius:12px;}
   .range-cap{font-size:10px; color:var(--dim); text-transform:uppercase; letter-spacing:.08em;
     margin-bottom:8px; font-family:"SF Mono", ui-monospace, monospace;}
-  .range-stage{position:relative; height:128px;}
+  .range-stage{position:relative; height:77px;}
   .range-bow-wrap{position:absolute; left:4px; top:50%; transform:translateY(-50%);}
   #range-bow-svg{display:block;}
   .range-track{position:absolute;}
@@ -226,7 +232,7 @@
 </head>
 <body>
 <header>
-  <div class="eyebrow">Arrow Tracker · v2.4.6</div>
+  <div class="eyebrow">Arrow Tracker · v2.4.8</div>
   <h1>Fleet Log</h1>
   <p>Log each shaft's specs, then log shots by orientation to see what's actually working.</p>
 </header>
@@ -493,7 +499,7 @@
         <div class="range-cap" id="range-cap">20 yd range</div>
         <div class="range-stage">
           <div class="range-bow-wrap" id="range-bow-wrap">
-            <svg id="range-bow-svg" width="60" height="66" viewBox="0 0 100 110" fill="none">
+            <svg id="range-bow-svg" width="36" height="40" viewBox="0 0 100 110" fill="none">
               <!-- original bow + string + nocked arrow icon -->
               <path d="M40 6 Q90 55 40 104" stroke="#c9822f" stroke-width="4" fill="none" stroke-linecap="round"/>
               <line x1="40" y1="6" x2="40" y2="104" stroke="#8c897a" stroke-width="1.6"/>
@@ -507,7 +513,7 @@
             <div class="range-dist" id="range-dist">20 yd</div>
           </div>
           <div class="range-target-wrap" id="range-target-wrap">
-            <svg id="range-target-svg" width="72" height="72" viewBox="0 0 120 120">
+            <svg id="range-target-svg" width="43" height="43" viewBox="0 0 120 120">
               <circle cx="60" cy="60" r="58" fill="none" stroke="#f2f0e8" stroke-width="3"/>
               <circle cx="60" cy="60" r="45" fill="#4a90d9"/>
               <circle cx="60" cy="60" r="32" fill="#d1483a"/>
@@ -519,15 +525,26 @@
       </div>
       <div class="field">
         <label>Orientation (deg)</label>
-        <div class="axis-legend" id="axis-legend" style="display:none;">
-          <span class="li"><span class="sw" style="background:var(--axis-weak)"></span>Weak</span>
-          <span class="li"><span class="sw" style="background:var(--axis-stiff)"></span>Stiff</span>
-          <span class="li"><span class="sw" style="background:var(--axis-flo)"></span>FLO</span>
-          <span class="li"><span class="sw" style="background:var(--axis-float)"></span>Float</span>
-          <span class="li"><span class="sw dashedsw"></span>EulerBuckle</span>
+        <div class="chip-row-solo">
+          <div class="axis-legend" id="axis-legend" style="display:none;">
+            <span class="li"><span class="sw" style="background:var(--axis-weak)"></span>Weak</span>
+            <span class="li"><span class="sw" style="background:var(--axis-stiff)"></span>Stiff</span>
+            <span class="li"><span class="sw" style="background:var(--axis-flo)"></span>FLO</span>
+            <span class="li"><span class="sw" style="background:var(--axis-float)"></span>Float</span>
+            <span class="li"><span class="sw dashedsw"></span>EulerBuckle</span>
+          </div>
+          <div class="chip-row" id="orient-chip-solo"></div>
         </div>
         <div class="chip-row" id="orient-chips"></div>
       </div>
+      <div class="target-wrap" style="gap:14px; align-items:center;">
+        <div style="flex:1; max-width:170px;">
+          <svg id="shot-radar-svg" width="100%" height="170" viewBox="0 0 260 260"></svg>
+          <p class="radar-caption" style="text-align:center; font-size:11px; color:var(--dim); margin-top:2px;">This arrow's spine pattern</p>
+        </div>
+        <svg class="target" id="target-svg" width="190" height="190" viewBox="0 0 260 260" style="flex:none;"></svg>
+      </div>
+      <p class="target-hint">Tap the target to get close, then dial in the exact numbers below.</p>
       <div class="row2">
         <div class="field">
           <label>LR direction</label>
@@ -555,14 +572,6 @@
         </div>
       </div>
       <p class="hint" style="margin-top:-8px;">Distance from point of aim, in the same 3/16" squares you already use on the graph paper. Tap the direction, type the number — no minus sign needed.</p>
-      <div class="target-wrap" style="gap:14px; align-items:center;">
-        <div style="flex:1; max-width:170px;">
-          <svg id="shot-radar-svg" width="100%" height="170" viewBox="0 0 260 260"></svg>
-          <p class="radar-caption" style="text-align:center; font-size:11px; color:var(--dim); margin-top:2px;">This arrow's spine pattern</p>
-        </div>
-        <svg class="target" id="target-svg" width="190" height="190" viewBox="0 0 260 260" style="flex:none;"></svg>
-      </div>
-      <p class="target-hint">Tap the target to get close, then dial in the exact numbers above.</p>
       <button class="btn btn-primary" id="log-shot-btn" style="margin-top:10px;">Log shot</button>
       <div class="field-row" style="margin-top:16px; margin-bottom:14px;">
         <div class="field">
@@ -1153,14 +1162,14 @@ const AXIS_RING_DEFS = [
 ];
 function renderChipAxisRings(arrowIdStr){
   const legend = document.getElementById('axis-legend');
-  orientChips.querySelectorAll('.axis-ring').forEach(r => r.remove());
+  document.querySelectorAll('#orient-chips .axis-ring, #orient-chip-solo .axis-ring').forEach(r => r.remove());
   if (!arrowIdStr){ if (legend) legend.style.display = 'none'; return; }
   const axes = getArrowAxisSetLive(arrowIdStr);
   let any = false;
   AXIS_RING_DEFS.forEach(def => {
     const step = nearestOrientStep(axes[def.key]);
     if (step == null) return;
-    const wrap = orientChips.querySelector(`[data-wrap="${step}"]`);
+    const wrap = document.querySelector(`#orient-chips [data-wrap="${step}"], #orient-chip-solo [data-wrap="${step}"]`);
     if (!wrap) return;
     any = true;
     const depth = wrap.querySelectorAll('.axis-ring').length;
@@ -1181,7 +1190,7 @@ const RANGE_TIER_SCALE = {20: 1.00, 30: 0.82, 40: 0.66, 50: 0.52, 60: 0.40};
 const RANGE_TIERS = [20, 30, 40, 50, 60];
 const RANGE_BOW_VIEWBOX_W = 100, RANGE_ARROW_TIP_X = 97;
 const RANGE_TARGET_VIEWBOX = 120;
-const RANGE_PANEL_SCALE = 0.6;
+const RANGE_PANEL_SCALE = 0.36; // v2.4.8: reduced from 0.6 (-40%) to match the shorter .range-stage
 const RANGE_REF_TARGET_SIZE = RANGE_TARGET_VIEWBOX * RANGE_PANEL_SCALE;
 const RANGE_MIN_GAP_PX = 10;
 const RANGE_RIGHT_EDGE_MARGIN_PX = 6;
@@ -1332,6 +1341,13 @@ function openShotLogger(arrowId){
   orientChips.innerHTML = ORIENT_CCW_ORDER.map(o =>
     `<span class="orient-chip-wrap" data-wrap="${o}"><button class="chip${o===0?' active':''}" data-o="${o}">${fmtDeg(o)}</button></span>`
   ).join('');
+  // v2.4.8: relocate the trailing chip (last entry in ORIENT_CCW_ORDER, i.e. 22.5deg) up next
+  // to the legend so it doesn't sit alone on its own row -- purely a DOM move, so it stays the
+  // same element with the same data-o/data-wrap, no reordering of ORIENT_CCW_ORDER itself.
+  const orientSoloEl = document.getElementById('orient-chip-solo');
+  if (orientSoloEl && orientChips.lastElementChild){
+    orientSoloEl.appendChild(orientChips.lastElementChild);
+  }
   renderChipAxisRings(arrow.arrowId);
   distanceInput.value = '';
   distancePresetChips.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
@@ -1376,7 +1392,7 @@ document.getElementById('ws-back-btn').addEventListener('click', closeModal);
 // (click a chip) and the target face (click a dot), so the two stay in sync either direction.
 function selectOrientation(o){
   activeOrientation = o;
-  orientChips.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', parseFloat(c.getAttribute('data-o')) === o));
+  document.querySelectorAll('#orient-chips .chip, #orient-chip-solo .chip').forEach(c => c.classList.toggle('active', parseFloat(c.getAttribute('data-o')) === o));
   if (activeArrowId){
     const arrow = loadArrows().find(a => a.id === activeArrowId);
     if (arrow) drawShotRadar(arrow.arrowId, activeOrientation);
@@ -1384,6 +1400,13 @@ function selectOrientation(o){
   drawTarget();
 }
 orientChips.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-o]');
+  if (!btn) return;
+  selectOrientation(parseFloat(btn.getAttribute('data-o')));
+});
+// v2.4.8: the relocated 22.5deg chip lives outside #orient-chips now, so it needs its own
+// identical delegated listener to stay clickable.
+document.getElementById('orient-chip-solo').addEventListener('click', (e) => {
   const btn = e.target.closest('[data-o]');
   if (!btn) return;
   selectOrientation(parseFloat(btn.getAttribute('data-o')));
