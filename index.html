@@ -169,6 +169,8 @@
   .chip-row-solo{display:flex; justify-content:flex-end; align-items:center; gap:10px; margin-bottom:8px;}
   .chip-row-solo .axis-legend{flex:1; min-width:0; margin:0;}
   .chip-row-solo #orient-chip-solo{flex:none; margin-bottom:0;}
+  .shaft-wrap{flex:none; width:34px; display:flex; align-items:center; justify-content:center;}
+  #shaft-svg{transition:transform .25s ease; transform-origin:50% 50%;}
   #orient-chip-solo .chip{padding:10px 8px; min-width:52px; border-radius:12px; text-align:center;}
   /* ---- standalone range diagram: fixed bow, distance-scaled target (decorative, read-only) ---- */
   .range-wrap{margin:14px 0 14px; padding:12px 14px 10px; background:var(--panel-2);
@@ -232,7 +234,7 @@
 </head>
 <body>
 <header>
-  <div class="eyebrow">Arrow Tracker · v2.4.8</div>
+  <div class="eyebrow">Arrow Tracker · v2.4.11</div>
   <h1>Fleet Log</h1>
   <p>Log each shaft's specs, then log shots by orientation to see what's actually working.</p>
 </header>
@@ -243,7 +245,6 @@
   </div>
   <div id="view-landing" class="view">
     <div class="panel">
-      <h2>Pick an arrow</h2>
       <div class="field">
         <label for="landing-arrow-select">Arrow</label>
         <select id="landing-arrow-select">
@@ -532,6 +533,20 @@
             <span class="li"><span class="sw" style="background:var(--axis-flo)"></span>FLO</span>
             <span class="li"><span class="sw" style="background:var(--axis-float)"></span>Float</span>
             <span class="li"><span class="sw dashedsw"></span>EulerBuckle</span>
+          </div>
+          <div class="shaft-wrap" id="shaft-wrap" title="Nock/fletch orientation, viewed from behind the arrow">
+            <svg id="shaft-svg" width="34" height="46" viewBox="0 0 100 130">
+              <!-- yellow top fletch (blade), pointed away from viewer -->
+              <path d="M50 2 L60 46 L50 40 L40 46 Z" fill="#e8c93a"/>
+              <!-- shaft cross-section: black ring + gray nock groove -->
+              <circle cx="50" cy="65" r="26" fill="none" stroke="#1a1a17" stroke-width="4.5"/>
+              <rect x="45.5" y="40" width="9" height="50" fill="#8c897a"/>
+              <rect x="45.5" y="40" width="2" height="50" fill="#1a1a17"/>
+              <rect x="52.5" y="40" width="2" height="50" fill="#1a1a17"/>
+              <!-- two lower fletches, 120deg apart from the top one -->
+              <path d="M27 80 L2 122 L8 126 L34 92 Z" fill="#c9463a"/>
+              <path d="M73 80 L98 122 L92 126 L66 92 Z" fill="#c9463a"/>
+            </svg>
           </div>
           <div class="chip-row" id="orient-chip-solo"></div>
         </div>
@@ -1276,6 +1291,17 @@ function getArrowSpineByAngle(arrowIdStr){
   return wb || null;
 }
 function drawShotRadar(arrowIdStr, rotateToTop){
+  // v2.4.11: the shaft graphic and the spine radar are intentionally NOT the same rotation.
+  // Shaft: vane points directly at the selected orientation chip's degree (clockwise-positive,
+  // same convention as the chip labels) -- e.g. chip 22.5deg -> shaft rotated 22.5deg CW.
+  // Radar: rotates the OPPOSITE way so the polar plot's top label is the mirror angle
+  // (360 - chip degree) -- e.g. chip 22.5deg -> radar shows 337.5deg at 12 o'clock.
+  // This mirrored pairing (confirmed against real shaft/radar orientation, not guessed) is why
+  // the two use two different angle variables below instead of sharing rotateToTop directly.
+  const shaftAngle = rotateToTop || 0;
+  const radarTop = (360 - shaftAngle) % 360;
+  const shaftSvg = document.getElementById('shaft-svg');
+  if (shaftSvg) shaftSvg.style.transform = `rotate(${shaftAngle}deg)`;
   const svg = document.getElementById('shot-radar-svg');
   if (!svg) return;
   svg.innerHTML = '';
@@ -1288,14 +1314,14 @@ function drawShotRadar(arrowIdStr, rotateToTop){
   const spine = getArrowSpineByAngle(arrowIdStr);
   const recorded = spine ? ORIENTATIONS.map(o => ({angle:o, val: spine[String(o)]})).filter(e => e.val != null) : [];
   ORIENTATIONS.forEach(o => {
-    const isSel = o === rotateToTop;
-    const p = shotRadarPoint(o, SHOT_RADAR_R + 6, rotateToTop);
+    const isSel = o === radarTop;
+    const p = shotRadarPoint(o, SHOT_RADAR_R + 6, radarTop);
     const line = document.createElementNS(svgNS,'line');
     line.setAttribute('x1', SHOT_RADAR_CX); line.setAttribute('y1', SHOT_RADAR_CY);
     line.setAttribute('x2', p.x); line.setAttribute('y2', p.y);
     line.setAttribute('stroke', isSel ? '#c9822f' : '#262620'); line.setAttribute('stroke-width', isSel ? '2' : '1');
     svg.appendChild(line);
-    const lp = shotRadarPoint(o, SHOT_RADAR_R + 16, rotateToTop);
+    const lp = shotRadarPoint(o, SHOT_RADAR_R + 16, radarTop);
     const label = document.createElementNS(svgNS,'text');
     label.setAttribute('x', lp.x); label.setAttribute('y', lp.y);
     label.setAttribute('font-size', '9'); label.setAttribute('fill', '#8c897a');
@@ -1315,14 +1341,14 @@ function drawShotRadar(arrowIdStr, rotateToTop){
   if (max === min){ min -= 0.005; max += 0.005; }
   const radiusFor = (val) => 20 + ((val - min) / (max - min)) * (SHOT_RADAR_R - 20);
   if (recorded.length === ORIENTATIONS.length){
-    const poly = ORIENTATIONS.map(o => { const p = shotRadarPoint(o, radiusFor(spine[String(o)]), rotateToTop); return p.x + ',' + p.y; }).join(' ');
+    const poly = ORIENTATIONS.map(o => { const p = shotRadarPoint(o, radiusFor(spine[String(o)]), radarTop); return p.x + ',' + p.y; }).join(' ');
     const polygon = document.createElementNS(svgNS,'polygon');
     polygon.setAttribute('points', poly);
     polygon.setAttribute('fill', '#4a90d980'); polygon.setAttribute('stroke', '#4a90d9'); polygon.setAttribute('stroke-width', '2');
     svg.appendChild(polygon);
   }
   recorded.forEach(e => {
-    const p = shotRadarPoint(e.angle, radiusFor(e.val), rotateToTop);
+    const p = shotRadarPoint(e.angle, radiusFor(e.val), radarTop);
     const dot = document.createElementNS(svgNS,'circle');
     dot.setAttribute('cx', p.x); dot.setAttribute('cy', p.y); dot.setAttribute('r', 3);
     dot.setAttribute('fill', '#e8e6dd');
@@ -1337,7 +1363,8 @@ function openShotLogger(arrowId){
   activeOrientation = 0;
   editingShotId = null;
   modalTitle.textContent = 'Log shot — ' + arrow.arrowId;
-  modalSub.textContent = 'Pick the nock orientation and distance, tap the target to get close, then dial in the exact numbers.';
+  modalSub.textContent = '';
+  modalSub.style.display = 'none';
   orientChips.innerHTML = ORIENT_CCW_ORDER.map(o =>
     `<span class="orient-chip-wrap" data-wrap="${o}"><button class="chip${o===0?' active':''}" data-o="${o}">${fmtDeg(o)}</button></span>`
   ).join('');
