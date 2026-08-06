@@ -282,11 +282,11 @@
   }
   @keyframes recede-shaft{
     0%{transform:translate(0,0) scale(1); opacity:1;}
-    100%{transform:translate(221px,234.4px) scale(.22); opacity:.85;}
+    100%{transform:translate(132.6px,271px) scale(.22); opacity:.85;}
   }
   @keyframes recede-target{
     0%{transform:translate(0,0) scale(1); opacity:1;}
-    100%{transform:translate(132.6px,271px) scale(.22); opacity:.85;}
+    100%{transform:translate(221px,234.4px) scale(.22); opacity:.85;}
   }
   @keyframes recede-sight{
     0%{transform:translate(0,0) scale(1); opacity:1;}
@@ -303,13 +303,18 @@
   #scene-arrows{ animation: sceneIn 0.24s ease 0s forwards, recede-arrows 0.3s ease 1.2s forwards; }
   #scene-gauge{ animation: sceneIn 0.24s ease 1.5s forwards, recede-gauge 0.3s ease 2.7s forwards; }
   #scene-spine-results{ animation: sceneIn 0.24s ease 3s forwards, recede-spine-results 0.3s ease 4.2s forwards; }
-  #scene-shaft{ animation: sceneIn 0.24s ease 4.5s forwards, recede-shaft 0.3s ease 5.7s forwards; }
-  #scene-target{ animation: sceneIn 0.24s ease 6s forwards, recede-target 0.3s ease 7.2s forwards; }
+  #scene-target{ animation: sceneIn 0.24s ease 4.5s forwards, recede-target 0.3s ease 5.7s forwards; }
+  #scene-shaft{ animation: sceneIn 0.24s ease 6s forwards, recede-shaft 0.3s ease 7.2s forwards; }
   #scene-sight{ animation: sceneIn 0.24s ease 7.5s forwards, recede-sight 0.3s ease 8.7s forwards; }
   #scene-shot{ animation: sceneIn 0.24s ease 9s forwards, recede-shot 0.3s ease 10.2s forwards; }
-  #scene-data{ animation: sceneIn 0.24s ease 10.5s forwards, recede-data 0.3s ease 11.7s forwards; }
+  #scene-data{ animation: sceneIn 0.24s ease 10.5s forwards, recede-data 0.3s ease 12.2s forwards; }
 
-  .shaft-spin{ transform-origin:170px 190px; animation:shaftSpin 0.84s ease-in-out 4.68s forwards; }
+  .shaft-spin{ transform-origin:170px 190px; animation:shaftSpin 0.84s ease-in-out 6.18s forwards; }
+  .data-zoom{ transform-origin:170px 195px; animation:dataZoom 1.3s ease 10.74s forwards; }
+  @keyframes dataZoom{
+    0%{transform:scale(1);}
+    100%{transform:scale(1.28);}
+  }
   @keyframes shaftSpin{
     0%{transform:rotate(0deg);}
     55%{transform:rotate(240deg);}
@@ -317,7 +322,7 @@
   }
 
   .radar-mark{position:absolute; inset:0; width:100%; height:100%; overflow:visible;
-    opacity:0; animation:sceneIn 0.48s ease 12s forwards;}
+    opacity:0; animation:sceneIn 0.48s ease 12.5s forwards;}
   .radar-ring{fill:none; stroke:var(--line); stroke-width:1;}
   .radar-spoke{stroke:var(--line); stroke-width:1;}
   .radar-label{fill:var(--dim); font-size:7px; font-family:"SF Mono",ui-monospace,monospace; text-anchor:middle; dominant-baseline:middle;}
@@ -340,7 +345,7 @@
     100%{transform:rotate(22deg);}
   }
   .target-ring-solo{ opacity:0; transform:scale(1.15); transform-origin:170px 190px;
-    animation:targetSettle 0.84s cubic-bezier(.3,.7,.3,1) 6.18s forwards; }
+    animation:targetSettle 0.84s cubic-bezier(.3,.7,.3,1) 4.68s forwards; }
   @keyframes targetSettle{ to{opacity:1; transform:scale(1);} }
   .arrow-nock{ opacity:0; transform:translateY(14px); animation:arrowRise 0.36s ease forwards; }
   @keyframes arrowRise{to{opacity:1; transform:translateY(0);}}
@@ -376,17 +381,32 @@
     margin-top:16px;
     font-family:"SF Mono",ui-monospace,monospace;font-size:13px;letter-spacing:.2em;
     text-transform:uppercase;color:var(--dim);opacity:0;
-    animation:fadeup 0.36s ease 12.18s forwards;
+    animation:fadeup 0.36s ease 12.68s forwards;
   }
   #app-splash .wordmark b{color:var(--text);font-weight:650;letter-spacing:.05em;}
   @keyframes fadeup{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+  /* sound-wave graphic — appears alongside the wordmark, syncs with the voice line */
+  #app-splash .sound-wave{ opacity:0; margin-top:9px; animation:fadeup 0.3s ease 12.68s forwards; }
+  #app-splash .wave-bar{ fill:var(--accent); transform-origin:bottom; animation:waveBounce 0.6s ease-in-out 12.68s infinite; }
+  #app-splash .wave-bar:nth-child(2){animation-delay:12.72s;}
+  #app-splash .wave-bar:nth-child(3){animation-delay:12.76s;}
+  #app-splash .wave-bar:nth-child(4){animation-delay:12.8s;}
+  #app-splash .wave-bar:nth-child(5){animation-delay:12.84s;}
+  #app-splash .wave-bar:nth-child(6){animation-delay:12.88s;}
+  #app-splash .wave-bar:nth-child(7){animation-delay:12.92s;}
+  #app-splash .wave-bar:nth-child(8){animation-delay:12.96s;}
+  @keyframes waveBounce{
+    0%,100%{transform:scaleY(.4);}
+    50%{transform:scaleY(1);}
+  }
 
   #enter-btn{
     margin-top:22px; padding:12px 34px; border:none; border-radius:10px;
     background:var(--accent); color:#1a1408; font-size:14px; font-weight:700;
     letter-spacing:.08em; text-transform:uppercase; font-family:"SF Mono",ui-monospace,monospace;
     cursor:pointer; opacity:0; position:relative; min-width:150px;
-    animation:fadeup 0.3s ease 12.54s forwards;
+    animation:fadeup 0.3s ease 13.04s forwards;
   }
   #enter-btn:active{background:var(--accent-dim);}
   #enter-btn.loading{color:transparent; pointer-events:none;}
@@ -467,26 +487,37 @@
       <circle cx="170" cy="95" r="2.5" fill="var(--text)"/>
       <path class="instrument" d="M100,200 L260,200" />
       <path class="hand" d="M255,215 Q272,205 285,220 L280,255 Q265,265 250,250 Z" />
-      <text class="cap" x="170" y="375" text-anchor="middle">SPINE READING — 0.212"</text>
+      <text class="cap" x="170" y="375" text-anchor="middle">SPINE READING — 0.412"</text>
     </svg>
 
     <!-- BEAT 3: spine results — the reading from Beat 1 confirmed on a readout -->
     <svg id="scene-spine-results" class="scene" viewBox="0 0 340 400">
       <path class="hand" d="M90,300 Q60,270 75,235 L110,225 Q140,235 135,270 Z" />
       <rect class="readout-bg" x="95" y="150" width="150" height="95" rx="10" />
-      <text class="readout-text" x="170" y="192" font-size="24" text-anchor="middle">0.212"</text>
+      <text class="readout-text" x="170" y="192" font-size="24" text-anchor="middle">0.412"</text>
       <text class="cap" x="170" y="212" text-anchor="middle" style="fill:var(--dim)">SPINE — RECORDED</text>
       <path class="instrument" d="M80,247 L260,247" />
       <text class="cap" x="170" y="270" text-anchor="middle">MATCHED TO FLEET 6</text>
     </svg>
 
-    <!-- BEAT 4: arrow shaft — the real orientation graphic from this app's Log Shot screen,
+    <!-- BEAT 4: target — standalone reveal before aiming -->
+    <svg id="scene-target" class="scene" viewBox="0 0 340 400">
+      <g class="target-ring-solo">
+        <circle class="instrument" cx="170" cy="190" r="95" />
+        <circle class="instrument" cx="170" cy="190" r="68" />
+        <circle class="instrument-accent" cx="170" cy="190" r="40" />
+        <circle cx="170" cy="190" r="14" fill="var(--accent)" />
+      </g>
+      <text class="cap" x="170" y="320" text-anchor="middle">RANGE SET — 45yd</text>
+    </svg>
+
+    <!-- BEAT 5: arrow shaft — the real orientation graphic from this app's Log Shot screen,
          rotates 240° then back to 120° before receding onto the ring -->
     <svg id="scene-shaft" class="scene" viewBox="0 0 340 400">
       <g class="shaft-spin">
         <g transform="translate(70,60) scale(2)">
-          <!-- 3 vanes, evenly spaced 120° apart around the shaft center (50,65) -->
-          <path d="M50 2 L60 46 L50 40 L40 46 Z" fill="#c9c6ba"/>
+          <!-- 3 vanes, evenly spaced 120° apart around the shaft center (50,65) — all one color -->
+          <path d="M50 2 L60 46 L50 40 L40 46 Z" fill="#4a4a44"/>
           <path d="M50 2 L60 46 L50 40 L40 46 Z" fill="#4a4a44" transform="rotate(120 50 65)"/>
           <path d="M50 2 L60 46 L50 40 L40 46 Z" fill="#4a4a44" transform="rotate(240 50 65)"/>
           <circle cx="50" cy="65" r="26" fill="none" stroke="#1a1a17" stroke-width="4.5"/>
@@ -497,17 +528,6 @@
         </g>
       </g>
       <text class="cap" x="170" y="380" text-anchor="middle">ORIENTATION — NOCK VIEW</text>
-    </svg>
-
-    <!-- BEAT 5: target — standalone reveal before aiming -->
-    <svg id="scene-target" class="scene" viewBox="0 0 340 400">
-      <g class="target-ring-solo">
-        <circle class="instrument" cx="170" cy="190" r="95" />
-        <circle class="instrument" cx="170" cy="190" r="68" />
-        <circle class="instrument-accent" cx="170" cy="190" r="40" />
-        <circle cx="170" cy="190" r="14" fill="var(--accent)" />
-      </g>
-      <text class="cap" x="170" y="320" text-anchor="middle">RANGE SET — 45yd</text>
     </svg>
 
     <!-- BEAT 6: aim — sight picture down the riser at the target -->
@@ -542,25 +562,27 @@
       <text class="cap" x="170" y="380" text-anchor="middle">IMPACT</text>
     </svg>
 
-    <!-- BEAT 8: data analysis — iOS device grouping readout -->
+    <!-- BEAT 8: data analysis — iOS device grouping readout; zooms in larger, holds 2.0s -->
     <svg id="scene-data" class="scene" viewBox="0 0 340 400">
-      <path class="hand" d="M90,320 Q60,290 78,255 L115,245 Q145,258 138,292 Z" />
-      <rect class="readout-bg" x="80" y="120" width="180" height="150" rx="12" />
-      <g transform="translate(100,235)">
-        <rect class="data-bar" x="0"   y="-30" width="14" height="30" style="animation-delay:10.59s"/>
-        <rect class="data-bar" x="20"  y="-52" width="14" height="52" style="animation-delay:10.65s"/>
-        <rect class="data-bar" x="40"  y="-70" width="14" height="70" style="animation-delay:10.71s"/>
-        <rect class="data-bar" x="60"  y="-40" width="14" height="40" style="animation-delay:10.77s"/>
-        <rect class="data-bar" x="80"  y="-20" width="14" height="20" style="animation-delay:10.83s"/>
-        <rect class="data-bar" x="100" y="-34" width="14" height="34" style="animation-delay:10.89s"/>
-        <rect class="data-bar" x="120" y="-15" width="14" height="15" style="animation-delay:10.95s"/>
-        <line x1="0" y1="0" x2="140" y2="0" stroke="var(--line)" stroke-width="1"/>
+      <g class="data-zoom">
+        <path class="hand" d="M90,320 Q60,290 78,255 L115,245 Q145,258 138,292 Z" />
+        <rect class="readout-bg" x="80" y="120" width="180" height="150" rx="12" />
+        <g transform="translate(100,235)">
+          <rect class="data-bar" x="0"   y="-30" width="14" height="30" style="animation-delay:10.59s"/>
+          <rect class="data-bar" x="20"  y="-52" width="14" height="52" style="animation-delay:10.65s"/>
+          <rect class="data-bar" x="40"  y="-70" width="14" height="70" style="animation-delay:10.71s"/>
+          <rect class="data-bar" x="60"  y="-40" width="14" height="40" style="animation-delay:10.77s"/>
+          <rect class="data-bar" x="80"  y="-20" width="14" height="20" style="animation-delay:10.83s"/>
+          <rect class="data-bar" x="100" y="-34" width="14" height="34" style="animation-delay:10.89s"/>
+          <rect class="data-bar" x="120" y="-15" width="14" height="15" style="animation-delay:10.95s"/>
+          <line x1="0" y1="0" x2="140" y2="0" stroke="var(--line)" stroke-width="1"/>
+        </g>
+        <g class="magnifier">
+          <circle cx="150" cy="185" r="16" fill="none" stroke="var(--text)" stroke-width="2.5"/>
+          <line x1="161" y1="196" x2="172" y2="207" stroke="var(--text)" stroke-width="3" stroke-linecap="round"/>
+        </g>
+        <text class="cap" x="170" y="145" text-anchor="middle" style="fill:var(--danger)">ORIENTATION: 22.5°</text>
       </g>
-      <g class="magnifier">
-        <circle cx="150" cy="185" r="16" fill="none" stroke="var(--text)" stroke-width="2.5"/>
-        <line x1="161" y1="196" x2="172" y2="207" stroke="var(--text)" stroke-width="3" stroke-linecap="round"/>
-      </g>
-      <text class="cap" x="170" y="145" text-anchor="middle" style="fill:var(--danger)">ORIENTATION: 22.5°</text>
       <text class="cap" x="170" y="290" text-anchor="middle">ANALYZING GROUPING</text>
     </svg>
 
@@ -595,6 +617,16 @@
 
   </div>
   <div class="wordmark"><b>ArrowSpace</b> · Arrow Log</div>
+  <svg class="sound-wave" viewBox="0 0 60 20" width="60" height="20">
+    <rect class="wave-bar" x="0"  y="6" width="4" height="8"/>
+    <rect class="wave-bar" x="8"  y="2" width="4" height="16"/>
+    <rect class="wave-bar" x="16" y="8" width="4" height="4"/>
+    <rect class="wave-bar" x="24" y="0" width="4" height="20"/>
+    <rect class="wave-bar" x="32" y="4" width="4" height="12"/>
+    <rect class="wave-bar" x="40" y="7" width="4" height="6"/>
+    <rect class="wave-bar" x="48" y="3" width="4" height="14"/>
+    <rect class="wave-bar" x="56" y="6" width="4" height="8"/>
+  </svg>
   <button id="enter-btn" onclick="enterApp(this)">Enter Here</button>
 </div>
 <!-- ===================== END ADDED ===================== -->
@@ -1021,11 +1053,83 @@ function enterApp(btn){
   dots.className = 'btn-dots';
   dots.innerHTML = '<span></span><span></span><span></span>';
   btn.appendChild(dots);
+  playArrowSpaceVoice();
   setTimeout(() => {
     const splash = document.getElementById('app-splash');
     if (splash) splash.classList.add('hide');
   }, 650);
 }
+
+// ===================== ADDED: end-of-intro voice line =====================
+// Plays once, timed to the wordmark/sound-wave reveal (~12.68s into the sequence).
+// A deep, slowed-down "ArrowSpace" line via the browser's built-in speech synthesis,
+// layered with a low synthesized rumble for a mechanical, breathy quality — a stylized
+// approximation of a deep sci-fi voice, not a reproduction of any copyrighted character's
+// actual voice recording (that's outside what can be built here).
+let _splashAudioCtx = null;
+let _voiceoverPlayed = false;
+function getSplashAudioCtx(){
+  if (!_splashAudioCtx){
+    try{ _splashAudioCtx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){}
+  }
+  if (_splashAudioCtx && _splashAudioCtx.state === 'suspended'){
+    _splashAudioCtx.resume().catch(()=>{});
+  }
+  return _splashAudioCtx;
+}
+function playArrowSpaceVoice(){
+  if (_voiceoverPlayed) return;
+  _voiceoverPlayed = true;
+
+  // low mechanical rumble bed
+  try{
+    const ctx = getSplashAudioCtx();
+    if (ctx){
+      const now = ctx.currentTime;
+      const osc1 = ctx.createOscillator();
+      const osc2 = ctx.createOscillator();
+      const filter = ctx.createBiquadFilter();
+      const gain = ctx.createGain();
+      osc1.type = 'sawtooth'; osc1.frequency.setValueAtTime(70, now);
+      osc2.type = 'sine';     osc2.frequency.setValueAtTime(46, now);
+      filter.type = 'lowpass'; filter.frequency.setValueAtTime(320, now);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.16, now + 0.25);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.6);
+      osc1.connect(filter); osc2.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+      osc1.start(now); osc2.start(now);
+      osc1.stop(now + 1.7); osc2.stop(now + 1.7);
+    }
+  }catch(e){}
+
+  // spoken "ArrowSpace" — pitched low and slowed down
+  try{
+    if ('speechSynthesis' in window){
+      const say = () => {
+        const u = new SpeechSynthesisUtterance('ArrowSpace');
+        u.pitch = 0.1;
+        u.rate = 0.72;
+        u.volume = 1;
+        const voices = window.speechSynthesis.getVoices();
+        const deep = voices.find(v => /male|daniel|alex|fred|aaron|david/i.test(v.name)) || voices[0];
+        if (deep) u.voice = deep;
+        window.speechSynthesis.speak(u);
+      };
+      if (window.speechSynthesis.getVoices().length) say();
+      else window.speechSynthesis.onvoiceschanged = say;
+    }
+  }catch(e){}
+}
+(function(){
+  const splashEl = document.getElementById('app-splash');
+  if (splashEl){
+    // unlock the audio context on the first tap anywhere in the splash, so the
+    // auto-timed playback below isn't blocked by autoplay restrictions
+    splashEl.addEventListener('pointerdown', getSplashAudioCtx, { once: true });
+    setTimeout(playArrowSpaceVoice, 12680);
+  }
+})();
+// ===================== END ADDED: end-of-intro voice line =====================
 
 // Skip Intro is visible from the very start of the sequence (unlike Enter Here, which
 // only fades in once the ring/radar finish) -- jumps straight into the app, no delay.
