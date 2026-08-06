@@ -263,54 +263,51 @@
   @keyframes sceneIn{from{opacity:0;}to{opacity:1;}}
 
   /* Beat timing (seconds from load), CIRCLE MODE:
-     0.0-2.5    arrows            2.5-5.0    test bench (spine tester dial)
-     5.0-7.5    spine value       7.5-10.0   arrow shaft (rotates 240deg then back to 120deg)
-     10.0-12.5  target            12.5-15.0  aim
-     15.0-17.5  arrow flight      17.5-20.0  data analysis
-     20.0       radar chart fades into the center; wordmark + Enter Here button follow */
+     REVISION: the standalone target beat was removed, so the ring now forms from 7 beats
+     spaced evenly around the circle (360/7 ≈ 51.4deg apart) instead of 8 at 45deg apart.
+     0.0-1.5    arrows            1.5-3.0    test bench (spine tester dial)
+     3.0-4.5    spine value       4.5-6.0    arrow shaft (rotates 240deg then back to 120deg)
+     6.0-7.5    aim               7.5-9.0    arrow flight
+     9.0-11.0   data analysis
+     11.0       radar chart fades into the center; wordmark + Enter Here button follow */
   @keyframes recede-arrows{
     0%{transform:translate(0,0) scale(1); opacity:1;}
-    100%{transform:translate(132.6px,21px) scale(.22); opacity:.85;}
+    100%{transform:translate(128.2px,18.2px) scale(.22); opacity:.85;}
   }
   @keyframes recede-gauge{
     0%{transform:translate(0,0) scale(1); opacity:1;}
-    100%{transform:translate(221px,57.6px) scale(.22); opacity:.85;}
+    100%{transform:translate(229px,68.7px) scale(.22); opacity:.85;}
   }
   @keyframes recede-spine-results{
     0%{transform:translate(0,0) scale(1); opacity:1;}
-    100%{transform:translate(257.6px,146px) scale(.22); opacity:.85;}
+    100%{transform:translate(254px,168.1px) scale(.22); opacity:.85;}
   }
   @keyframes recede-shaft{
     0%{transform:translate(0,0) scale(1); opacity:1;}
-    100%{transform:translate(132.6px,271px) scale(.22); opacity:.85;}
-  }
-  @keyframes recede-target{
-    0%{transform:translate(0,0) scale(1); opacity:1;}
-    100%{transform:translate(221px,234.4px) scale(.22); opacity:.85;}
+    100%{transform:translate(186.4px,259.9px) scale(.22); opacity:.85;}
   }
   @keyframes recede-sight{
     0%{transform:translate(0,0) scale(1); opacity:1;}
-    100%{transform:translate(44.2px,234.4px) scale(.22); opacity:.85;}
+    100%{transform:translate(78.8px,259.9px) scale(.22); opacity:.85;}
   }
   @keyframes recede-shot{
     0%{transform:translate(0,0) scale(1); opacity:1;}
-    100%{transform:translate(7.6px,146px) scale(.22); opacity:.85;}
+    100%{transform:translate(11.7px,189px) scale(.22); opacity:.85;}
   }
   @keyframes recede-data{
     0%{transform:translate(0,0) scale(1); opacity:1;}
-    100%{transform:translate(44.2px,57.6px) scale(.22); opacity:.85;}
+    100%{transform:translate(35.7px,69.8px) scale(.22); opacity:.85;}
   }
   #scene-arrows{ animation: sceneIn 0.24s ease 0s forwards, recede-arrows 0.3s ease 1.2s forwards; }
   #scene-gauge{ animation: sceneIn 0.24s ease 1.5s forwards, recede-gauge 0.3s ease 2.7s forwards; }
   #scene-spine-results{ animation: sceneIn 0.24s ease 3s forwards, recede-spine-results 0.3s ease 4.2s forwards; }
-  #scene-target{ animation: sceneIn 0.24s ease 4.5s forwards, recede-target 0.3s ease 5.7s forwards; }
-  #scene-shaft{ animation: sceneIn 0.24s ease 6s forwards, recede-shaft 0.3s ease 7.2s forwards; }
-  #scene-sight{ animation: sceneIn 0.24s ease 7.5s forwards, recede-sight 0.3s ease 8.7s forwards; }
-  #scene-shot{ animation: sceneIn 0.24s ease 9s forwards, recede-shot 0.3s ease 10.2s forwards; }
-  #scene-data{ animation: sceneIn 0.24s ease 10.5s forwards, recede-data 0.3s ease 12.2s forwards; }
+  #scene-shaft{ animation: sceneIn 0.24s ease 4.5s forwards, recede-shaft 0.3s ease 5.7s forwards; }
+  #scene-sight{ animation: sceneIn 0.24s ease 6s forwards, recede-sight 0.3s ease 7.2s forwards; }
+  #scene-shot{ animation: sceneIn 0.24s ease 7.5s forwards, recede-shot 0.3s ease 8.7s forwards; }
+  #scene-data{ animation: sceneIn 0.24s ease 9s forwards, recede-data 0.3s ease 10.7s forwards; }
 
-  .shaft-spin{ transform-origin:170px 190px; animation:shaftSpin 0.84s ease-in-out 6.18s forwards; }
-  .data-zoom{ transform-origin:170px 195px; animation:dataZoom 1.3s ease 10.74s forwards; }
+  .shaft-spin{ transform-origin:170px 190px; animation:shaftSpin 0.84s ease-in-out 4.68s forwards; }
+  .data-zoom{ transform-origin:170px 195px; animation:dataZoom 1.3s ease 9.24s forwards; }
   @keyframes dataZoom{
     0%{transform:scale(1);}
     100%{transform:scale(1.28);}
@@ -322,7 +319,7 @@
   }
 
   .radar-mark{position:absolute; inset:0; width:100%; height:100%; overflow:visible;
-    opacity:0; animation:sceneIn 0.48s ease 12.5s forwards;}
+    opacity:0; animation:sceneIn 0.48s ease 11s forwards;}
   .radar-ring{fill:none; stroke:var(--line); stroke-width:1;}
   .radar-spoke{stroke:var(--line); stroke-width:1;}
   .radar-label{fill:var(--dim); font-size:7px; font-family:"SF Mono",ui-monospace,monospace; text-anchor:middle; dominant-baseline:middle;}
@@ -344,24 +341,36 @@
     60%{transform:rotate(35deg);}
     100%{transform:rotate(22deg);}
   }
-  .target-ring-solo{ opacity:0; transform:scale(1.15); transform-origin:170px 190px;
-    animation:targetSettle 0.84s cubic-bezier(.3,.7,.3,1) 4.68s forwards; }
-  @keyframes targetSettle{ to{opacity:1; transform:scale(1);} }
   .arrow-nock{ opacity:0; transform:translateY(14px); animation:arrowRise 0.36s ease forwards; }
   @keyframes arrowRise{to{opacity:1; transform:translateY(0);}}
-  .sight-ring{ transform-origin:170px 190px; animation:sightSettle 0.78s cubic-bezier(.3,.7,.3,1) 7.68s forwards; }
+  /* REVISION: sort the fanned arrows by nock color once they've risen in, sliding each one
+     into a slot next to its same-colored neighbors -- accent (orange) group first, then the
+     text (white) group. Runs after the rise-in and finishes before Beat 1 recedes (1.2s). */
+  .arrow-sort{ animation-fill-mode:forwards; animation-timing-function:cubic-bezier(.3,.7,.3,1);
+    animation-duration:0.55s; animation-delay:0.4s; }
+  .arrow-sort-1{ animation-name:arrowSort1; }
+  .arrow-sort-2{ animation-name:arrowSort2; }
+  .arrow-sort-3{ animation-name:arrowSort3; }
+  .arrow-sort-4{ animation-name:arrowSort4; }
+  .arrow-sort-5{ animation-name:arrowSort5; }
+  @keyframes arrowSort1{ from{transform:translateX(0);} to{transform:translateX(0);} }
+  @keyframes arrowSort2{ from{transform:translateX(0);} to{transform:translateX(100px);} }
+  @keyframes arrowSort3{ from{transform:translateX(0);} to{transform:translateX(-50px);} }
+  @keyframes arrowSort4{ from{transform:translateX(0);} to{transform:translateX(45px);} }
+  @keyframes arrowSort5{ from{transform:translateX(0);} to{transform:translateX(-95px);} }
+  .sight-ring{ transform-origin:170px 190px; animation:sightSettle 0.78s cubic-bezier(.3,.7,.3,1) 6.18s forwards; }
   @keyframes sightSettle{
     0%{transform:translate(-18px,-10px);}
     100%{transform:translate(0,0);}
   }
-  .pov-shaft{ transform-origin:170px 380px; animation:shaftRush 0.72s cubic-bezier(.3,.6,.3,1) 9.18s forwards; }
+  .pov-shaft{ transform-origin:170px 380px; animation:shaftRush 0.72s cubic-bezier(.3,.6,.3,1) 7.68s forwards; }
   @keyframes shaftRush{
     0%{transform:scale(1); opacity:1;}
     100%{transform:scale(2.6); opacity:0;}
   }
   #app-splash .impact-flash{
     fill:var(--accent); opacity:0; transform-origin:170px 130px;
-    animation:impactFlash 0.3s ease 9.78s forwards;
+    animation:impactFlash 0.3s ease 8.28s forwards;
   }
   @keyframes impactFlash{
     0%{opacity:0; transform:scale(.2);}
@@ -370,7 +379,7 @@
   }
   #app-splash .data-bar{fill:var(--accent-dim); opacity:0; transform-origin:bottom; animation:barGrow 0.36s ease forwards;}
   @keyframes barGrow{from{opacity:0; transform:scaleY(0);} to{opacity:1; transform:scaleY(1);}}
-  .magnifier{ animation:magSweep 0.78s ease-in-out 10.74s forwards; opacity:0; }
+  .magnifier{ animation:magSweep 0.78s ease-in-out 9.24s forwards; opacity:0; }
   @keyframes magSweep{
     0%{opacity:0; transform:translateX(-30px);}
     15%{opacity:1;}
@@ -381,21 +390,25 @@
     margin-top:16px;
     font-family:"SF Mono",ui-monospace,monospace;font-size:13px;letter-spacing:.2em;
     text-transform:uppercase;color:var(--dim);opacity:0;
-    animation:fadeup 0.36s ease 12.68s forwards;
+    animation:fadeup 0.36s ease 11.18s forwards;
   }
   #app-splash .wordmark b{color:var(--text);font-weight:650;letter-spacing:.05em;}
   @keyframes fadeup{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
 
   /* sound-wave graphic — appears alongside the wordmark, syncs with the voice line */
-  #app-splash .sound-wave{ opacity:0; margin-top:9px; animation:fadeup 0.3s ease 12.68s forwards; }
-  #app-splash .wave-bar{ fill:var(--accent); transform-origin:bottom; animation:waveBounce 0.6s ease-in-out 12.68s infinite; }
-  #app-splash .wave-bar:nth-child(2){animation-delay:12.72s;}
-  #app-splash .wave-bar:nth-child(3){animation-delay:12.76s;}
-  #app-splash .wave-bar:nth-child(4){animation-delay:12.8s;}
-  #app-splash .wave-bar:nth-child(5){animation-delay:12.84s;}
-  #app-splash .wave-bar:nth-child(6){animation-delay:12.88s;}
-  #app-splash .wave-bar:nth-child(7){animation-delay:12.92s;}
-  #app-splash .wave-bar:nth-child(8){animation-delay:12.96s;}
+  #app-splash .sound-wave{ opacity:0; margin-top:9px; animation:fadeup 0.3s ease 11.18s forwards; }
+  /* REVISION: the bars' bounce now starts at 12s, matching the voice line's new start time
+     (after the ring, radar, wordmark AND buttons have all finished appearing) instead of
+     bouncing before the audio actually begins. The wordmark/waveform shape itself still
+     fades in earlier at 11.18s (via .sound-wave below), just static until the bounce kicks in. */
+  #app-splash .wave-bar{ fill:var(--accent); transform-origin:bottom; animation:waveBounce 0.6s ease-in-out 12s infinite; }
+  #app-splash .wave-bar:nth-child(2){animation-delay:12.04s;}
+  #app-splash .wave-bar:nth-child(3){animation-delay:12.08s;}
+  #app-splash .wave-bar:nth-child(4){animation-delay:12.12s;}
+  #app-splash .wave-bar:nth-child(5){animation-delay:12.16s;}
+  #app-splash .wave-bar:nth-child(6){animation-delay:12.2s;}
+  #app-splash .wave-bar:nth-child(7){animation-delay:12.24s;}
+  #app-splash .wave-bar:nth-child(8){animation-delay:12.28s;}
   @keyframes waveBounce{
     0%,100%{transform:scaleY(.4);}
     50%{transform:scaleY(1);}
@@ -406,10 +419,21 @@
     background:var(--accent); color:#1a1408; font-size:14px; font-weight:700;
     letter-spacing:.08em; text-transform:uppercase; font-family:"SF Mono",ui-monospace,monospace;
     cursor:pointer; opacity:0; position:relative; min-width:150px;
-    animation:fadeup 0.3s ease 13.04s forwards;
+    animation:fadeup 0.3s ease 11.54s forwards;
   }
   #enter-btn:active{background:var(--accent-dim);}
   #enter-btn.loading{color:transparent; pointer-events:none;}
+  /* REVISION: Replay button -- speechSynthesis often gets blocked on the very first
+     auto-timed play (no user gesture yet), so this lets the person re-trigger the
+     "Arrow...Space Axis Finder" line + rumble on demand once the button row is visible. */
+  #replay-btn{
+    margin-top:10px; padding:8px 20px; border-radius:20px;
+    background:transparent; color:var(--dim); border:1px solid var(--line);
+    font-size:11.5px; font-weight:600; letter-spacing:.08em; text-transform:uppercase;
+    font-family:"SF Mono",ui-monospace,monospace; cursor:pointer;
+    opacity:0; animation:fadeup 0.3s ease 11.54s forwards;
+  }
+  #replay-btn:active{color:var(--accent); border-color:var(--accent);}
   #enter-btn .btn-dots{
     position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); display:flex; gap:5px;
   }
@@ -463,16 +487,29 @@
     <!-- BEAT 1: arrows — glancing down at arrows fanned in quiver -->
     <svg id="scene-arrows" class="scene" viewBox="0 0 340 400">
       <g>
-        <line class="arrow-nock" x1="110" y1="330" x2="95" y2="140" stroke="var(--dim)" stroke-width="3" style="animation-delay:0.012s"/>
-        <polygon class="arrow-nock" points="95,140 88,150 102,150" fill="var(--accent)" style="animation-delay:0.012s"/>
-        <line class="arrow-nock" x1="150" y1="335" x2="140" y2="110" stroke="var(--dim)" stroke-width="3" style="animation-delay:0.06s"/>
-        <polygon class="arrow-nock" points="140,110 132,121 148,121" fill="var(--text)" style="animation-delay:0.06s"/>
-        <line class="arrow-nock" x1="190" y1="335" x2="190" y2="100" stroke="var(--dim)" stroke-width="3" style="animation-delay:0.108s"/>
-        <polygon class="arrow-nock" points="190,100 182,112 198,112" fill="var(--accent)" style="animation-delay:0.108s"/>
-        <line class="arrow-nock" x1="230" y1="330" x2="240" y2="110" stroke="var(--dim)" stroke-width="3" style="animation-delay:0.156s"/>
-        <polygon class="arrow-nock" points="240,110 232,121 248,121" fill="var(--text)" style="animation-delay:0.156s"/>
-        <line class="arrow-nock" x1="265" y1="325" x2="285" y2="140" stroke="var(--dim)" stroke-width="3" style="animation-delay:0.204s"/>
-        <polygon class="arrow-nock" points="285,140 278,150 292,150" fill="var(--accent)" style="animation-delay:0.204s"/>
+        <!-- REVISION: each arrow now lives in its own group (arrow-sort-N) so it can slide
+             sideways into color-sorted order after it rises in -- accent (orange) nocks group
+             to the left, text (white) nocks group to the right. -->
+        <g class="arrow-sort arrow-sort-1">
+          <line class="arrow-nock" x1="110" y1="330" x2="95" y2="140" stroke="var(--dim)" stroke-width="3" style="animation-delay:0.012s"/>
+          <polygon class="arrow-nock" points="95,140 88,150 102,150" fill="var(--accent)" style="animation-delay:0.012s"/>
+        </g>
+        <g class="arrow-sort arrow-sort-2">
+          <line class="arrow-nock" x1="150" y1="335" x2="140" y2="110" stroke="var(--dim)" stroke-width="3" style="animation-delay:0.06s"/>
+          <polygon class="arrow-nock" points="140,110 132,121 148,121" fill="var(--text)" style="animation-delay:0.06s"/>
+        </g>
+        <g class="arrow-sort arrow-sort-3">
+          <line class="arrow-nock" x1="190" y1="335" x2="190" y2="100" stroke="var(--dim)" stroke-width="3" style="animation-delay:0.108s"/>
+          <polygon class="arrow-nock" points="190,100 182,112 198,112" fill="var(--accent)" style="animation-delay:0.108s"/>
+        </g>
+        <g class="arrow-sort arrow-sort-4">
+          <line class="arrow-nock" x1="230" y1="330" x2="240" y2="110" stroke="var(--dim)" stroke-width="3" style="animation-delay:0.156s"/>
+          <polygon class="arrow-nock" points="240,110 232,121 248,121" fill="var(--text)" style="animation-delay:0.156s"/>
+        </g>
+        <g class="arrow-sort arrow-sort-5">
+          <line class="arrow-nock" x1="265" y1="325" x2="285" y2="140" stroke="var(--dim)" stroke-width="3" style="animation-delay:0.204s"/>
+          <polygon class="arrow-nock" points="285,140 278,150 292,150" fill="var(--accent)" style="animation-delay:0.204s"/>
+        </g>
       </g>
       <path class="hand" d="M70,360 Q170,385 285,358 L285,375 Q170,398 70,378 Z" />
       <text class="cap" x="170" y="30" text-anchor="middle">SELECTING SHAFT — FLEET 6</text>
@@ -500,18 +537,11 @@
       <text class="cap" x="170" y="270" text-anchor="middle">MATCHED TO FLEET 6</text>
     </svg>
 
-    <!-- BEAT 4: target — standalone reveal before aiming -->
-    <svg id="scene-target" class="scene" viewBox="0 0 340 400">
-      <g class="target-ring-solo">
-        <circle class="instrument" cx="170" cy="190" r="95" />
-        <circle class="instrument" cx="170" cy="190" r="68" />
-        <circle class="instrument-accent" cx="170" cy="190" r="40" />
-        <circle cx="170" cy="190" r="14" fill="var(--accent)" />
-      </g>
-      <text class="cap" x="170" y="320" text-anchor="middle">RANGE SET — 45yd</text>
-    </svg>
+    <!-- REVISION: the standalone "target" beat (formerly Beat 4, plain range-set reveal) was
+         removed per request -- the target still appears later inside Beat 6 (aim) and the
+         live app itself, so nothing is lost, just the redundant solo beat. -->
 
-    <!-- BEAT 5: arrow shaft — the real orientation graphic from this app's Log Shot screen,
+    <!-- BEAT 4 (was 5): arrow shaft — the real orientation graphic from this app's Log Shot screen,
          rotates 240° then back to 120° before receding onto the ring -->
     <svg id="scene-shaft" class="scene" viewBox="0 0 340 400">
       <g class="shaft-spin">
@@ -530,7 +560,7 @@
       <text class="cap" x="170" y="380" text-anchor="middle">ORIENTATION — NOCK VIEW</text>
     </svg>
 
-    <!-- BEAT 6: aim — sight picture down the riser at the target -->
+    <!-- BEAT 5 (was 6): aim — sight picture down the riser at the target -->
     <svg id="scene-sight" class="scene" viewBox="0 0 340 400">
       <circle class="instrument" cx="170" cy="190" r="95" />
       <circle class="instrument" cx="170" cy="190" r="68" />
@@ -548,7 +578,7 @@
       <text class="cap" x="170" y="380" text-anchor="middle">AIM — FULL DRAW</text>
     </svg>
 
-    <!-- BEAT 7: impact — release, POV rushing down the shaft toward the target -->
+    <!-- BEAT 6 (was 7): impact — release, POV rushing down the shaft toward the target -->
     <svg id="scene-shot" class="scene" viewBox="0 0 340 400">
       <circle class="instrument" cx="170" cy="130" r="70" />
       <circle class="instrument" cx="170" cy="130" r="48" />
@@ -562,19 +592,19 @@
       <text class="cap" x="170" y="380" text-anchor="middle">IMPACT</text>
     </svg>
 
-    <!-- BEAT 8: data analysis — iOS device grouping readout; zooms in larger, holds 2.0s -->
+    <!-- BEAT 7 (was 8): data analysis — iOS device grouping readout; zooms in larger, holds 2.0s -->
     <svg id="scene-data" class="scene" viewBox="0 0 340 400">
       <g class="data-zoom">
         <path class="hand" d="M90,320 Q60,290 78,255 L115,245 Q145,258 138,292 Z" />
         <rect class="readout-bg" x="80" y="120" width="180" height="150" rx="12" />
         <g transform="translate(100,235)">
-          <rect class="data-bar" x="0"   y="-30" width="14" height="30" style="animation-delay:10.59s"/>
-          <rect class="data-bar" x="20"  y="-52" width="14" height="52" style="animation-delay:10.65s"/>
-          <rect class="data-bar" x="40"  y="-70" width="14" height="70" style="animation-delay:10.71s"/>
-          <rect class="data-bar" x="60"  y="-40" width="14" height="40" style="animation-delay:10.77s"/>
-          <rect class="data-bar" x="80"  y="-20" width="14" height="20" style="animation-delay:10.83s"/>
-          <rect class="data-bar" x="100" y="-34" width="14" height="34" style="animation-delay:10.89s"/>
-          <rect class="data-bar" x="120" y="-15" width="14" height="15" style="animation-delay:10.95s"/>
+          <rect class="data-bar" x="0"   y="-30" width="14" height="30" style="animation-delay:9.09s"/>
+          <rect class="data-bar" x="20"  y="-52" width="14" height="52" style="animation-delay:9.15s"/>
+          <rect class="data-bar" x="40"  y="-70" width="14" height="70" style="animation-delay:9.21s"/>
+          <rect class="data-bar" x="60"  y="-40" width="14" height="40" style="animation-delay:9.27s"/>
+          <rect class="data-bar" x="80"  y="-20" width="14" height="20" style="animation-delay:9.33s"/>
+          <rect class="data-bar" x="100" y="-34" width="14" height="34" style="animation-delay:9.39s"/>
+          <rect class="data-bar" x="120" y="-15" width="14" height="15" style="animation-delay:9.45s"/>
           <line x1="0" y1="0" x2="140" y2="0" stroke="var(--line)" stroke-width="1"/>
         </g>
         <g class="magnifier">
@@ -586,7 +616,8 @@
       <text class="cap" x="170" y="290" text-anchor="middle">ANALYZING GROUPING</text>
     </svg>
 
-    <!-- radar chart — fades into the empty center once all 8 points form the ring -->
+    <!-- radar chart — fades into the empty center once all 7 points form the ring
+         (this diagram's own 8-spoke layout is independent of the beat count above) -->
     <svg class="radar-mark" viewBox="0 0 340 400">
       <g transform="translate(170,190)">
         <circle class="radar-ring" r="18"/>
@@ -616,7 +647,7 @@
     </svg>
 
   </div>
-  <div class="wordmark"><b>ArrowSpace</b> · Arrow Log</div>
+  <div class="wordmark"><b>Arrow-space</b> Axis Finder</div>
   <svg class="sound-wave" viewBox="0 0 60 20" width="60" height="20">
     <rect class="wave-bar" x="0"  y="6" width="4" height="8"/>
     <rect class="wave-bar" x="8"  y="2" width="4" height="16"/>
@@ -628,6 +659,7 @@
     <rect class="wave-bar" x="56" y="6" width="4" height="8"/>
   </svg>
   <button id="enter-btn" onclick="enterApp(this)">Enter Here</button>
+  <button id="replay-btn" onclick="replayVoice()">&#9658; Replay sound</button>
 </div>
 <!-- ===================== END ADDED ===================== -->
 
@@ -1062,10 +1094,13 @@ function enterApp(btn){
 
 // ===================== ADDED: end-of-intro voice line =====================
 // Plays once, timed to the wordmark/sound-wave reveal (~12.68s into the sequence).
-// A deep, slowed-down "ArrowSpace" line via the browser's built-in speech synthesis,
-// layered with a low synthesized rumble for a mechanical, breathy quality — a stylized
-// approximation of a deep sci-fi voice, not a reproduction of any copyrighted character's
-// actual voice recording (that's outside what can be built here).
+// A deep, slowed-down "Arrow (pause) Space Axis Finder" line via the browser's built-in
+// speech synthesis, layered with a low synthesized rumble for a mechanical, breathy quality —
+// a stylized approximation of a deep sci-fi voice, not a reproduction of any copyrighted
+// character's actual voice recording (that's outside what can be built here).
+// REVISION: the "Arrow ... Space" portion is now spoken as its own slowed-down utterance
+// (with a beat of silence baked in via the ellipsis) before "Axis Finder" follows at a
+// closer-to-normal pace, so the full line runs noticeably longer than the old "ArrowSpace".
 let _splashAudioCtx = null;
 let _voiceoverPlayed = false;
 function getSplashAudioCtx(){
@@ -1102,18 +1137,31 @@ function playArrowSpaceVoice(){
     }
   }catch(e){}
 
-  // spoken "ArrowSpace" — pitched low and slowed down
+  // spoken "Arrow (pause) Space Axis Finder" — pitched low, "Arrow ... Space" slowed down
+  // further than "Axis Finder" so the whole line stretches out and reads as two beats.
   try{
     if ('speechSynthesis' in window){
       const say = () => {
-        const u = new SpeechSynthesisUtterance('ArrowSpace');
-        u.pitch = 0.1;
-        u.rate = 0.72;
-        u.volume = 1;
         const voices = window.speechSynthesis.getVoices();
         const deep = voices.find(v => /male|daniel|alex|fred|aaron|david/i.test(v.name)) || voices[0];
-        if (deep) u.voice = deep;
-        window.speechSynthesis.speak(u);
+
+        // "Arrow ... Space" -- extra-slow, with the ellipsis giving a held pause between the two words
+        const u1 = new SpeechSynthesisUtterance('Arrow... Space');
+        u1.pitch = 0.1;
+        u1.rate = 0.55;
+        u1.volume = 1;
+        if (deep) u1.voice = deep;
+
+        // "Axis Finder" -- still slow/deep, but closer to normal pace than the first half
+        const u2 = new SpeechSynthesisUtterance('Axis Finder');
+        u2.pitch = 0.1;
+        u2.rate = 0.85;
+        u2.volume = 1;
+        if (deep) u2.voice = deep;
+
+        // queued in order -- speechSynthesis plays queued utterances back-to-back
+        window.speechSynthesis.speak(u1);
+        window.speechSynthesis.speak(u2);
       };
       if (window.speechSynthesis.getVoices().length) say();
       else window.speechSynthesis.onvoiceschanged = say;
@@ -1126,9 +1174,23 @@ function playArrowSpaceVoice(){
     // unlock the audio context on the first tap anywhere in the splash, so the
     // auto-timed playback below isn't blocked by autoplay restrictions
     splashEl.addEventListener('pointerdown', getSplashAudioCtx, { once: true });
-    setTimeout(playArrowSpaceVoice, 12680);
+    // REVISION: pushed from 11180ms so the voice line starts only once the whole intro
+    // sequence (ring, radar, wordmark, and the Enter Here / Replay buttons) has fully
+    // finished appearing, instead of firing partway through that reveal.
+    setTimeout(playArrowSpaceVoice, 12000);
   }
 })();
+
+// REVISION: Replay button — the auto-timed play above can get silently blocked by browsers
+// that require a user gesture before speechSynthesis/AudioContext will make sound, which is
+// likely why it wasn't heard. This re-triggers the same rumble + "Arrow...Space Axis Finder"
+// line on a real click, which always counts as a user gesture.
+function replayVoice(){
+  try{ window.speechSynthesis && window.speechSynthesis.cancel(); }catch(e){}
+  _voiceoverPlayed = false;
+  getSplashAudioCtx();
+  playArrowSpaceVoice();
+}
 // ===================== END ADDED: end-of-intro voice line =====================
 
 // Skip Intro is visible from the very start of the sequence (unlike Enter Here, which
