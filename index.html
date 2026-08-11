@@ -1217,7 +1217,7 @@ function playIntroRumble(){
     }
   }catch(e){}
 }
-// "Unkie's Favorite ArrowSpace Axis Finder" -- one utterance, normal rate/pitch (no artificial slow-down),
+// "The Worlds First ArrowSpace Axis Finder" -- one utterance, normal rate/pitch (no artificial slow-down),
 // not gated behind getVoices() resolving (some Chrome builds never fire 'voiceschanged').
 function playIntroVoice(){
   if (_voicePlayed) return;
@@ -1227,7 +1227,7 @@ function playIntroVoice(){
     if ('speechSynthesis' in window){
       window.speechSynthesis.cancel();
       const deep = getDeepVoice();
-      const u = new SpeechSynthesisUtterance('Unkies Favorite ArrowSpace Axis Finder');
+      const u = new SpeechSynthesisUtterance('The Worlds First Ever ArrowSpace Axis Finder');
       u.pitch = 1;
       u.rate = 1;
       u.volume = 1;
