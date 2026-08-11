@@ -751,7 +751,7 @@
 <!-- ===================== END ADDED ===================== -->
 
 <header>
-  <div class="eyebrow">Arrow Tracker · v2.4.24</div>
+  <div class="eyebrow">Arrow Tracker · v2.4.26</div>
   <h1>ArrowSpace</h1>
   <p>Log each shaft's specs, then log shots by orientation to see what's actually working.</p>
 </header>
@@ -831,19 +831,19 @@
       <button class="btn btn-ghost btn-sm" id="restore-btn">Restore from backup</button>
     </div>
     <input type="file" id="restore-file" accept="application/json" style="display:none;">
-    <p class="hint">Full backup saves every arrow (spine/mass/point/notes) and every shot to one file — the only way to recover your fleet if this browser's storage is ever cleared. Worth doing after any real logging session.</p>
+    <p class="hint">Backup saves arrow (spine/mass/point/notes) and shots — the only way to recover your fleet if this browser's storage is cleared.</p>
   </div>
   </div>
   <div id="view-workspace" class="view" style="display:none;">
     <div class="panel" style="padding-bottom:14px;">
-      <button class="btn btn-ghost btn-sm" id="ws-back-btn" style="margin-bottom:12px;">&larr; Back to Arrows</button>
+      <button class="btn btn-ghost btn-sm" id="ws-back-btn" style="margin-bottom:12px;">&larr; Back 2 Arrows</button>
       <h2 style="margin-bottom:10px;" id="ws-arrow-title">Arrow</h2>
       <div class="field">
         <label for="ws-arrow-select">Switch arrow</label>
         <select id="ws-arrow-select"></select>
       </div>
       <div class="segmented" id="ws-mode-toggle">
-        <button type="button" class="active" data-mode="bench">Bench Test</button>
+        <button type="button" class="active" data-mode="bench">BenchTest</button>
         <button type="button" data-mode="shot">Log Shot</button>
       </div>
     </div>
@@ -854,7 +854,7 @@
         <div class="field">
           <label for="lab-id-select">Arrow ID</label>
           <select id="lab-id-select">
-            <option value="">Select an arrow…</option>
+            <option value="">Select arrow…</option>
           </select>
         </div>
       </div>
@@ -869,7 +869,7 @@
         <label for="lab-baseline">0&deg; baseline spine (in)</label>
         <input id="lab-baseline" type="number" inputmode="decimal" step="0.001" placeholder="0.595">
       </div>
-      <p class="hint">Spin the shaft to find its weakest axis, measure with calipers, set that as 0&deg; here, and zero the dial indicator there.</p>
+      <p class="hint">Find the weakest axis, measure, set that as 0&deg; here, and zero the dial indicator there.</p>
       <button class="btn btn-primary" id="lab-start-btn" style="margin-top:6px;">Start / resume wizard</button>
     </div>
     <div class="panel" id="lab-wizard-panel" style="display:none;">
@@ -893,15 +893,15 @@
           <svg class="target" id="lab-radar-svg" width="220" height="220" viewBox="0 0 260 260"></svg>
         </div>
       </div>
-      <p class="target-hint" id="lab-dial-caption">Enter a dial reading to see the calculated spine.</p>
+      <p class="target-hint" id="lab-dial-caption">Enter the reading to see the calculated spine.</p>
       <p class="target-hint" id="lab-radar-caption" style="margin-top:-12px;">Left: this reading. Right: the whole shaft's spine pattern so far.</p>
       <div id="lab-add-reading-wrap">
         <div class="row2">
           <div class="field" style="margin-bottom:0;">
             <label>Dial direction</label>
             <div class="chip-row" id="lab-dir-chips" style="margin-bottom:0;">
-              <button type="button" class="chip active" data-dir="cw">Clockwise (stiffer)</button>
-              <button type="button" class="chip" data-dir="ccw">Counter-clockwise (weaker)</button>
+              <button type="button" class="chip active" data-dir="cw">CW readings (stiffer)</button>
+              <button type="button" class="chip" data-dir="ccw">CCW readings (weaker)</button>
             </div>
           </div>
           <div class="field" style="margin-bottom:0;">
@@ -1069,7 +1069,7 @@
         </div>
         <svg class="target" id="target-svg" width="190" height="190" viewBox="0 0 260 260" style="flex:none;"></svg>
       </div>
-      <p class="target-hint">Tap the target to get close, then dial in the exact numbers below.</p>
+      <p class="target-hint">Tap target face, enter numbers for precision.</p>
       <div class="row2">
         <div class="field">
           <label>LR direction</label>
@@ -1096,24 +1096,24 @@
           <input id="f-ud-mag" type="number" inputmode="numeric" step="1" min="0" placeholder="e.g. 6">
         </div>
       </div>
-      <p class="hint" style="margin-top:-8px;">Distance from point of aim, in the same 3/16" squares you already use on the graph paper. Tap the direction, type the number — no minus sign needed.</p>
+      <p class="hint" style="margin-top:-8px;">Distance from point of aim, in the same 3/16" squares on the graph paper. Tap the direction, type the number — no minus sign needed.</p>
       <button class="btn btn-primary" id="log-shot-btn" style="margin-top:10px;">Log shot</button>
       <div class="field-row" style="margin-top:16px; margin-bottom:14px;">
         <div class="field">
-          <label for="f-radius">Target radius shown above (in)</label>
+          <label for="f-radius">Target radius above (in)</label>
           <input id="f-radius" type="number" inputmode="decimal" step="0.5" placeholder="6">
         </div>
       </div>
-      <p class="hint" style="margin-top:-8px; margin-bottom:14px;">The real-world radius this target graphic represents (e.g. scoring ring radius on your paper). Used to scale where your typed coordinates land on the visual, and to convert them to inches for export. Saved for next time.</p>
+      <p class="hint" style="margin-top:-8px; margin-bottom:14px;">The actual radius this target graphic represents (e.g. scoring ring radius on your paper). Used to scale where your typed coordinates land on the visual, and to convert them to inches for export. Saved for next time.</p>
       <div class="rec-panel" id="rec-panel" style="display:none;">
         <div style="display:flex; gap:16px;">
           <div style="flex:1;">
-            <div class="rec-label" style="font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--ok); font-family:'SF Mono',ui-monospace,monospace;">Recommended orientation</div>
+            <div class="rec-label" style="font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--ok); font-family:'SF Mono',ui-monospace,monospace;">Most stable axis</div>
             <div class="rec-orient" id="rec-orient">—</div>
             <div class="rec-conf" id="rec-conf">—</div>
           </div>
           <div style="flex:1;" id="rec-worst-wrap">
-            <div class="rec-label" style="font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--danger); font-family:'SF Mono',ui-monospace,monospace;">Worst orientation</div>
+            <div class="rec-label" style="font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--danger); font-family:'SF Mono',ui-monospace,monospace;">Leaset stable axis</div>
             <div class="rec-orient" id="rec-worst-orient" style="color:var(--danger);">—</div>
             <div class="rec-conf" id="rec-worst-conf">—</div>
           </div>
@@ -1217,7 +1217,7 @@ function playIntroRumble(){
     }
   }catch(e){}
 }
-// "ArrowSpace Axis Finder" -- one utterance, normal rate/pitch (no artificial slow-down),
+// "Unkie's Favorite ArrowSpace Axis Finder" -- one utterance, normal rate/pitch (no artificial slow-down),
 // not gated behind getVoices() resolving (some Chrome builds never fire 'voiceschanged').
 function playIntroVoice(){
   if (_voicePlayed) return;
@@ -1227,7 +1227,7 @@ function playIntroVoice(){
     if ('speechSynthesis' in window){
       window.speechSynthesis.cancel();
       const deep = getDeepVoice();
-      const u = new SpeechSynthesisUtterance('ArrowSpace Axis Finder');
+      const u = new SpeechSynthesisUtterance('Unkies Favorite ArrowSpace Axis Finder');
       u.pitch = 1;
       u.rate = 1;
       u.volume = 1;
